@@ -1,0 +1,43 @@
+h1{
+color:#F8F4F0;
+margin-bottom:20px;
+}
+
+h2{
+color:#B19F91;
+margin-top:30px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+background:#2A2A2A;
+margin-top:10px;
+}
+
+th{
+background:#343434;
+color:#F8F4F0;
+padding:10px;
+border:1px solid #484948;
+}
+
+td{
+padding:10px;
+border:1px solid #484948;
+color:#F8F4F0;
+}
+
+button{
+background:#C8A97E;
+color:#1C1C1C;
+border:none;
+padding:6px 12px;
+margin-right:5px;
+border-radius:5px;
+cursor:pointer;
+}
+
+button:hover{
+opacity:0.9;
+}

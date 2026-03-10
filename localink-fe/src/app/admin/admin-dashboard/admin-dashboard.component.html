@@ -1,0 +1,45 @@
+<h1>Admin Dashboard</h1>
+
+<h2>Pending Business Approvals</h2>
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Category</th>
+    <th>Contact</th>
+    <th>Actions</th>
+  </tr>
+
+  <tr *ngFor="let business of pendingBusinesses">
+    <td>{{ business.name }}</td>
+    <td>{{ business.category }}</td>
+    <td>{{ business.contact }}</td>
+
+    <td>
+      <button (click)="approve(business.id)">Approve</button>
+      <button (click)="reject(business.id)">Reject</button>
+    </td>
+  </tr>
+</table>
+
+
+<h2>All Businesses</h2>
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Status</th>
+    <th>Category</th>
+    <th>Action</th>
+  </tr>
+
+  <tr *ngFor="let business of allBusinesses">
+    <td>{{ business.name }}</td>
+    <td>{{ business.status }}</td>
+    <td>{{ business.category }}</td>
+
+    <td>
+      <button (click)="deactivate(business.id)">Deactivate</button>
+    </td>
+  </tr>
+</table>
