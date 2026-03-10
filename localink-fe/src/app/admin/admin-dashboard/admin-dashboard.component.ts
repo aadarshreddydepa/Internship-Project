@@ -1,8 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { BusinessService, Business } from '../../services/business.service';
-
+import { BusinessService, Business, BusinessStatus } from '../../services/business.service';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -13,84 +12,110 @@ import { BusinessService, Business } from '../../services/business.service';
 })
 export class AdminDashboardComponent {
 
-  allBusinesses: Business[] = [];
-  filteredBusinesses: Business[] = [];
+  businesses: Business[] = [];
 
   searchTerm = '';
   selectedStatus = 'all';
 
-  totalBusinesses = 0;
-  pendingCount = 0;
-  approvedCount = 0;
-  inactiveCount = 0;
+  selectedBusiness: Business | null = null;
 
   toastMessage = '';
   toastType = '';
   showToast = false;
 
-  constructor(private businessService: BusinessService) {}
+  constructor(private service: BusinessService) {}
 
   ngOnInit() {
-    this.loadBusinesses();
+    this.businesses = this.service.getAllBusinesses();
   }
 
-  loadBusinesses() {
-    this.allBusinesses = this.businessService.getAllBusinesses();
-    this.filteredBusinesses = [...this.allBusinesses];
+  /* ==============================
+     STATUS UPDATE METHODS
+  ============================== */
 
-    this.totalBusinesses = this.allBusinesses.length;
-    this.pendingCount = this.allBusinesses.filter(b => b.status === 'pending').length;
-    this.approvedCount = this.allBusinesses.filter(b => b.status === 'approved').length;
-    this.inactiveCount = this.allBusinesses.filter(b => b.status === 'inactive').length;
-  }
-
-  filterBusinesses() {
-    this.filteredBusinesses = this.allBusinesses.filter(b => {
-      const matchesSearch = b.name.toLowerCase().includes(this.searchTerm.toLowerCase());
-      const matchesStatus =
-        this.selectedStatus === 'all' || b.status === this.selectedStatus;
-
-      return matchesSearch && matchesStatus;
-    });
+  updateStatus(id: number, status: BusinessStatus, message: string, type: string) {
+    this.service.updateStatus(id, status);
+    this.notify(message, type);
   }
 
   approve(id: number) {
-this.businessService.approveBusiness(id);
-this.loadBusinesses();
-this.showNotification("Business approved successfully", "success");
-}
+    this.updateStatus(id, 'approved', 'Business approved', 'success');
+  }
 
   reject(id: number) {
-this.businessService.rejectBusiness(id);
-this.loadBusinesses();
-this.showNotification("Business rejected", "error");
-}
+    this.updateStatus(id, 'rejected', 'Business rejected', 'error');
+  }
 
   deactivate(id: number) {
-this.businessService.deactivateBusiness(id);
-this.loadBusinesses();
-this.showNotification("Business deactivated", "warning");
-}
+    this.updateStatus(id, 'inactive', 'Business deactivated', 'warning');
+  }
 
-  selectedBusiness: Business | null = null;
-  openBusinessDetails(business: Business) {
-  this.selectedBusiness = business;
-}
+  /* ==============================
+     STATS COUNTERS
+  ============================== */
 
-closeModal() {
-  this.selectedBusiness = null;
-}
-showNotification(message: string, type: string) {
+  get totalCount() {
+    return this.businesses.length;
+  }
 
-this.toastMessage = message;
-this.toastType = type;
-this.showToast = true;
+  get pendingCount() {
+    return this.businesses.filter(b => b.status === 'pending').length;
+  }
 
-setTimeout(() => {
-this.showToast = false;
-}, 3000);
+  get approvedCount() {
+    return this.businesses.filter(b => b.status === 'approved').length;
+  }
 
+  get inactiveCount() {
+    return this.businesses.filter(b => b.status === 'inactive').length;
+  }
 
-}
+  /* ==============================
+     FILTERING
+  ============================== */
+
+  get filteredBusinesses() {
+
+    return this.businesses.filter(b => {
+
+      const search =
+        b.name.toLowerCase().includes(this.searchTerm.toLowerCase());
+
+      const status =
+        this.selectedStatus === 'all' || b.status === this.selectedStatus;
+
+      return search && status;
+
+    });
+
+  }
+
+  /* ==============================
+     MODAL
+  ============================== */
+
+  openBusinessDetails(b: Business) {
+    this.selectedBusiness = b;
+  }
+
+  closeModal() {
+    this.selectedBusiness = null;
+  }
+
+  /* ==============================
+     TOAST
+  ============================== */
+
+  notify(message: string, type: string) {
+
+    this.toastMessage = message;
+    this.toastType = type;
+    this.showToast = true;
+
+    setTimeout(() => {
+      this.showToast = false;
+    }, 2500);
+
+  }
 
 }

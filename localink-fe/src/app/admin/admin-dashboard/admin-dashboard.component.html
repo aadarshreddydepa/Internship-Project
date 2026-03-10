@@ -6,13 +6,11 @@
   <h2 class="logo">Localink</h2>
 
   <nav>
-
     <a class="active">Dashboard</a>
     <a>Businesses</a>
     <a>Reviews</a>
     <a>Users</a>
     <a>Settings</a>
-
   </nav>
 
 </aside>
@@ -25,13 +23,13 @@
 <h1 class="title">Admin Dashboard</h1>
 
 
-<!-- STATS CARDS -->
+<!-- STATS -->
 
 <div class="stats">
 
   <div class="card">
     <span>Total</span>
-    <h2>{{totalBusinesses}}</h2>
+    <h2>{{totalCount}}</h2>
   </div>
 
   <div class="card pending">
@@ -52,7 +50,7 @@
 </div>
 
 
-<!-- SEARCH BAR -->
+<!-- FILTERS -->
 
 <div class="filters">
 
@@ -60,10 +58,9 @@
 type="text"
 placeholder="Search business..."
 [(ngModel)]="searchTerm"
-(input)="filterBusinesses()"
 />
 
-<select [(ngModel)]="selectedStatus" (change)="filterBusinesses()">
+<select [(ngModel)]="selectedStatus">
 
 <option value="all">All Status</option>
 <option value="pending">Pending</option>
@@ -94,7 +91,8 @@ placeholder="Search business..."
 
 <tbody>
 
-<tr *ngFor="let business of filteredBusinesses" (click)="openBusinessDetails(business)">
+<tr *ngFor="let business of filteredBusinesses"
+(click)="openBusinessDetails(business)">
 
 <td>{{business.name}}</td>
 <td>{{business.category}}</td>
@@ -108,9 +106,23 @@ placeholder="Search business..."
 
 <td class="actions">
 
-<button class="approve" (click)="approve(business.id)">Approve</button>
-<button class="reject" (click)="reject(business.id)">Reject</button>
-<button class="deactivate" (click)="deactivate(business.id)">Deactivate</button>
+<button
+class="approve"
+(click)="approve(business.id); $event.stopPropagation()">
+Approve
+</button>
+
+<button
+class="reject"
+(click)="reject(business.id); $event.stopPropagation()">
+Reject
+</button>
+
+<button
+class="deactivate"
+(click)="deactivate(business.id); $event.stopPropagation()">
+Deactivate
+</button>
 
 </td>
 
@@ -124,7 +136,9 @@ placeholder="Search business..."
 
 </div>
 </div>
-<!-- BUSINESS DETAILS MODAL -->
+
+
+<!-- MODAL -->
 
 <div class="modal-overlay" *ngIf="selectedBusiness">
 
@@ -144,15 +158,18 @@ placeholder="Search business..."
 
 <div class="modal-actions">
 
-<button class="approve" (click)="approve(selectedBusiness.id)">
+<button class="approve"
+(click)="approve(selectedBusiness.id)">
 Approve
 </button>
 
-<button class="reject" (click)="reject(selectedBusiness.id)">
+<button class="reject"
+(click)="reject(selectedBusiness.id)">
 Reject
 </button>
 
-<button class="close" (click)="closeModal()">
+<button class="close"
+(click)="closeModal()">
 Close
 </button>
 
@@ -161,6 +178,10 @@ Close
 </div>
 
 </div>
+
+
+<!-- TOAST -->
+
 <div class="toast"
 *ngIf="showToast"
 [ngClass]="toastType">
