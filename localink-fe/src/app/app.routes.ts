@@ -4,14 +4,8 @@ import { AdminDashboardComponent } from './admin/admin-dashboard/admin-dashboard
 export const routes: Routes = [
 
 {
-path: '',
-redirectTo: 'admin',
-pathMatch: 'full'
-},
-
-{
-path: 'admin',
-component: AdminDashboardComponent
+path:'admin',
+component:AdminDashboardComponent
 }
 
 ];
