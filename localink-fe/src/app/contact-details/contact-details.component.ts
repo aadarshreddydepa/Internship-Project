@@ -16,7 +16,7 @@ export class ContactDetailsComponent {
 
   successMessage = false;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private router: Router) {
 
     this.contactForm = this.fb.group({
 
@@ -55,6 +55,10 @@ export class ContactDetailsComponent {
 
     }
 
+  }
+
+  previous() {
+    this.router.navigate(['/register-business']);
   }
 
 }

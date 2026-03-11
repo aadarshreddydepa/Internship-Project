@@ -1,0 +1,59 @@
+.hours-container {
+  background-color: #2A2A2A;
+  padding: 20px;
+  color: #F8F4F0;
+}
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 15px;
+  color: #F8F4F0;
+}
+
+h3 {
+  color: #C8A97E;
+  margin-bottom: 15px;
+}
+
+.time-row {
+  display: flex;
+  gap: 20px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  color: #B19F91;
+  margin-bottom: 5px;
+}
+
+input {
+  background-color: #343434;
+  border: 1px solid #484948;
+  color: #F8F4F0;
+  padding: 6px;
+  border-radius: 4px;
+}
+
+button {
+  margin-top: 15px;
+  background-color: #C8A97E;
+  color: #1C1C1C;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.5;
+}
+
+.error {
+  color: #F4C430;
+  margin-top: 8px;
+}

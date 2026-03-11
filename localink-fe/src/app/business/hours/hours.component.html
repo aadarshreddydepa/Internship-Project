@@ -1,0 +1,49 @@
+<div class="hours-container">
+
+  <h3>Business Hours</h3>
+
+  <form [formGroup]="businessHoursForm">
+
+    <div class="checkbox-row">
+      <input type="checkbox" formControlName="open24Hours" />
+      <label>Open 24 Hours</label>
+    </div>
+
+    <div class="time-row" *ngIf="!businessHoursForm.get('open24Hours')?.value">
+
+      <div class="input-group">
+        <label>Open Time</label>
+        <input type="time" formControlName="openTime" />
+
+        <div class="error"
+             *ngIf="submitted && businessHoursForm.get('openTime')?.invalid">
+          Open time is required.
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Close Time</label>
+        <input type="time" formControlName="closeTime" />
+
+        <div class="error"
+             *ngIf="submitted && businessHoursForm.get('closeTime')?.invalid">
+          Close time is required.
+        </div>
+      </div>
+
+    </div>
+
+    <div class="error"
+         *ngIf="submitted && businessHoursForm.errors?.['invalidTimeRange']">
+      Closing time must be after opening time.
+    </div>
+
+    <button
+      type="button"
+      (click)="submitHours()">
+      Save Hours
+    </button>
+
+  </form>
+
+</div>

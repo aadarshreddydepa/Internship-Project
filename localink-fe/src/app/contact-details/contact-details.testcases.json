@@ -1,0 +1,61 @@
+{
+  "testCases": [
+
+    {
+      "scenario": "Valid contact details",
+      "data": {
+        "phone": "9876543210",
+        "email": "user@gmail.com",
+        "website": "https://example.com",
+        "address": "MG Road",
+        "city": "Mumbai",
+        "state": "Maharashtra",
+        "pincode": "400001"
+      },
+      "expected": true
+    },
+
+    {
+      "scenario": "Invalid phone number",
+      "data": {
+        "phone": "123",
+        "email": "user@gmail.com",
+        "website": "https://example.com",
+        "address": "MG Road",
+        "city": "Mumbai",
+        "state": "Maharashtra",
+        "pincode": "400001"
+      },
+      "expected": false
+    },
+
+    {
+      "scenario": "Invalid email format",
+      "data": {
+        "phone": "9876543210",
+        "email": "wrong-email",
+        "website": "https://example.com",
+        "address": "MG Road",
+        "city": "Mumbai",
+        "state": "Maharashtra",
+        "pincode": "400001"
+      },
+      "expected": false
+    },
+
+    {
+      "scenario": "Invalid pincode",
+      "data": {
+        "phone": "9876543210",
+        "email": "user@gmail.com",
+        "website": "https://example.com",
+        "address": "MG Road",
+        "city": "Mumbai",
+        "state": "Maharashtra",
+        "pincode": "123"
+      },
+      "expected": false
+    }
+
+  ]
+}

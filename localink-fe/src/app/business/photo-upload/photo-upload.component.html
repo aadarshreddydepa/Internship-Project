@@ -1,0 +1,31 @@
+<div class="photo-upload-container">
+
+  <h3>Business Photo</h3>
+
+  <input
+    type="file"
+    accept=".jpg,.jpeg,.png"
+    (change)="onFileSelected($event)"
+  />
+
+  <p class="info-text">
+    Accepted formats: JPG, JPEG, PNG
+  </p>
+
+  <div class="error" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <div class="preview-container" *ngIf="selectedImage">
+
+    <p>Image Preview</p>
+
+    <img
+      [src]="selectedImage"
+      alt="Business Photo Preview"
+      class="preview-image"
+    />
+
+  </div>
+
+</div>
