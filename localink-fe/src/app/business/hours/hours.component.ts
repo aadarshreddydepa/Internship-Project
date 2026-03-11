@@ -11,76 +11,101 @@ import { CommonModule } from '@angular/common';
 })
 export class HoursComponent {
 
-  businessHoursForm: FormGroup;
+  businessHoursForm!: FormGroup;
   submitted = false;
 
   constructor(private fb: FormBuilder) {
 
-    this.businessHoursForm = this.fb.group(
-      {
-        open24Hours: [false],
-        openTime: ['', Validators.required],
-        closeTime: ['', Validators.required]
-      },
-      { validators: this.timeValidator }
-    );
+    try {
 
-    this.businessHoursForm.get('open24Hours')?.valueChanges.subscribe(value => {
+      this.businessHoursForm = this.fb.group(
+        {
+          open24Hours: [false],
+          openTime: ['', Validators.required],
+          closeTime: ['', Validators.required]
+        },
+        { validators: this.timeValidator }
+      );
 
-      const open = this.businessHoursForm.get('openTime');
-      const close = this.businessHoursForm.get('closeTime');
+      this.businessHoursForm.get('open24Hours')?.valueChanges.subscribe(value => {
 
-      if (value) {
+        try {
 
-        open?.clearValidators();
-        close?.clearValidators();
+          const open = this.businessHoursForm.get('openTime');
+          const close = this.businessHoursForm.get('closeTime');
 
-        open?.disable();
-        close?.disable();
+          if (value) {
 
-        open?.setValue('');
-        close?.setValue('');
+            open?.clearValidators();
+            close?.clearValidators();
 
-      } else {
+            open?.disable();
+            close?.disable();
 
-        open?.setValidators(Validators.required);
-        close?.setValidators(Validators.required);
+            open?.setValue('');
+            close?.setValue('');
 
-        open?.enable();
-        close?.enable();
+          } else {
 
-      }
+            open?.setValidators(Validators.required);
+            close?.setValidators(Validators.required);
 
-      open?.updateValueAndValidity();
-      close?.updateValueAndValidity();
+            open?.enable();
+            close?.enable();
 
-    });
+          }
+
+          open?.updateValueAndValidity();
+          close?.updateValueAndValidity();
+
+        } catch (error) {
+          console.error('Error handling open24Hours change:', error);
+        }
+
+      });
+
+    } catch (error) {
+      console.error('Error initializing form:', error);
+    }
 
   }
 
   timeValidator(group: FormGroup) {
 
-    const open24 = group.get('open24Hours')?.value;
-    const open = group.get('openTime')?.value;
-    const close = group.get('closeTime')?.value;
+    try {
 
-    if (open24) return null;
+      const open24 = group.get('open24Hours')?.value;
+      const open = group.get('openTime')?.value;
+      const close = group.get('closeTime')?.value;
 
-    if (!open || !close) return null;
+      if (open24) return null;
 
-    return open < close ? null : { invalidTimeRange: true };
+      if (!open || !close) return null;
+
+      return open < close ? null : { invalidTimeRange: true };
+
+    } catch (error) {
+      console.error('Error validating time range:', error);
+      return null;
+    }
 
   }
 
   submitHours() {
 
-    this.submitted = true;
+    try {
 
-    if (this.businessHoursForm.invalid) {
-      return;
+      this.submitted = true;
+
+      if (this.businessHoursForm.invalid) {
+        return;
+      }
+
+      console.log('Business Hours:', this.businessHoursForm.value);
+
+    } catch (error) {
+      console.error('Error submitting business hours:', error);
     }
-
-    console.log('Business Hours:', this.businessHoursForm.value);
 
   }
 
