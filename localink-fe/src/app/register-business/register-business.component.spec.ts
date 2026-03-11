@@ -1,5 +1,3 @@
-// 
-
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RegisterBusinessComponent } from './register-business.component';
 import { ReactiveFormsModule } from '@angular/forms';
