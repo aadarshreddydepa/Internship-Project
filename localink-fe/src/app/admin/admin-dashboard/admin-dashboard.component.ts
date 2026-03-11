@@ -28,72 +28,44 @@ export class AdminDashboardComponent {
   ngOnInit() {
     this.businesses = this.service.getAllBusinesses();
   }
-
-  /* ==============================
-     STATUS UPDATE METHODS
-  ============================== */
-
+//-------Status Update Methods------
   updateStatus(id: number, status: BusinessStatus, message: string, type: string) {
     this.service.updateStatus(id, status);
     this.notify(message, type);
   }
-
   approve(id: number) {
     this.updateStatus(id, 'approved', 'Business approved', 'success');
   }
-
   reject(id: number) {
     this.updateStatus(id, 'rejected', 'Business rejected', 'error');
   }
-
   deactivate(id: number) {
     this.updateStatus(id, 'inactive', 'Business deactivated', 'warning');
   }
-
-  /* ==============================
-     STATS COUNTERS
-  ============================== */
-
+  //-------Stats Counter------
   get totalCount() {
     return this.businesses.length;
   }
-
   get pendingCount() {
     return this.businesses.filter(b => b.status === 'pending').length;
   }
-
   get approvedCount() {
     return this.businesses.filter(b => b.status === 'approved').length;
   }
-
   get inactiveCount() {
     return this.businesses.filter(b => b.status === 'inactive').length;
   }
-
-  /* ==============================
-     FILTERING
-  ============================== */
-
+ //---------Filtering-------
   get filteredBusinesses() {
-
     return this.businesses.filter(b => {
-
       const search =
         b.name.toLowerCase().includes(this.searchTerm.toLowerCase());
-
       const status =
         this.selectedStatus === 'all' || b.status === this.selectedStatus;
-
       return search && status;
-
     });
-
   }
-
-  /* ==============================
-     MODAL
-  ============================== */
-
+     //-----MODAL-----
   openBusinessDetails(b: Business) {
     this.selectedBusiness = b;
   }
@@ -101,11 +73,7 @@ export class AdminDashboardComponent {
   closeModal() {
     this.selectedBusiness = null;
   }
-
-  /* ==============================
-     TOAST
-  ============================== */
-
+    //------TOAST-----
   notify(message: string, type: string) {
 
     this.toastMessage = message;
@@ -115,7 +83,5 @@ export class AdminDashboardComponent {
     setTimeout(() => {
       this.showToast = false;
     }, 2500);
-
   }
-
 }
