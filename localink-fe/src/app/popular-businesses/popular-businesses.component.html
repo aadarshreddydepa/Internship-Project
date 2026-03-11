@@ -1,0 +1,38 @@
+<section class="popular-section">
+
+<h2 class="section-title">Popular This Week</h2>
+
+<div class="popular-grid">
+
+<div class="business-card"
+*ngFor="let business of businesses">
+
+<div class="image-placeholder">
+Image
+</div>
+
+<div class="card-content">
+
+<h3>{{business.name}}</h3>
+
+<p class="category">
+{{business.category}}
+</p>
+
+<div class="rating">
+
+<span class="stars">★★★★★</span>
+
+<span class="rating-number">
+({{business.rating}})
+</span>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
