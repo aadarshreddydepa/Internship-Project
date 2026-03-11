@@ -1,0 +1,69 @@
+<div class="page">
+
+  <div class="header">
+
+    <button class="back-btn" onclick="history.back()">
+      ← Back
+    </button>
+
+    <div>
+      <h1>{{subcategory}}</h1>
+      <p class="subtitle">
+        {{businesses.length}} businesses found
+      </p>
+    </div>
+
+  </div>
+
+  <div class="business-list">
+
+    <div class="business-card" *ngFor="let b of businesses">
+
+      <div class="image-box">
+        Image
+      </div>
+
+      <div class="business-info">
+
+        <div class="title-row">
+
+          <h2>{{b.name}}</h2>
+
+          <span *ngIf="b.verified" class="verified">
+            Verified
+          </span>
+
+        </div>
+
+        <p class="desc">
+          {{b.desc}}
+        </p>
+
+        <div class="rating">
+
+          <span class="star">★</span>
+
+          {{b.rating}}
+          <span class="reviews">
+            ({{b.reviews}} reviews)
+          </span>
+
+        </div>
+
+        <div class="details">
+
+          <span>📞 {{b.phone}}</span>
+
+          <span>📍 {{b.address}}</span>
+
+          <span>⏰ {{b.hours}}</span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

@@ -1,0 +1,41 @@
+.container{
+  background:#1C1C1C;
+  min-height:100vh;
+  padding:40px;
+  color:#F8F4F0;
+}
+
+.breadcrumb{
+  color:#B19F91;
+  margin-bottom:30px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+}
+
+.card{
+  background:#2A2A2A;
+  border:1px solid #484948;
+  padding:25px;
+  border-radius:12px;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.card:hover{
+  background:#343434;
+  border-color:#C8A97E;
+}
+
+.title{
+  font-size:18px;
+  font-weight:600;
+}
+
+.count{
+  margin-top:6px;
+  color:#B19F91;
+}

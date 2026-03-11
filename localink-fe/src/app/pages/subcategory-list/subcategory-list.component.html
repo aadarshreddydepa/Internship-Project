@@ -1,0 +1,23 @@
+<div class="container">
+
+  <h2>{{categoryName}}</h2>
+
+  <div class="grid">
+
+    <div class="card"
+         *ngFor="let sub of subcategories"
+         [routerLink]="['/businesses', sub.name]">
+
+      <div class="title">
+        {{sub.name}}
+      </div>
+
+      <div class="count">
+        {{sub.count}} businesses
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
