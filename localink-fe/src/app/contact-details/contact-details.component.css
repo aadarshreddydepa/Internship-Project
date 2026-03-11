@@ -1,0 +1,107 @@
+/* Page background */
+body{
+background-color:#1C1C1C;
+font-family:"Segoe UI", Arial, sans-serif;
+color:#F8F4F0;
+margin:0;
+padding:0;
+}
+
+/* Main form card */
+.container{
+width:700px;
+margin:50px auto;
+background:#2A2A2A;
+padding:35px;
+border-radius:10px;
+box-shadow:0 6px 15px rgba(0,0,0,0.5);
+border:1px solid #484948;
+}
+
+/* Title */
+h2{
+text-align:center;
+margin-bottom:25px;
+color:#F8F4F0;
+}
+
+/* Labels */
+label{
+display:block;
+margin-top:12px;
+margin-bottom:6px;
+color:#B19F91;
+font-size:14px;
+}
+
+/* Inputs */
+input{
+width:100%;
+padding:10px;
+background:#343434;
+border:1px solid #484948;
+border-radius:6px;
+color:#F8F4F0;
+font-size:14px;
+transition:all 0.2s ease;
+box-sizing:border-box;
+}
+
+/* Placeholder */
+input::placeholder{
+color:#B19F91;
+}
+
+/* Focus effect */
+input:focus{
+outline:none;
+border-color:#C8A97E;
+box-shadow:0 0 4px #C8A97E;
+}
+
+/* Divider */
+hr{
+border:none;
+border-top:1px solid #484948;
+margin:25px 0;
+}
+
+/* Button container */
+.button-container{
+display:flex;
+justify-content:flex-end;
+margin-top:20px;
+}
+
+/* Button */
+button{
+padding:12px 25px;
+background:#C8A97E;
+border:none;
+border-radius:6px;
+font-size:16px;
+font-weight:600;
+cursor:pointer;
+color:#1C1C1C;
+transition:0.3s;
+}
+
+/* Hover effect */
+button:hover{
+background:#b5956c;
+}
+
+/* Error messages */
+.error{
+color:#ff6b6b;
+font-size:12px;
+margin-top:3px;
+}
+
+/* Success message */
+.success-message{
+margin-top:20px;
+color:#C8A97E;
+font-weight:600;
+text-align:center;
+}

@@ -6,10 +6,8 @@ import { PhotoUploadComponent } from "./business/photo-upload/photo-upload.compo
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [HoursComponent, PhotoUploadComponent],
+  imports: [HoursComponent, PhotoUploadComponent,RouterOutlet],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent {
-  title = 'localink-fe';
-}
+export class AppComponent {}

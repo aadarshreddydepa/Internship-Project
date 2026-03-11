@@ -1,0 +1,57 @@
+<div class="container">
+
+    <h2>Register Business</h2>
+
+    <form [formGroup]="businessForm">
+
+        <h3>Business Details</h3>
+
+        <label>Business Name</label>
+        <input type="text" formControlName="businessName" >
+
+        <div class="error" *ngIf="businessForm.get('businessName')?.touched && businessForm.get('businessName')?.invalid">
+        Business name is required
+        </div>
+
+
+        <label>Description</label>
+        <textarea formControlName="description" ></textarea>
+
+        <div class="error" *ngIf="businessForm.get('description')?.touched && businessForm.get('description')?.invalid">
+        Description is required
+        </div>
+
+
+        <label>Category</label>
+        <select formControlName="category" (change)="onCategoryChange()">
+
+        <option value="">Select Category</option>
+
+        <option *ngFor="let cat of categories" [value]="cat.name">
+        {{cat.name}}
+        </option>
+
+        </select>
+
+
+        <label>Subcategory</label>
+        <select formControlName="subcategory">
+
+        <option value="">Select Subcategory</option>
+
+        <option *ngFor="let sub of subcategories" [value]="sub">
+        {{sub}}
+        </option>
+
+        </select>
+
+
+        <hr>
+
+        <div class="button-container">
+        <button type="button" (click)="goToNext()">Next</button>
+        </div>
+
+    </form>
+
+</div>
