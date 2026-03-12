@@ -8,14 +8,13 @@ background: #121212;
 box-sizing: border-box;
 }
 .dashboard{
-padding:40px;
-background:#121212;
-color:#F8F4F0;
-min-height:100vh;
-font-family: Arial, Helvetica, sans-serif;
-width:100%;
-max-width:100%;
-margin:0;
+  width:100%;
+  min-height:100vh;
+  padding:40px;
+  margin:0;
+  background:#121212;
+  color:#F8F4F0;
+  font-family: Arial, Helvetica, sans-serif;
 }
 .title{
 font-size:28px;
