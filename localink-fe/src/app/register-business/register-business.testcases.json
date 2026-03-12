@@ -1,0 +1,40 @@
+{
+  "testCases": [
+    {
+      "scenario": "Valid business details",
+      "data": {
+        "businessName": "Tech Solutions",
+        "category": "IT Services",
+        "description": "Software development company"
+      },
+      "expected": true
+    },
+    {
+      "scenario": "Empty business name",
+      "data": {
+        "businessName": "",
+        "category": "IT Services",
+        "description": "Software development company"
+      },
+      "expected": false
+    },
+    {
+      "scenario": "Empty business category",
+      "data": {
+        "businessName": "Tech Solutions",
+        "category": "",
+        "description": "Software development company"
+      },
+      "expected": false
+    },
+    {
+      "scenario": "Empty description",
+      "data": {
+        "businessName": "Tech Solutions",
+        "category": "IT Services",
+        "description": ""
+      },
+      "expected": false
+    }
+  ]
+}

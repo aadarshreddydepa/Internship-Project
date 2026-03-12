@@ -1,16 +1,27 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+
+import { ContactDetailsComponent } from '../contact-details/contact-details.component';
+import { HoursComponent } from '../business/hours/hours.component';
+import { PhotoUploadComponent } from '../business/photo-upload/photo-upload.component';
 
 @Component({
   selector: 'app-register-business',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    ContactDetailsComponent,
+    HoursComponent,
+    PhotoUploadComponent
+  ],
   templateUrl: './register-business.component.html',
   styleUrls: ['./register-business.component.css']
 })
 export class RegisterBusinessComponent {
+
+  currentStep = 1;
 
   businessForm!: FormGroup;
 
@@ -22,7 +33,7 @@ export class RegisterBusinessComponent {
 
   subcategories: string[] = [];
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(private fb: FormBuilder) {
 
     this.businessForm = this.fb.group({
       businessName: ['', Validators.required],
@@ -49,13 +60,24 @@ export class RegisterBusinessComponent {
 
   goToNext() {
 
-    if (this.businessForm.valid) {
-      this.router.navigate(['/contact-details']);
-    } 
-    else {
-      this.businessForm.markAllAsTouched();
+    if (this.currentStep === 1) {
+
+      if (this.businessForm.valid) {
+        this.currentStep = 2;
+      } else {
+        this.businessForm.markAllAsTouched();
+      }
+
+    } else if (this.currentStep < 3) {
+      this.currentStep++;
     }
 
+  }
+
+  goToPrevious() {
+    if (this.currentStep > 1) {
+      this.currentStep--;
+    }
   }
 
 }

@@ -1,1 +1,18 @@
 /* You can add global styles to this file, and also import other style files */
+/* Full page background */
+html, body{
+height:100%;
+margin:0;
+padding:0;
+background-color:#1C1C1C;
+font-family:"Segoe UI", Arial, sans-serif;
+color:#F8F4F0;
+}
+
+/* Angular root component */
+app-root{
+display:block;
+min-height:100vh;
+background-color:#1C1C1C;
+}
+

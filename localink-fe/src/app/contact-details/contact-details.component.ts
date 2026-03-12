@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -13,7 +13,8 @@ export class ContactDetailsComponent {
 
   contactForm!: FormGroup;
 
-  successMessage = false;
+  @Output() next = new EventEmitter<void>();
+  @Output() previous = new EventEmitter<void>();
 
   constructor(private fb: FormBuilder) {
 
@@ -37,23 +38,18 @@ export class ContactDetailsComponent {
 
   }
 
-  submit() {
+  submit(){
 
-    if (this.contactForm.valid) {
-
-      console.log("Form Data:", this.contactForm.value);
-
-      this.successMessage = true;
-
-    } 
-    else {
-
+    if(this.contactForm.valid){
+      this.next.emit();
+    }else{
       this.contactForm.markAllAsTouched();
-
-      this.successMessage = false;
-
     }
 
+  }
+
+  previousStep(){
+    this.previous.emit();
   }
 
 }

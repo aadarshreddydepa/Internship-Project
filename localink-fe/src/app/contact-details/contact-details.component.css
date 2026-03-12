@@ -6,18 +6,13 @@ color:#F8F4F0;
 margin:0;
 padding:0;
 }
-
-/* Main form card */
 .container{
-width:700px;
-margin:50px auto;
-background:#2A2A2A;
-padding:35px;
-border-radius:10px;
-box-shadow:0 6px 15px rgba(0,0,0,0.5);
-border:1px solid #484948;
+width:100%;
+padding:0;
+background:transparent;
+border:none;
+box-shadow:none;
 }
-
 /* Title */
 h2{
 text-align:center;
@@ -43,7 +38,6 @@ border:1px solid #484948;
 border-radius:6px;
 color:#F8F4F0;
 font-size:14px;
-transition:all 0.2s ease;
 box-sizing:border-box;
 }
 
@@ -52,7 +46,7 @@ input::placeholder{
 color:#B19F91;
 }
 
-/* Focus effect */
+/* Input focus */
 input:focus{
 outline:none;
 border-color:#C8A97E;
@@ -66,14 +60,38 @@ border-top:1px solid #484948;
 margin:25px 0;
 }
 
-/* Button container */
-.button-container{
+/* City State Pincode row */
+.location-row{
 display:flex;
-justify-content:flex-end;
-margin-top:20px;
+gap:15px;
+margin-top:10px;
 }
 
-/* Button */
+.location-field{
+flex:1;
+display:flex;
+flex-direction:column;
+}
+
+/* Buttons */
+.button-container{
+display:flex;
+justify-content:space-between;
+margin-top:25px;
+}
+
+/* Previous button */
+.previous-btn{
+  background:#343434;
+  border:1px solid #484948;
+  color:#F8F4F0;
+}
+
+.previous-btn:hover{
+background:#444;
+}
+
+/* Submit button */
 button{
 padding:12px 25px;
 background:#C8A97E;
@@ -83,10 +101,8 @@ font-size:16px;
 font-weight:600;
 cursor:pointer;
 color:#1C1C1C;
-transition:0.3s;
 }
 
-/* Hover effect */
 button:hover{
 background:#b5956c;
 }

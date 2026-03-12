@@ -1,57 +1,206 @@
-<div class="container">
+<div class="page-wrapper">
 
-    <h2>Register Business</h2>
+  <div class="wizard-container">
 
-    <form [formGroup]="businessForm">
+    <!-- HEADER -->
+    <div class="header">
+      <h2>Register Your Business</h2>
+      <p>Join our directory and reach more customers</p>
+    </div>
 
-        <h3>Business Details</h3>
+    <!-- STEP PROGRESS -->
+    <div class="stepper">
 
-        <label>Business Name</label>
-        <input type="text" formControlName="businessName" >
+      <div class="step" [class.active]="currentStep >= 1">
+        <div class="circle">1</div>
+        <span>Basic Info</span>
+      </div>
 
-        <div class="error" *ngIf="businessForm.get('businessName')?.touched && businessForm.get('businessName')?.invalid">
-        Business name is required
+      <div class="line"></div>
+
+      <div class="step" [class.active]="currentStep >= 2">
+        <div class="circle">2</div>
+        <span>Contact Details</span>
+      </div>
+
+      <div class="line"></div>
+
+      <div class="step" [class.active]="currentStep >= 3">
+        <div class="circle">3</div>
+        <span>Additional Info</span>
+      </div>
+
+    </div>
+
+    <!-- FORM CARD -->
+    <div class="form-card">
+
+      <!-- STEP 1 : BASIC INFO -->
+
+      <div *ngIf="currentStep === 1">
+
+        <h3>Basic Information</h3>
+
+        <form [formGroup]="businessForm">
+
+          <!-- BUSINESS NAME -->
+
+          <div class="form-group">
+
+            <label>Business Name *</label>
+
+            <input
+              type="text"
+              placeholder="Enter business name"
+              formControlName="businessName">
+
+            <div class="error"
+              *ngIf="businessForm.get('businessName')?.touched && businessForm.get('businessName')?.invalid">
+
+              Business name is required
+
+            </div>
+
+          </div>
+
+
+          <!-- BUSINESS DESCRIPTION -->
+
+          <div class="form-group">
+
+            <label>Business Description *</label>
+
+            <textarea
+              rows="4"
+              placeholder="Describe your business, services, and what makes you unique"
+              formControlName="description">
+            </textarea>
+
+            <div class="error"
+              *ngIf="businessForm.get('description')?.touched && businessForm.get('description')?.invalid">
+
+              Description is required
+
+            </div>
+
+          </div>
+
+
+          <!-- CATEGORY + SUBCATEGORY -->
+
+          <div class="two-column">
+
+            <div class="form-group">
+
+              <label>Category *</label>
+
+              <select
+                formControlName="category"
+                (change)="onCategoryChange()">
+
+                <option value="">Select category</option>
+
+                <option
+                  *ngFor="let cat of categories"
+                  [value]="cat.name">
+
+                  {{cat.name}}
+
+                </option>
+
+              </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label>Subcategory *</label>
+
+              <select formControlName="subcategory">
+
+                <option value="">Select subcategory</option>
+
+                <option
+                  *ngFor="let sub of subcategories"
+                  [value]="sub">
+
+                  {{sub}}
+
+                </option>
+
+              </select>
+
+            </div>
+
+          </div>
+
+
+          <!-- BUTTON -->
+
+          <div class="button-container">
+
+            <button
+              type="button"
+              (click)="goToNext()">
+
+              Next Step
+
+            </button>
+
+          </div>
+
+        </form>
+
+      </div>
+
+
+      <!-- STEP 2 : CONTACT DETAILS -->
+
+      <div *ngIf="currentStep === 2">
+
+        <app-contact-details
+          (next)="goToNext()"
+          (previous)="goToPrevious()">
+        </app-contact-details>
+
+      </div>
+
+
+      <!-- STEP 3 : ADDITIONAL INFO -->
+
+      <div *ngIf="currentStep === 3">
+
+        <h3>Additional Information</h3>
+
+        <!-- HOURS COMPONENT -->
+        <app-hours></app-hours>
+
+        <!-- PHOTO UPLOAD -->
+        <app-photo-upload></app-photo-upload>
+
+        <div class="button-container step3-buttons">
+
+          <button
+            class="previous-btn"
+            (click)="goToPrevious()">
+
+            Previous
+
+          </button>
+
+          <button class="submit-btn">
+
+            Submit Registration
+
+          </button>
+
         </div>
 
+      </div>
 
-        <label>Description</label>
-        <textarea formControlName="description" ></textarea>
+    </div>
 
-        <div class="error" *ngIf="businessForm.get('description')?.touched && businessForm.get('description')?.invalid">
-        Description is required
-        </div>
-
-
-        <label>Category</label>
-        <select formControlName="category" (change)="onCategoryChange()">
-
-        <option value="">Select Category</option>
-
-        <option *ngFor="let cat of categories" [value]="cat.name">
-        {{cat.name}}
-        </option>
-
-        </select>
-
-
-        <label>Subcategory</label>
-        <select formControlName="subcategory">
-
-        <option value="">Select Subcategory</option>
-
-        <option *ngFor="let sub of subcategories" [value]="sub">
-        {{sub}}
-        </option>
-
-        </select>
-
-
-        <hr>
-
-        <div class="button-container">
-        <button type="button" (click)="goToNext()">Next</button>
-        </div>
-
-    </form>
+  </div>
 
 </div>

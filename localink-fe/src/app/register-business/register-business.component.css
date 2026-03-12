@@ -1,119 +1,195 @@
 /* Page background */
-body{
-background-color:#1C1C1C;
-font-family:"Segoe UI", Arial, sans-serif;
-color:#F8F4F0;
-margin:0;
-padding:0;
+.page-wrapper{
+  background:#1C1C1C;
+  min-height:100vh;
+  padding-top:60px;
+  font-family:"Segoe UI", Arial, sans-serif;
+  color:#F8F4F0;
 }
 
-/* Main form card */
-.container{
-width:700px;
-margin:50px auto;
-background:#2A2A2A;
-padding:35px;
-border-radius:10px;
-box-shadow:0 6px 15px rgba(0,0,0,0.5);
-border:1px solid #484948;
+/* Centered wizard container */
+.wizard-container{
+  width:900px;
+  margin:auto;
 }
 
-/* Title */
-h2{
-text-align:center;
-margin-bottom:25px;
-color:#F8F4F0;
+/* Header section */
+.header{
+  text-align:center;
+  margin-bottom:25px;
 }
 
-/* Section headings */
-h3{
-margin-top:25px;
-color:#C8A97E;
-font-size:18px;
+.header h2{
+  margin-bottom:5px;
+}
+
+.header p{
+  color:#B19F91;
+  font-size:14px;
+}
+
+/* Step indicator */
+.stepper{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-bottom:35px;
+}
+
+.step{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  color:#B19F91;
+  font-size:14px;
+}
+
+.step.active{
+  color:#C8A97E;
+}
+
+.circle{
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  background:#343434;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-bottom:6px;
+  font-weight:600;
+}
+
+.step.active .circle{
+  background:#C8A97E;
+  color:#1C1C1C;
+}
+
+.line{
+  width:100px;
+  height:2px;
+  background:#484948;
+  margin:0 12px;
+}
+
+/* Form card */
+.form-card{
+  background:#2A2A2A;
+  padding:35px;
+  border-radius:10px;
+  border:1px solid #484948;
+  box-shadow:0 6px 20px rgba(0,0,0,0.4);
+}
+
+/* Section title */
+.form-card h3{
+  margin-bottom:20px;
+  color:#C8A97E;
 }
 
 /* Labels */
 label{
-display:block;
-margin-top:12px;
-margin-bottom:6px;
-color:#B19F91;
-font-size:14px;
+  display:block;
+  margin-top:12px;
+  margin-bottom:6px;
+  color:#B19F91;
+  font-size:14px;
 }
 
 /* Inputs */
 input,
-select,
-textarea{
-width:100%;
-padding:10px;
-background:#343434;
-border:1px solid #484948;
-border-radius:6px;
-color:#F8F4F0;
-font-size:14px;
-transition:all 0.2s ease;
-box-sizing:border-box;
+textarea,
+select{
+  width:100%;
+  padding:10px;
+  background:#343434;
+  border:1px solid #484948;
+  border-radius:6px;
+  color:#F8F4F0;
+  font-size:14px;
+  box-sizing:border-box;
+}
+
+/* Focus effect */
+input:focus,
+textarea:focus,
+select:focus{
+  outline:none;
+  border-color:#C8A97E;
+  box-shadow:0 0 4px #C8A97E;
 }
 
 /* Placeholder */
 input::placeholder,
 textarea::placeholder{
-color:#B19F91;
+  color:#B19F91;
 }
 
-/* Focus effect */
-input:focus,
-select:focus,
-textarea:focus{
-outline:none;
-border-color:#C8A97E;
-box-shadow:0 0 4px #C8A97E;
+/* Two column layout */
+.two-column{
+  display:flex;
+  gap:20px;
+  margin-top:10px;
 }
 
-/* Divider */
-hr{
-border:none;
-border-top:1px solid #484948;
-margin:25px 0;
-}
-
-/* Button container */
-.button-container{
-display:flex;
-justify-content:flex-end;
-margin-top:20px;
-}
-
-/* Button */
-button{
-padding:12px 25px;
-background:#C8A97E;
-border:none;
-border-radius:6px;
-font-size:16px;
-font-weight:600;
-cursor:pointer;
-color:#1C1C1C;
-transition:0.3s;
-}
-
-/* Hover effect */
-button:hover{
-background:#b5956c;
+.two-column > div{
+  flex:1;
 }
 
 /* Error messages */
 .error{
-color:#ff6b6b;
-font-size:12px;
-margin-top:3px;
+  color:#ff6b6b;
+  font-size:12px;
+  margin-top:3px;
 }
 
-/* Success message */
-.success-message{
-margin-top:20px;
-color:#C8A97E;
-font-weight:600;
-text-align:center;
+/* Button container */
+.button-container{
+  display:flex;
+  justify-content:flex-end;
+  margin-top:25px;
+}
+
+/* Step 3 buttons */
+.step3-buttons{
+  justify-content:space-between;
+}
+
+/* Buttons */
+button{
+  padding:12px 28px;
+  background:#C8A97E;
+  border:none;
+  border-radius:6px;
+  font-size:15px;
+  font-weight:600;
+  cursor:pointer;
+  color:#1C1C1C;
+  transition:0.3s;
+}
+
+button:hover{
+  background:#b5956c;
+}
+
+/* Previous button */
+.previous-btn{
+  background:#343434;
+  border:1px solid #484948;
+  color:#F8F4F0;
+}
+
+.previous-btn:hover{
+  background:#444;
+}
+
+/* Space between step 3 components */
+app-hours{
+  display:block;
+  margin-top:20px;
+}
+
+app-photo-upload{
+  display:block;
+  margin-top:25px;
 }
