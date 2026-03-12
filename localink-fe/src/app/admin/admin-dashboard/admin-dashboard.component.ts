@@ -1,87 +1,130 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { BusinessService, Business, BusinessStatus } from '../../services/business.service';
+import * as XLSX from 'xlsx';
+
+import { BusinessService,Business } from '../../services/business.service';
+
+type Section = 'pending' | 'approved' | 'rejected' | 'inactive';
 
 @Component({
-  selector: 'app-admin-dashboard',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './admin-dashboard.component.html',
-  styleUrl: './admin-dashboard.component.css'
+  selector:'app-admin-dashboard',
+  standalone:true,
+  imports:[CommonModule,FormsModule],
+  templateUrl:'./admin-dashboard.component.html',
+  styleUrl:'./admin-dashboard.component.css'
 })
-export class AdminDashboardComponent {
+export class AdminDashboardComponent{
 
-  businesses: Business[] = [];
+  businesses:Business[] = [];
 
-  searchTerm = '';
-  selectedStatus = 'all';
+  currentSection:Section = 'pending';
 
-  selectedBusiness: Business | null = null;
+  searchTerm='';
 
-  toastMessage = '';
-  toastType = '';
-  showToast = false;
+  selectedBusiness:Business|null=null;
 
-  constructor(private service: BusinessService) {}
+  toastMessage='';
+  showToast=false;
 
-  ngOnInit() {
-    this.businesses = this.service.getAllBusinesses();
-  }
-//-------Status Update Methods------
-  updateStatus(id: number, status: BusinessStatus, message: string, type: string) {
-    this.service.updateStatus(id, status);
-    this.notify(message, type);
-  }
-  approve(id: number) {
-    this.updateStatus(id, 'approved', 'Business approved', 'success');
-  }
-  reject(id: number) {
-    this.updateStatus(id, 'rejected', 'Business rejected', 'error');
-  }
-  deactivate(id: number) {
-    this.updateStatus(id, 'inactive', 'Business deactivated', 'warning');
-  }
-  //-------Stats Counter------
-  get totalCount() {
-    return this.businesses.length;
-  }
-  get pendingCount() {
-    return this.businesses.filter(b => b.status === 'pending').length;
-  }
-  get approvedCount() {
-    return this.businesses.filter(b => b.status === 'approved').length;
-  }
-  get inactiveCount() {
-    return this.businesses.filter(b => b.status === 'inactive').length;
-  }
- //---------Filtering-------
-  get filteredBusinesses() {
-    return this.businesses.filter(b => {
-      const search =
-        b.name.toLowerCase().includes(this.searchTerm.toLowerCase());
-      const status =
-        this.selectedStatus === 'all' || b.status === this.selectedStatus;
-      return search && status;
-    });
-  }
-     //-----MODAL-----
-  openBusinessDetails(b: Business) {
-    this.selectedBusiness = b;
+  rejectModalOpen=false;
+  rejectComment='';
+  rejectBusinessId:number|null=null;
+
+  constructor(private service:BusinessService){}
+
+  ngOnInit(){
+    this.businesses = this.service.getBusinesses();
   }
 
-  closeModal() {
-    this.selectedBusiness = null;
+  get filteredBusinesses(){
+
+    return this.businesses
+    .filter(b=>b.status===this.currentSection)
+    .filter(b=>
+      b.name.toLowerCase().includes(this.searchTerm.toLowerCase())
+    );
+
   }
-    //------TOAST-----
-  notify(message: string, type: string) {
+
+  approve(id:number){
+    this.service.updateStatus(id,'approved');
+    this.notify('Business Approved');
+  }
+
+  deactivate(id:number){
+    this.service.updateStatus(id,'inactive');
+    this.notify('Business Deactivated');
+  }
+
+  activate(id:number){
+    this.service.updateStatus(id,'approved');
+    this.notify('Business Activated');
+  }
+
+  openRejectModal(id:number){
+    this.rejectBusinessId = id;
+    this.rejectModalOpen = true;
+  }
+
+  submitRejection(){
+
+    if(!this.rejectComment.trim()) return;
+
+    if(this.rejectBusinessId!==null){
+
+      this.service.rejectBusiness(
+        this.rejectBusinessId,
+        this.rejectComment
+      );
+
+    }
+
+    this.rejectModalOpen=false;
+    this.rejectComment='';
+    this.rejectBusinessId=null;
+
+    this.notify('Business Rejected');
+
+  }
+
+  closeRejectModal(){
+    this.rejectModalOpen=false;
+    this.rejectComment='';
+  }
+
+  openDetails(b:Business){
+    this.selectedBusiness=b;
+  }
+
+  closeModal(){
+    this.selectedBusiness=null;
+  }
+
+  notify(message:string){
 
     this.toastMessage = message;
-    this.toastType = type;
-    this.showToast = true;
+    this.showToast=true;
 
-    setTimeout(() => {
-      this.showToast = false;
-    }, 2500);
+    setTimeout(()=>{
+      this.showToast=false;
+    },2500)
+
   }
+
+  downloadExcel(){
+
+    const data = this.filteredBusinesses;
+
+    if(data.length===0) return;
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(workbook,worksheet,"Businesses");
+
+    XLSX.writeFile(workbook,`${this.currentSection}-businesses.xlsx`);
+
+  }
+
 }

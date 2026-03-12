@@ -15,14 +15,14 @@ describe('BusinessService', () => {
   });
 
   it('should return businesses', () => {
-    expect(service.getAllBusinesses().length).toBeGreaterThan(0);
+    expect(service.getBusinesses().length).toBeGreaterThan(0);
   });
 
   it('should update business status', () => {
 
     service.updateStatus(1, 'approved');
 
-    const business = service.getAllBusinesses().find(b => b.id === 1);
+    const business = service.getBusinesses().find(b => b.id === 1);
 
     expect(business?.status).toBe('approved');
 
