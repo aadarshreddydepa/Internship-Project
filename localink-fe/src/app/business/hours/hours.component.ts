@@ -1,111 +1,206 @@
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { BusinessHoursService } from '../../services/business-hours.service';
+
+interface TimeSlot {
+  open: string;
+  close: string;
+}
 
 @Component({
   selector: 'app-hours',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './hours.component.html',
   styleUrls: ['./hours.component.css']
 })
-export class HoursComponent {
+export class HoursComponent implements OnInit {
 
-  businessHoursForm!: FormGroup;
-  submitted = false;
+  constructor(private hoursService: BusinessHoursService) {}
 
-  constructor(private fb: FormBuilder) {
+  days = [
+    'Monday','Tuesday','Wednesday',
+    'Thursday','Friday','Saturday','Sunday'
+  ];
 
-    try {
+  selectedDay = 'Monday';
 
-      this.businessHoursForm = this.fb.group(
-        {
-          open24Hours: [false],
-          openTime: ['', Validators.required],
-          closeTime: ['', Validators.required]
-        },
-        { validators: this.timeValidator }
-      );
+  errorMessage = '';
 
-      this.businessHoursForm.get('open24Hours')?.valueChanges.subscribe(value => {
+  timeSlots: TimeSlot[] = [
+    { open:'', close:'' }
+  ];
 
-        try {
+  businessHours:any = {
+    Monday:{ closed:false, slots:[] },
+    Tuesday:{ closed:false, slots:[] },
+    Wednesday:{ closed:false, slots:[] },
+    Thursday:{ closed:false, slots:[] },
+    Friday:{ closed:false, slots:[] },
+    Saturday:{ closed:false, slots:[] },
+    Sunday:{ closed:false, slots:[] }
+  };
 
-          const open = this.businessHoursForm.get('openTime');
-          const close = this.businessHoursForm.get('closeTime');
+  ngOnInit(){
 
-          if (value) {
+    const stored = this.hoursService.getHours();
 
-            open?.clearValidators();
-            close?.clearValidators();
+    if(stored){
+      this.businessHours = stored;
+    }
 
-            open?.disable();
-            close?.disable();
+  }
 
-            open?.setValue('');
-            close?.setValue('');
+  selectDay(day:string){
 
-          } else {
+    // Save current day slots
+    if(!this.businessHours[this.selectedDay].closed){
+      this.businessHours[this.selectedDay].slots =
+        this.timeSlots.map(s => ({...s}));
+    }
 
-            open?.setValidators(Validators.required);
-            close?.setValidators(Validators.required);
+    this.selectedDay = day;
 
-            open?.enable();
-            close?.enable();
+    const data = this.businessHours[day];
 
-          }
+    if(data.closed){
+      this.timeSlots = [];
+    }
+    else{
 
-          open?.updateValueAndValidity();
-          close?.updateValueAndValidity();
+      this.timeSlots = data.slots.length
+        ? data.slots.map((s:any)=>({open:s.open,close:s.close}))
+        : [{open:'',close:''}];
 
-        } catch (error) {
-          console.error('Error handling open24Hours change:', error);
+    }
+
+    this.errorMessage = '';
+
+  }
+
+  addSlot(){
+
+    if(this.businessHours[this.selectedDay].closed) return;
+
+    this.timeSlots.push({open:'',close:''});
+
+  }
+
+  removeSlot(index:number){
+
+    if(this.businessHours[this.selectedDay].closed) return;
+
+    this.timeSlots.splice(index,1);
+
+    if(this.timeSlots.length === 0){
+      this.timeSlots.push({open:'',close:''});
+    }
+
+  }
+
+  toggleClosed(day:string){
+
+    this.businessHours[day].closed =
+      !this.businessHours[day].closed;
+
+    if(this.businessHours[day].closed){
+
+      this.businessHours[day].slots = [];
+      this.timeSlots = [];
+
+    }
+    else{
+
+      this.timeSlots = [{open:'',close:''}];
+
+    }
+
+    this.errorMessage = '';
+
+  }
+
+  applyWeekdays(){
+
+    const mondaySlots = this.businessHours['Monday'].slots;
+
+    ['Tuesday','Wednesday','Thursday','Friday']
+      .forEach(day => {
+
+        if(!this.businessHours[day].closed){
+
+          this.businessHours[day].slots =
+            mondaySlots.map((slot:any)=>({
+              open: slot.open,
+              close: slot.close
+            }));
+
         }
 
       });
 
-    } catch (error) {
-      console.error('Error initializing form:', error);
-    }
-
   }
 
-  timeValidator(group: FormGroup) {
+  validateSlots(slots:TimeSlot[]):boolean{
 
-    try {
-
-      const open24 = group.get('open24Hours')?.value;
-      const open = group.get('openTime')?.value;
-      const close = group.get('closeTime')?.value;
-
-      if (open24) return null;
-
-      if (!open || !close) return null;
-
-      return open < close ? null : { invalidTimeRange: true };
-
-    } catch (error) {
-      console.error('Error validating time range:', error);
-      return null;
+    if(this.businessHours[this.selectedDay].closed){
+      return true;
     }
 
-  }
+    this.errorMessage='';
 
-  submitHours() {
+    for(const slot of slots){
 
-    try {
-
-      this.submitted = true;
-
-      if (this.businessHoursForm.invalid) {
-        return;
+      if(!slot.open && !slot.close){
+        this.errorMessage='Open and Close hours are required.';
+        return false;
       }
 
-      console.log('Business Hours:', this.businessHoursForm.value);
+      if(!slot.open){
+        this.errorMessage='Open time is required.';
+        return false;
+      }
 
-    } catch (error) {
-      console.error('Error submitting business hours:', error);
+      if(!slot.close){
+        this.errorMessage='Close time is required.';
+        return false;
+      }
+
+      if(slot.open >= slot.close){
+        this.errorMessage='Open time must be earlier than close time.';
+        return false;
+      }
+
     }
+
+    return true;
+
+  }
+
+  submitHours(){
+
+    if(!this.validateSlots(this.timeSlots)) return;
+
+    if(!this.businessHours[this.selectedDay].closed){
+
+      this.businessHours[this.selectedDay].slots =
+        this.timeSlots.map(s=>({...s}));
+
+    }
+
+    this.hoursService.setHours(this.businessHours);
+
+    console.log(
+      'Saved Hours:',
+      JSON.stringify(this.businessHours,null,2)
+    );
+
+  }
+  /** For showing ✔ tick mark in UI */
+  hasHours(day:string){
+
+    return !this.businessHours[day].closed &&
+           this.businessHours[day].slots.length > 0;
 
   }
 

@@ -1,31 +1,55 @@
 <div class="photo-upload-container">
 
-  <h3>Business Photo</h3>
+  <h3>Upload Business Photos (Optional)</h3>
+
+  <div
+    class="upload-box"
+    (click)="fileInput.click()"
+    (dragover)="onDragOver($event)"
+    (drop)="onDrop($event)"
+  >
+
+    <!-- Upload Area -->
+    <div *ngIf="!selectedImage" class="upload-placeholder">
+
+      <div class="upload-icon">⬆</div>
+
+      <p>Click to upload or drag and drop</p>
+
+      <span>PNG, JPG up to 10MB</span>
+
+    </div>
+
+    <!-- Image Preview -->
+    <div *ngIf="selectedImage" class="preview-wrapper">
+
+      <img
+        [src]="selectedImage"
+        alt="Uploaded Business Photo"
+        class="preview-image"
+      />
+
+      <button
+        class="remove-btn"
+        (click)="removeImage($event)"
+      >
+        Remove
+      </button>
+
+    </div>
+
+  </div>
 
   <input
+    #fileInput
     type="file"
     accept=".jpg,.jpeg,.png"
     (change)="onFileSelected($event)"
+    hidden
   />
-
-  <p class="info-text">
-    Accepted formats: JPG, JPEG, PNG
-  </p>
 
   <div class="error" *ngIf="errorMessage">
     {{ errorMessage }}
-  </div>
-
-  <div class="preview-container" *ngIf="selectedImage">
-
-    <p>Image Preview</p>
-
-    <img
-      [src]="selectedImage"
-      alt="Business Photo Preview"
-      class="preview-image"
-    />
-
   </div>
 
 </div>
