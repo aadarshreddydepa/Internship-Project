@@ -11,27 +11,35 @@
     <!-- STEP PROGRESS -->
     <div class="stepper">
 
-      <div class="step" [class.active]="currentStep >= 1">
-        <div class="circle">1</div>
-        <span>Basic Info</span>
-      </div>
+  <div class="step" [class.active]="currentStep >= 1">
+    <div class="circle">1</div>
+    <span>Basic Info</span>
+  </div>
 
-      <div class="line"></div>
+  <div class="line"></div>
 
-      <div class="step" [class.active]="currentStep >= 2">
-        <div class="circle">2</div>
-        <span>Contact Details</span>
-      </div>
+  <div class="step" [class.active]="currentStep >= 2">
+    <div class="circle">2</div>
+    <span>Contact Details</span>
+  </div>
 
-      <div class="line"></div>
+  
+  <div class="line"></div>
 
-      <div class="step" [class.active]="currentStep >= 3">
-        <div class="circle">3</div>
-        <span>Additional Info</span>
-      </div>
+  <div class="step" [class.active]="currentStep >= 3">
+    <div class="circle">3</div>
+    <span>Additional Info</span>
+  </div>
 
-    </div>
+  <div class="line"></div>
 
+  <div class="step" [class.active]="currentStep >= 4">
+    <div class="circle">4</div>
+    <span>Preview</span>
+  </div>
+
+
+</div>
     <!-- FORM CARD -->
     <div class="form-card">
 
@@ -54,10 +62,15 @@
               placeholder="Enter business name"
               formControlName="businessName">
 
-            <div class="error"
-              *ngIf="businessForm.get('businessName')?.touched && businessForm.get('businessName')?.invalid">
+           <div class="error" *ngIf="businessForm.get('businessName')?.touched">
 
-              Business name is required
+            <span *ngIf="businessForm.get('businessName')?.errors?.['required']">
+                Business name is required
+            </span>
+
+            <span *ngIf="businessForm.get('businessName')?.errors?.['pattern']">
+            Business name cannot contain only spaces
+            </span>
 
             </div>
 
@@ -76,10 +89,15 @@
               formControlName="description">
             </textarea>
 
-            <div class="error"
-              *ngIf="businessForm.get('description')?.touched && businessForm.get('description')?.invalid">
+            <div class="error" *ngIf="businessForm.get('description')?.touched">
 
-              Description is required
+            <span *ngIf="businessForm.get('description')?.errors?.['required']">
+                Description is required
+            </span>
+
+            <span *ngIf="businessForm.get('description')?.errors?.['minlength']">
+                Description must be at least 10 characters
+            </span>
 
             </div>
 
@@ -108,6 +126,10 @@
 
                 </option>
 
+                <div class="error" *ngIf="businessForm.get('category')?.touched && businessForm.get('category')?.invalid">
+                Category is required
+                </div>
+
               </select>
 
             </div>
@@ -128,6 +150,10 @@
                   {{sub}}
 
                 </option>
+
+                <div class="error" *ngIf="businessForm.get('subcategory')?.touched && businessForm.get('subcategory')?.invalid">
+                Subcategory is required
+                </div>
 
               </select>
 
@@ -165,7 +191,8 @@
         </app-contact-details>
 
       </div>
-
+    
+     
 
       <!-- STEP 3 : ADDITIONAL INFO -->
 
@@ -189,16 +216,62 @@
 
           </button>
 
-          <button class="submit-btn">
-
-            Submit Registration
-
+          <button class="next-btn" (click)="goToNext()">
+            Next
           </button>
 
         </div>
 
       </div>
 
+      <!-- STEP 4 : PREVIEW -->
+
+<div *ngIf="currentStep === 4">
+
+<h2>Review Your Details</h2>
+
+<div class="review-box">
+
+<h3>Business Information</h3>
+
+<p><b>Business Name:</b> {{businessData?.businessName}}</p>
+<p><b>Description:</b> {{businessData?.description}}</p>
+<p><b>Category:</b> {{businessData?.category}}</p>
+<p><b>Subcategory:</b> {{businessData?.subcategory}}</p>
+
+<h3>Contact Details</h3>
+
+<p><b>Phone:</b> {{contactData?.phone}}</p>
+<p><b>Email:</b> {{contactData?.email}}</p>
+<p><b>Website:</b> {{contactData?.website}}</p>
+<p><b>Address:</b> {{contactData?.address}}</p>
+<p><b>City:</b> {{contactData?.city}}</p>
+<p><b>State:</b> {{contactData?.state}}</p>
+<p><b>Pincode:</b> {{contactData?.pincode}}</p>
+
+</div>
+
+<div class="button-container">
+
+<button
+class="previous-btn"
+(click)="goToPrevious()">
+
+Edit Details
+
+</button>
+
+<button
+class="submit-btn"
+(click)="submitRegistration()">
+
+Submit Registration
+
+</button>
+
+</div>
+
+</div>
     </div>
 
   </div>

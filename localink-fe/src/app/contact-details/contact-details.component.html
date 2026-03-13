@@ -4,15 +4,23 @@
 
 <form [formGroup]="contactForm">
 
-<label>Phone Number</label>
+<label>Phone Number *</label>
 <input type="text" formControlName="phone" placeholder="Enter phone number">
 
-<div class="error" *ngIf="contactForm.get('phone')?.touched && contactForm.get('phone')?.invalid">
-Phone number must be 10 digits
+<div class="error" *ngIf="contactForm.get('phone')?.touched">
+
+<span *ngIf="contactForm.get('phone')?.errors?.['required']">
+Phone number is required
+</span>
+
+<span *ngIf="contactForm.get('phone')?.errors?.['pattern']">
+Enter a valid 10-digit phone number
+</span>
+
 </div>
 
 
-<label>Email</label>
+<label>Email *</label>
 <input type="email" formControlName="email" placeholder="Enter email">
 
 <div class="error" *ngIf="contactForm.get('email')?.touched && contactForm.get('email')?.invalid">
@@ -20,7 +28,7 @@ Enter a valid email
 </div>
 
 
-<label>Website</label>
+<label>Website(Optional)</label>
 <input type="text" formControlName="website" placeholder="Enter website">
 
 <div class="error" *ngIf="contactForm.get('website')?.touched && contactForm.get('website')?.invalid">
@@ -30,7 +38,7 @@ Enter a valid website URL
 
 <hr>
 
-<label>Address</label>
+<label>Street Address *</label>
 <input type="text" formControlName="address" placeholder="Enter business address">
 
 <div class="error" *ngIf="contactForm.get('address')?.touched && contactForm.get('address')?.invalid">
@@ -42,7 +50,7 @@ Address is required
 <div class="location-row">
 
 <div class="location-field">
-<label>City</label>
+<label>City *</label>
 <input type="text" formControlName="city" placeholder="City">
 
 <div class="error" *ngIf="contactForm.get('city')?.touched && contactForm.get('city')?.invalid">
@@ -52,7 +60,7 @@ City is required
 
 
 <div class="location-field">
-<label>State</label>
+<label>State *</label>
 <input type="text" formControlName="state" placeholder="State">
 
 <div class="error" *ngIf="contactForm.get('state')?.touched && contactForm.get('state')?.invalid">
@@ -62,11 +70,11 @@ State is required
 
 
 <div class="location-field">
-<label>Pincode</label>
+<label>Pincode *</label>
 <input type="text" formControlName="pincode" placeholder="Pincode">
 
 <div class="error" *ngIf="contactForm.get('pincode')?.touched && contactForm.get('pincode')?.invalid">
-Pincode must be 6 digits
+Enter a valid 6 digit pincode
 </div>
 </div>
 

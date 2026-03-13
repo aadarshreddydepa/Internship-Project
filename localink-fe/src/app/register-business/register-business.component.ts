@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { PLATFORM_ID } from '@angular/core';
 
 import { ContactDetailsComponent } from '../contact-details/contact-details.component';
 import { HoursComponent } from '../business/hours/hours.component';
@@ -19,11 +20,12 @@ import { PhotoUploadComponent } from '../business/photo-upload/photo-upload.comp
   templateUrl: './register-business.component.html',
   styleUrls: ['./register-business.component.css']
 })
-export class RegisterBusinessComponent {
+export class RegisterBusinessComponent implements OnInit {
 
   currentStep = 1;
-
   businessForm!: FormGroup;
+  businessData: any;
+  contactData: any;
 
   categories = [
     { name: 'Food', subcategories: ['Restaurant', 'Cafe', 'Bakery'] },
@@ -33,45 +35,65 @@ export class RegisterBusinessComponent {
 
   subcategories: string[] = [];
 
-  constructor(private fb: FormBuilder) {
-
+  constructor(
+    private fb: FormBuilder,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
     this.businessForm = this.fb.group({
-      businessName: ['', Validators.required],
-      description: ['', Validators.required],
+      businessName: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern(/^(?!\s*$).+/)
+        ]
+      ],
+      description: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(10)
+        ]
+      ],
       category: ['', Validators.required],
       subcategory: ['', Validators.required]
     });
+  }
 
+  ngOnInit() {
+    if (isPlatformBrowser(this.platformId)) {
+      const savedBusiness = localStorage.getItem('businessDetails');
+      if (savedBusiness && this.currentStep !== 1) {
+        this.businessForm.patchValue(JSON.parse(savedBusiness));
+      }
+    }
   }
 
   onCategoryChange() {
-
     const selectedCategory = this.businessForm.get('category')?.value;
-
-    const categoryObj = this.categories.find(
-      cat => cat.name === selectedCategory
-    );
-
+    const categoryObj = this.categories.find(cat => cat.name === selectedCategory);
     this.subcategories = categoryObj ? categoryObj.subcategories : [];
-
     this.businessForm.patchValue({ subcategory: '' });
-
   }
 
   goToNext() {
-
     if (this.currentStep === 1) {
-
       if (this.businessForm.valid) {
+        if (isPlatformBrowser(this.platformId)) {
+          localStorage.setItem('businessDetails', JSON.stringify(this.businessForm.value));
+        }
         this.currentStep = 2;
       } else {
         this.businessForm.markAllAsTouched();
       }
-
-    } else if (this.currentStep < 3) {
-      this.currentStep++;
+    } else if (this.currentStep === 2) {
+      this.currentStep = 3;
+    } else if (this.currentStep === 3) {
+      if (isPlatformBrowser(this.platformId)) {
+        this.businessData = JSON.parse(localStorage.getItem('businessDetails') || '{}');
+        this.contactData = JSON.parse(localStorage.getItem('contactDetails') || '{}');
+      }
+      this.currentStep = 4;
     }
-
   }
 
   goToPrevious() {
@@ -80,4 +102,17 @@ export class RegisterBusinessComponent {
     }
   }
 
+  submitRegistration() {
+    alert("Business Registered Successfully!");
+
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem('businessDetails');
+      localStorage.removeItem('contactDetails');
+    }
+
+    this.businessData = null;
+    this.contactData = null;
+    this.businessForm.reset();
+    this.currentStep = 1;
+  }
 }

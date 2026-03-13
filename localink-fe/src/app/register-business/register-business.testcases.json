@@ -4,8 +4,9 @@
       "scenario": "Valid business details",
       "data": {
         "businessName": "Tech Solutions",
-        "category": "IT Services",
-        "description": "Software development company"
+        "description": "We provide software development services",
+        "category": "Services",
+        "subcategory": "Consulting"
       },
       "expected": true
     },
@@ -13,17 +14,29 @@
       "scenario": "Empty business name",
       "data": {
         "businessName": "",
-        "category": "IT Services",
-        "description": "Software development company"
+        "description": "We provide software development services",
+        "category": "Services",
+        "subcategory": "Consulting"
       },
       "expected": false
     },
     {
-      "scenario": "Empty business category",
+      "scenario": "Business name too short",
       "data": {
-        "businessName": "Tech Solutions",
-        "category": "",
-        "description": "Software development company"
+        "businessName": "AB",
+        "description": "We provide software development services",
+        "category": "Services",
+        "subcategory": "Consulting"
+      },
+      "expected": false
+    },
+    {
+      "scenario": "Business name only whitespace",
+      "data": {
+        "businessName": "   ",
+        "description": "We provide software development services",
+        "category": "Services",
+        "subcategory": "Consulting"
       },
       "expected": false
     },
@@ -31,8 +44,39 @@
       "scenario": "Empty description",
       "data": {
         "businessName": "Tech Solutions",
-        "category": "IT Services",
-        "description": ""
+        "description": "",
+        "category": "Services",
+        "subcategory": "Consulting"
+      },
+      "expected": false
+    },
+    {
+      "scenario": "Description too short",
+      "data": {
+        "businessName": "Tech Solutions",
+        "description": "Too short",
+        "category": "Services",
+        "subcategory": "Consulting"
+      },
+      "expected": false
+    },
+    {
+      "scenario": "Empty category",
+      "data": {
+        "businessName": "Tech Solutions",
+        "description": "We provide software development services",
+        "category": "",
+        "subcategory": "Consulting"
+      },
+      "expected": false
+    },
+    {
+      "scenario": "Empty subcategory",
+      "data": {
+        "businessName": "Tech Solutions",
+        "description": "We provide software development services",
+        "category": "Services",
+        "subcategory": ""
       },
       "expected": false
     }
