@@ -1,49 +1,79 @@
 <div class="hours-container">
 
-  <h3>Business Hours</h3>
+<h3>Business Working Hours</h3>
 
-  <form [formGroup]="businessHoursForm">
+<div class="day-tabs">
 
-    <div class="checkbox-row">
-      <input type="checkbox" formControlName="open24Hours" />
-      <label>Open 24 Hours</label>
-    </div>
+<button
+*ngFor="let day of days"
+(click)="selectDay(day)"
+[class.active]="selectedDay === day">
 
-    <div class="time-row" *ngIf="!businessHoursForm.get('open24Hours')?.value">
+{{day}}
 
-      <div class="input-group">
-        <label>Open Time</label>
-        <input type="time" formControlName="openTime" />
+<span *ngIf="businessHours[day].closed">
+(Closed)
+</span>
 
-        <div class="error"
-             *ngIf="submitted && businessHoursForm.get('openTime')?.invalid">
-          Open time is required.
-        </div>
-      </div>
+</button>
 
-      <div class="input-group">
-        <label>Close Time</label>
-        <input type="time" formControlName="closeTime" />
+</div>
 
-        <div class="error"
-             *ngIf="submitted && businessHoursForm.get('closeTime')?.invalid">
-          Close time is required.
-        </div>
-      </div>
 
-    </div>
+<div class="quick-actions">
 
-    <div class="error"
-         *ngIf="submitted && businessHoursForm.errors?.['invalidTimeRange']">
-      Closing time must be after opening time.
-    </div>
+<button (click)="applyWeekdays()">
+Apply Monday hours to Weekdays
+</button>
 
-    <button
-      type="button"
-      (click)="submitHours()">
-      Save Hours
-    </button>
+<button (click)="toggleClosed(selectedDay)">
+Toggle Closed
+</button>
 
-  </form>
+</div>
+
+
+<div *ngIf="!businessHours[selectedDay].closed">
+
+<div
+class="slot"
+*ngFor="let slot of timeSlots; let i = index">
+
+<label>From</label>
+
+<input
+type="time"
+[(ngModel)]="slot.open">
+
+<span>→</span>
+
+<label>To</label>
+
+<input
+type="time"
+[(ngModel)]="slot.close">
+
+<button
+(click)="removeSlot(i) " class="remove">
+Remove
+</button>
+
+</div>
+
+<button class="add-slot" (click)="addSlot()">
+Add Slot
+</button>
+
+</div>
+
+
+<div class="error" *ngIf="errorMessage">
+{{errorMessage}}
+</div>
+
+
+<button (click)="submitHours()" class="save">
+Save Hours
+</button>
 
 </div>

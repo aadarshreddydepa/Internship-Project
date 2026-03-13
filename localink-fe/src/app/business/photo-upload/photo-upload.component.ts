@@ -11,72 +11,81 @@ import { CommonModule } from '@angular/common';
 export class PhotoUploadComponent {
 
   selectedImage: string | null = null;
-  errorMessage: string = '';
+  errorMessage = '';
 
   allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
 
-  maxFileSize = 5 * 1024 * 1024; // 5MB
+  maxFileSize = 10 * 1024 * 1024; // 10MB
 
   onFileSelected(event: Event) {
 
-    try {
+    const input = event.target as HTMLInputElement;
 
-      const input = event.target as HTMLInputElement;
-
-      if (!input.files || input.files.length === 0) {
-        return;
-      }
-
-      const file = input.files[0];
-
-      // File type validation
-      if (!this.allowedTypes.includes(file.type)) {
-
-        this.errorMessage = 'Only JPG, JPEG, and PNG files are allowed.';
-        this.selectedImage = null;
-        return;
-
-      }
-
-      // File size validation
-      if (file.size > this.maxFileSize) {
-
-        this.errorMessage = 'Image size must be less than 5MB.';
-        this.selectedImage = null;
-        return;
-
-      }
-
-      this.errorMessage = '';
-
-      const reader = new FileReader();
-
-      reader.onload = () => {
-
-        try {
-
-          this.selectedImage = reader.result as string;
-
-          // Dummy local storage
-          localStorage.setItem('businessPhoto', this.selectedImage);
-
-        } catch (storageError) {
-          console.error('Error saving image to local storage:', storageError);
-        }
-
-      };
-
-      reader.onerror = (error) => {
-        console.error('FileReader error:', error);
-        this.errorMessage = 'Failed to read the selected file.';
-      };
-
-      reader.readAsDataURL(file);
-
-    } catch (error) {
-      console.error('Error processing uploaded file:', error);
-      this.errorMessage = 'Unexpected error occurred during file upload.';
+    if (!input.files || input.files.length === 0) {
+      return;
     }
+
+    this.processFile(input.files[0]);
+
+  }
+
+  onDragOver(event: DragEvent) {
+
+    event.preventDefault();
+
+  }
+
+  onDrop(event: DragEvent) {
+
+    event.preventDefault();
+
+    if (!event.dataTransfer?.files.length) return;
+
+    const file = event.dataTransfer.files[0];
+
+    this.processFile(file);
+
+  }
+
+  processFile(file: File) {
+
+    if (!this.allowedTypes.includes(file.type)) {
+
+      this.errorMessage = 'Only JPG, JPEG, and PNG files are allowed.';
+      return;
+
+    }
+
+    if (file.size > this.maxFileSize) {
+
+      this.errorMessage = 'Image must be smaller than 10MB.';
+      return;
+
+    }
+
+    this.errorMessage = '';
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+
+      this.selectedImage = reader.result as string;
+
+      localStorage.setItem('businessPhoto', this.selectedImage);
+
+    };
+
+    reader.readAsDataURL(file);
+
+  }
+
+  removeImage(event: Event) {
+
+    event.stopPropagation();
+
+    this.selectedImage = null;
+
+    localStorage.removeItem('businessPhoto');
 
   }
 
