@@ -16,9 +16,9 @@
     },
 
     {
-      "scenario": "Invalid phone number",
+      "scenario": "Phone number less than 10 digits",
       "data": {
-        "phone": "123",
+        "phone": "987654321",
         "email": "user@gmail.com",
         "website": "https://example.com",
         "address": "MG Road",
@@ -30,10 +30,10 @@
     },
 
     {
-      "scenario": "Invalid email format",
+      "scenario": "Phone number starting below 6",
       "data": {
-        "phone": "9876543210",
-        "email": "wrong-email",
+        "phone": "5123456789",
+        "email": "user@gmail.com",
         "website": "https://example.com",
         "address": "MG Road",
         "city": "Mumbai",
@@ -44,7 +44,77 @@
     },
 
     {
-      "scenario": "Invalid pincode",
+      "scenario": "Phone number with all repeating digits",
+      "data": {
+        "phone": "0000000000",
+        "email": "user@gmail.com",
+        "website": "https://example.com",
+        "address": "MG Road",
+        "city": "Mumbai",
+        "state": "Maharashtra",
+        "pincode": "400001"
+      },
+      "expected": false
+    },
+
+    {
+      "scenario": "Email starting with dot",
+      "data": {
+        "phone": "9876543210",
+        "email": ".user@gmail.com",
+        "website": "https://example.com",
+        "address": "MG Road",
+        "city": "Mumbai",
+        "state": "Maharashtra",
+        "pincode": "400001"
+      },
+      "expected": false
+    },
+
+    {
+      "scenario": "Email without domain extension",
+      "data": {
+        "phone": "9876543210",
+        "email": "user@gmail",
+        "website": "https://example.com",
+        "address": "MG Road",
+        "city": "Mumbai",
+        "state": "Maharashtra",
+        "pincode": "400001"
+      },
+      "expected": false
+    },
+
+    {
+      "scenario": "Invalid website format",
+      "data": {
+        "phone": "9876543210",
+        "email": "user@gmail.com",
+        "website": "invalid-site",
+        "address": "MG Road",
+        "city": "Mumbai",
+        "state": "Maharashtra",
+        "pincode": "400001"
+      },
+      "expected": false
+    },
+
+    {
+      "scenario": "Website field left empty (allowed)",
+      "data": {
+        "phone": "9876543210",
+        "email": "user@gmail.com",
+        "website": "",
+        "address": "MG Road",
+        "city": "Mumbai",
+        "state": "Maharashtra",
+        "pincode": "400001"
+      },
+      "expected": true
+    },
+
+    {
+      "scenario": "Pincode less than 6 digits",
       "data": {
         "phone": "9876543210",
         "email": "user@gmail.com",
@@ -53,6 +123,20 @@
         "city": "Mumbai",
         "state": "Maharashtra",
         "pincode": "123"
+      },
+      "expected": false
+    },
+
+    {
+      "scenario": "Pincode starting with zero",
+      "data": {
+        "phone": "9876543210",
+        "email": "user@gmail.com",
+        "website": "https://example.com",
+        "address": "MG Road",
+        "city": "Mumbai",
+        "state": "Maharashtra",
+        "pincode": "012345"
       },
       "expected": false
     }
