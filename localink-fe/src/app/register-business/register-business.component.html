@@ -62,18 +62,14 @@
               placeholder="Enter business name"
               formControlName="businessName">
 
-           <div class="error" *ngIf="businessForm.get('businessName')?.touched">
-
-            <span *ngIf="businessForm.get('businessName')?.errors?.['required']">
+            <div class="error" *ngIf="businessForm.get('businessName')?.touched && businessForm.get('businessName')?.invalid">
+                <span *ngIf="businessForm.get('businessName')?.errors?.['required']">
                 Business name is required
-            </span>
-
-            <span *ngIf="businessForm.get('businessName')?.errors?.['pattern']">
-            Business name cannot contain only spaces
-            </span>
-
+                </span>
+                <span *ngIf="businessForm.get('businessName')?.errors?.['pattern']">
+                Business name must contain only letters, spaces, &, ', or -
+                </span>
             </div>
-
           </div>
 
 
@@ -97,6 +93,10 @@
 
             <span *ngIf="businessForm.get('description')?.errors?.['minlength']">
                 Description must be at least 10 characters
+            </span>
+
+            <span *ngIf="businessForm.get('description')?.errors?.['pattern']">
+                Description must contain only letters
             </span>
 
             </div>
@@ -126,11 +126,10 @@
 
                 </option>
 
-                <div class="error" *ngIf="businessForm.get('category')?.touched && businessForm.get('category')?.invalid">
-                Category is required
-                </div>
-
               </select>
+              <div class="error" *ngIf="businessForm.get('category')?.touched && businessForm.get('category')?.invalid">
+              Category is required
+              </div>
 
             </div>
 
@@ -151,11 +150,11 @@
 
                 </option>
 
-                <div class="error" *ngIf="businessForm.get('subcategory')?.touched && businessForm.get('subcategory')?.invalid">
+              </select>
+
+               <div class="error" *ngIf="businessForm.get('subcategory')?.touched && businessForm.get('subcategory')?.invalid">
                 Subcategory is required
                 </div>
-
-              </select>
 
             </div>
 

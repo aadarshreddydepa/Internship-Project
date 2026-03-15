@@ -30,7 +30,7 @@ font-size:14px;
 }
 
 /* Inputs */
-input{
+input,select{
 width:100%;
 padding:10px;
 background:#343434;
@@ -47,7 +47,7 @@ color:#B19F91;
 }
 
 /* Input focus */
-input:focus{
+input:focus,select:focus{
 outline:none;
 border-color:#C8A97E;
 box-shadow:0 0 4px #C8A97E;
@@ -63,7 +63,7 @@ margin:25px 0;
 /* City State Pincode row */
 .location-row{
 display:flex;
-gap:15px;
+gap:12px;
 margin-top:10px;
 }
 
@@ -121,3 +121,4 @@ color:#C8A97E;
 font-weight:600;
 text-align:center;
 }
+
