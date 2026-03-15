@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { EventEmitter, Output, Input } from '@angular/core';
 
 interface TimeSlot {
   open: string;
@@ -25,6 +26,22 @@ interface DaySchedule {
 })
 export class HoursComponent {
 
+  @Output() hoursSaved = new EventEmitter<any>();
+  @Input() initialHours: any;
+
+  ngOnInit() {
+
+      if (this.initialHours && this.initialHours.length) {
+        this.days.forEach(day => {
+          const saved = this.initialHours.find((d: { day: string; }) => d.day === day.name);
+          if (saved) {
+            day.mode = saved.mode;
+            day.slots = saved.slots || [];
+          }
+        });
+      }
+    }
+    
   days: DaySchedule[] = [
     { name: 'Monday', selected: false, mode: 'custom', slots: [] },
     { name: 'Tuesday', selected: false, mode: 'custom', slots: [] },
@@ -142,9 +159,8 @@ export class HoursComponent {
     }));
 
     console.log("Saved Business Hours:", result);
-
+    this.hoursSaved.emit(result);
     this.successMessage = "Business hours saved successfully!";
-
     setTimeout(() => {
       this.successMessage = '';
     }, 3000);
