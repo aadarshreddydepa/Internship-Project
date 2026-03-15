@@ -185,7 +185,8 @@
       <div *ngIf="currentStep === 2">
 
         <app-contact-details
-          (next)="goToNext()"
+          [initialData]="contactData"
+          (next)="saveContactAndNext($event)"
           (previous)="goToPrevious()">
         </app-contact-details>
 
@@ -198,13 +199,12 @@
       <div *ngIf="currentStep === 3">
 
         <h3>Additional Information</h3>
+        <app-hours [initialHours]="hoursData" (hoursSaved)="saveHours($event)"></app-hours>
+        <app-photo-upload [initialPhoto]="photoData" (photoSelected)="savePhoto($event)"></app-photo-upload>
 
-        <!-- HOURS COMPONENT -->
-        <app-hours></app-hours>
-
-        <!-- PHOTO UPLOAD -->
-        <app-photo-upload></app-photo-upload>
-
+        <div class="error" *ngIf="hoursErrorMessage">
+          {{ hoursErrorMessage }}
+        </div>
         <div class="button-container step3-buttons">
 
           <button
@@ -224,55 +224,31 @@
       </div>
 
       <!-- STEP 4 : PREVIEW -->
+       <div *ngIf="currentStep === 4">
 
-<div *ngIf="currentStep === 4">
+        <app-preview
+          [businessData]="businessData"
+          [contactData]="contactData"
+          [hoursData]="hoursData"
+          [photoData]="photoData">
+        </app-preview>
 
-<h2>Review Your Details</h2>
+        <div class="button-container preview-buttons">
 
-<div class="review-box">
+          <button
+            class="previous-btn"
+            (click)="goToPrevious()">
+            Edit Details
+          </button>
 
-<h3>Business Information</h3>
+          <button
+            class="submit-btn"
+            (click)="submitRegistration()">
+            Submit Registration
+          </button>
 
-<p><b>Business Name:</b> {{businessData?.businessName}}</p>
-<p><b>Description:</b> {{businessData?.description}}</p>
-<p><b>Category:</b> {{businessData?.category}}</p>
-<p><b>Subcategory:</b> {{businessData?.subcategory}}</p>
-
-<h3>Contact Details</h3>
-
-<p><b>Phone:</b> {{contactData?.phone}}</p>
-<p><b>Email:</b> {{contactData?.email}}</p>
-<p><b>Website:</b> {{contactData?.website}}</p>
-<p><b>Address:</b> {{contactData?.address}}</p>
-<p><b>City:</b> {{contactData?.city}}</p>
-<p><b>State:</b> {{contactData?.state}}</p>
-<p><b>Pincode:</b> {{contactData?.pincode}}</p>
-
-</div>
-
-<div class="button-container">
-
-<button
-class="previous-btn"
-(click)="goToPrevious()">
-
-Edit Details
-
-</button>
-
-<button
-class="submit-btn"
-(click)="submitRegistration()">
-
-Submit Registration
-
-</button>
-
-</div>
-
-</div>
-    </div>
-
+        </div>
+        </div>
   </div>
 
 </div>

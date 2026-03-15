@@ -188,7 +188,11 @@ button:hover{
   border:1px solid #484948;
   color:#F8F4F0;
 }
-
+.preview-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
 .previous-btn:hover{
   background:#444;
 }

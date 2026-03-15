@@ -7,6 +7,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { ContactDetailsComponent } from '../contact-details/contact-details.component';
 import { HoursComponent } from '../business/hours/hours.component';
 import { PhotoUploadComponent } from '../business/photo-upload/photo-upload.component';
+import { PreviewComponent } from '../business/preview/preview.component';
 
 @Component({
   selector: 'app-register-business',
@@ -17,23 +18,27 @@ import { PhotoUploadComponent } from '../business/photo-upload/photo-upload.comp
     NgSelectModule,
     ContactDetailsComponent,
     HoursComponent,
-    PhotoUploadComponent
+    PhotoUploadComponent,
+    PreviewComponent
   ],
   templateUrl: './register-business.component.html',
   styleUrls: ['./register-business.component.css']
 })
-export class RegisterBusinessComponent implements OnInit {
+export class RegisterBusinessComponent {
 
   currentStep = 1;
   businessForm!: FormGroup;
   businessData: any;
   contactData: any;
+  hoursErrorMessage = '';
 
   categories = [
     { name: 'Food', subcategories: ['Restaurant', 'Cafe', 'Bakery'] },
     { name: 'Retail', subcategories: ['Clothing', 'Electronics', 'Supermarket'] },
     { name: 'Services', subcategories: ['Salon', 'Repair', 'Consulting'] }
   ];
+  hoursData: any = [];
+  photoData: string | null = null;
 
   subcategories: string[] = [];
 
@@ -64,15 +69,6 @@ export class RegisterBusinessComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
-    if (isPlatformBrowser(this.platformId)) {
-      const savedBusiness = localStorage.getItem('businessDetails');
-      if (savedBusiness && this.currentStep !== 1) {
-        this.businessForm.patchValue(JSON.parse(savedBusiness));
-      }
-    }
-  }
-
   onCategoryChange() {
     const selectedCategory = this.businessForm.get('category')?.value;
     const categoryObj = this.categories.find(cat => cat.name === selectedCategory);
@@ -85,20 +81,18 @@ export class RegisterBusinessComponent implements OnInit {
   goToNext() {
     if (this.currentStep === 1) {
       if (this.businessForm.valid) {
-        if (isPlatformBrowser(this.platformId)) {
-          localStorage.setItem('businessDetails', JSON.stringify(this.businessForm.value));
-        }
+        this.businessData = this.businessForm.value;
         this.currentStep = 2;
       } else {
         this.businessForm.markAllAsTouched();
       }
-    } else if (this.currentStep === 2) {
-      this.currentStep = 3;
-    } else if (this.currentStep === 3) {
-      if (isPlatformBrowser(this.platformId)) {
-        this.businessData = JSON.parse(localStorage.getItem('businessDetails') || '{}');
-        this.contactData = JSON.parse(localStorage.getItem('contactDetails') || '{}');
+    }
+    else if (this.currentStep === 3) {
+      if (!this.validateBusinessHours()) {
+        this.hoursErrorMessage = "Please configure business hours for all days";
+        return;
       }
+      this.hoursErrorMessage = '';
       this.currentStep = 4;
     }
   }
@@ -108,6 +102,38 @@ export class RegisterBusinessComponent implements OnInit {
       this.currentStep--;
     }
   }
+  saveContactAndNext(data: any) {
+    this.contactData = data;
+    this.currentStep = 3;
+  }
+
+  saveHours(hours: any) {
+    this.hoursData = hours;
+    this.hoursErrorMessage = '';
+  }
+
+  savePhoto(photo: string) {
+    this.photoData = photo;
+  }
+
+  validateBusinessHours(): boolean {
+      if (!this.hoursData || this.hoursData.length === 0) {
+        return false;
+      }
+      for (let day of this.hoursData) {
+        if (day.mode === 'custom') {
+          if (!day.slots || day.slots.length === 0) {
+            return false;
+          }
+          for (let slot of day.slots) {
+            if (!slot.open || !slot.close) {
+              return false;
+            }
+          }
+        }
+      }
+      return true;
+    }
 
   submitRegistration() {
     alert("Business Registered Successfully!");
