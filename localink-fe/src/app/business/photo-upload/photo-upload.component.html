@@ -4,6 +4,7 @@
 
   <div
     class="upload-box"
+    [class.has-image]="selectedImage"
     (click)="fileInput.click()"
     (dragover)="onDragOver($event)"
     (drop)="onDrop($event)"
@@ -16,10 +17,9 @@
 
       <p>Click to upload or drag and drop</p>
 
-      <span>PNG, JPG up to 10MB</span>
+      <span>PNG, JPG up to 5MB</span>
 
     </div>
-
     <!-- Image Preview -->
     <div *ngIf="selectedImage" class="preview-wrapper">
 

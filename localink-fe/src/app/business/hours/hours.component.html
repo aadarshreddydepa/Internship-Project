@@ -1,79 +1,200 @@
-<div class="hours-container">
+<div class="container">
 
-<h3>Business Working Hours</h3>
+  <h3>Business Hours</h3>
+  <p class="subtitle">Select days and configure schedule</p>
 
-<div class="day-tabs">
+  <!-- STEP 1 -->
 
-<button
-*ngFor="let day of days"
-(click)="selectDay(day)"
-[class.active]="selectedDay === day">
+  <div class="card">
 
-{{day}}
+    <div class="header">
+      <h3>Select Days</h3>
 
-<span *ngIf="businessHours[day].closed">
-(Closed)
-</span>
+      <div class="actions">
+        <button (click)="selectAll()">Select All</button>
+        <button (click)="clearSelection()">Clear</button>
+      </div>
+    </div>
 
-</button>
+    <!-- <div class="days">
 
-</div>
+        <div
+            class="day"
+            *ngFor="let d of days"
+            [class.active]="d.selected"
+            (click)="d.selected = !d.selected">
 
+            <span>{{d.name}}</span>
 
-<div class="quick-actions">
+            <span class="check" *ngIf="d.selected">✓</span>
 
-<button (click)="applyWeekdays()">
-Apply Monday hours to Weekdays
-</button>
+        </div>
 
-<button (click)="toggleClosed(selectedDay)">
-Toggle Closed
-</button>
+    </div> -->
+    <div class="days">
 
-</div>
+  <div
+    class="day-chip"
+    *ngFor="let d of days"
+    [class.active]="d.selected"
+    (click)="d.selected = !d.selected">
 
+    {{d.name}}
 
-<div *ngIf="!businessHours[selectedDay].closed">
-
-<div
-class="slot"
-*ngFor="let slot of timeSlots; let i = index">
-
-<label>From</label>
-
-<input
-type="time"
-[(ngModel)]="slot.open">
-
-<span>→</span>
-
-<label>To</label>
-
-<input
-type="time"
-[(ngModel)]="slot.close">
-
-<button
-(click)="removeSlot(i) " class="remove">
-Remove
-</button>
+  </div>
 
 </div>
+    <button
+      class="set-btn"
+      *ngIf="selectedDays.length"
+      (click)="openConfig()">
 
-<button class="add-slot" (click)="addSlot()">
-Add Slot
-</button>
+      Set Hours for {{selectedDays.length}} Day(s)
+
+    </button>
+
+  </div>
+
+  <!-- CONFIGURE HOURS -->
+
+  <div class="card configure" *ngIf="showConfig && selectedDays.length">
+
+    <h3>Configure Hours</h3>
+
+    <p class="selected-days">
+      <span *ngFor="let d of selectedDays; let last = last">
+        {{d.name}}{{last ? '' : ', '}}
+      </span>
+    </p>
+
+    <!-- MODE TOGGLES -->
+
+    <div class="mode-toggle">
+
+      <button
+        [class.active]="mode==='custom'"
+        (click)="mode='custom'">
+        Custom Hours
+      </button>
+
+      <button
+        [class.active]="mode==='24h'"
+        (click)="mode='24h'">
+        24 Hours
+      </button>
+
+      <button
+        [class.active]="mode==='closed'"
+        (click)="mode='closed'">
+        Closed
+      </button>
+
+    </div>
+
+    <!-- TIME SLOTS -->
+
+<div class="slots" *ngIf="mode==='custom'">
+
+  <div
+  class="slot-row"
+  *ngFor="let slot of configSlots; let i=index">
+
+    <input type="time" [(ngModel)]="slot.open">
+
+    <span class="to">to</span>
+
+    <input type="time" [(ngModel)]="slot.close">
+
+    <!-- ADD SLOT beside first row -->
+
+    <button
+      class="add-slot"
+      *ngIf="i === 0 && configSlots.length < 2"
+      (click)="addSlot()">
+
+      + Add Time Slot
+
+    </button>
+
+    <button
+      class="remove-slot"
+      *ngIf="configSlots.length > 1"
+      (click)="removeSlot(i)">
+      ✕
+    </button>
+
+  </div>
+
+  <p class="error" *ngIf="hasOverlap()">
+    Time slots cannot overlap
+  </p>
 
 </div>
+    <!-- ACTION BUTTONS -->
 
+    <div class="buttons">
 
-<div class="error" *ngIf="errorMessage">
-{{errorMessage}}
+      <button class="apply-btn" (click)="applyHours()">
+        Apply
+      </button>
+
+      <button class="cancel-btn" (click)="cancelConfig()">
+        Cancel
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- CURRENT SCHEDULE -->
+
+  <div class="card">
+
+    <h3>Current Schedule</h3>
+
+    <div class="schedule" *ngFor="let d of days">
+
+      <span>{{d.name}}</span>
+
+      <span *ngIf="d.mode==='closed'">Closed</span>
+
+      <span *ngIf="d.mode==='24h'">24 Hours</span>
+
+      <span *ngIf="d.mode==='custom' && d.slots.length">
+
+        <span *ngFor="let s of d.slots; let last=last">
+
+          {{s.open}} - {{s.close}}
+          <span *ngIf="!last"> , </span>
+
+        </span>
+
+      </span>
+
+      <span *ngIf="d.mode==='custom' && !d.slots.length">
+        —
+      </span>
+
+    </div>
+
+  </div>
+
+  <!-- SAVE BUTTON -->
+
+  <div class="save-section">
+
+  <button
+    class="save-btn"
+    (click)="saveBusinessHours()">
+
+    Save Business Hours
+
+  </button>
+
+  <p class="success" *ngIf="successMessage">
+    {{successMessage}}
+  </p>
+
 </div>
-
-
-<button (click)="submitHours()" class="save">
-Save Hours
-</button>
 
 </div>
