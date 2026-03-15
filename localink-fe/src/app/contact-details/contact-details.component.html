@@ -46,36 +46,80 @@ Address is required
 </div>
 
 
-<!-- CITY STATE PINCODE SAME ROW -->
+<!-- LOCATION ROW -->
 <div class="location-row">
 
+
+<!-- COUNTRY -->
 <div class="location-field">
+
+<label>Country *</label>
+
+<ng-select
+  [items]="countries"
+  bindLabel="name"
+  bindValue="name"
+  placeholder="Select Country"
+  formControlName="country"
+  [searchable]="true"
+  [clearable]="false"
+  [virtualScroll]="true"
+  (change)="onCountryChange()">
+</ng-select>
+
+<div class="error" *ngIf="contactForm.get('country')?.touched && contactForm.get('country')?.invalid">
+Country is required
+</div>
+
+</div>
+
+
+<!-- STATE -->
+<div class="location-field">
+
+<label>State *</label>
+
+<ng-select
+  [items]="states"
+  placeholder="Select State"
+  formControlName="state"
+  [searchable]="true"
+  [clearable]="false"
+  [disabled]="!contactForm.get('country')?.value">
+</ng-select>
+
+<div class="error" *ngIf="contactForm.get('state')?.touched && contactForm.get('state')?.invalid">
+State is required
+</div>
+
+</div>
+
+
+<!-- CITY -->
+<div class="location-field">
+
 <label>City *</label>
+
 <input type="text" formControlName="city" placeholder="City">
 
 <div class="error" *ngIf="contactForm.get('city')?.touched && contactForm.get('city')?.invalid">
 City is required
 </div>
+
 </div>
 
 
+<!-- PINCODE -->
 <div class="location-field">
-<label>State *</label>
-<input type="text" formControlName="state" placeholder="State">
 
-<div class="error" *ngIf="contactForm.get('state')?.touched && contactForm.get('state')?.invalid">
-State is required
-</div>
-</div>
-
-
-<div class="location-field">
 <label>Pincode *</label>
+
 <input type="text" formControlName="pincode" placeholder="Pincode">
 
 <div class="error" *ngIf="contactForm.get('pincode')?.touched && contactForm.get('pincode')?.invalid">
 Enter a valid 6 digit pincode
 </div>
+
 </div>
 
 </div>
@@ -94,9 +138,6 @@ Next Step
 
 </div>
 
-
 </form>
-
-
 
 </div>

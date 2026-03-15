@@ -136,6 +136,16 @@ textarea::placeholder{
   flex:1;
 }
 
+/* .location-row {
+  display: flex;
+  gap: 20px;
+  margin-top: 10px;
+}
+
+.location-row > .location-field {
+  flex: 1;
+} */
+
 /* Error messages */
 .error{
   color:#ff6b6b;

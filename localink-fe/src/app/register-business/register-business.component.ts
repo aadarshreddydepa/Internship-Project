@@ -2,6 +2,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { PLATFORM_ID } from '@angular/core';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 import { ContactDetailsComponent } from '../contact-details/contact-details.component';
 import { HoursComponent } from '../business/hours/hours.component';
@@ -13,6 +14,7 @@ import { PhotoUploadComponent } from '../business/photo-upload/photo-upload.comp
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    NgSelectModule,
     ContactDetailsComponent,
     HoursComponent,
     PhotoUploadComponent
@@ -41,19 +43,22 @@ export class RegisterBusinessComponent implements OnInit {
   ) {
     this.businessForm = this.fb.group({
       businessName: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern(/^(?!\s*$).+/)
-        ]
-      ],
+      '',
+      [
+        Validators.required,
+        Validators.pattern(/^[A-Za-z\s&'-]+$/)  // letters, spaces, &, ', -
+      ]
+    ],
+
       description: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(10)
-        ]
-      ],
+      '',
+      [
+        Validators.required,
+        Validators.minLength(10),
+        Validators.pattern(/^[A-Za-z][A-Za-z\s]*$/) // only letters and spaces
+      ]
+    ],
+
       category: ['', Validators.required],
       subcategory: ['', Validators.required]
     });
@@ -72,7 +77,9 @@ export class RegisterBusinessComponent implements OnInit {
     const selectedCategory = this.businessForm.get('category')?.value;
     const categoryObj = this.categories.find(cat => cat.name === selectedCategory);
     this.subcategories = categoryObj ? categoryObj.subcategories : [];
-    this.businessForm.patchValue({ subcategory: '' });
+    // this.businessForm.patchValue({ subcategory: '' });
+    this.businessForm.get('subcategory')?.setValue('');
+
   }
 
   goToNext() {
