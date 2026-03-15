@@ -79,7 +79,22 @@ display:flex;
 justify-content:space-between;
 margin-top:25px;
 }
+.phone-wrapper{
+display:flex;
+gap:10px;
+}
 
+.phone-code{
+width:120px;
+}
+
+.phone-wrapper input{
+flex:1;
+}
+
+.flag{
+margin-right:6px;
+}
 /* Previous button */
 .previous-btn{
   background:#343434;

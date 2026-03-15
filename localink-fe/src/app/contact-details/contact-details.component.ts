@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Output, OnInit } from '@angular/core';
+import { Component, EventEmitter, Output, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-contact-details',
@@ -14,40 +15,43 @@ export class ContactDetailsComponent implements OnInit {
 
   contactForm!: FormGroup;
 
-
-  @Output() next = new EventEmitter<void>();
+  @Input() initialData: any;
+  @Output() next = new EventEmitter<any>();
   @Output() previous = new EventEmitter<void>();
 
-  countries = [
-  {
-    name: 'Select Country',
-    states: []
-  },
-  {
-    name: 'India',
-    states: ['Andhra Pradesh','Telangana','Tamil Nadu','Karnataka','Kerala']
-  },
-  {
-    name: 'USA',
-    states: ['California','Texas','Florida','New York']
-  },
-  {
-    name: 'Australia',
-    states: ['New South Wales','Victoria','Queensland']
-  }
-];
-  states: string[] = ['Select state'];
+  phoneCountries: any[] = [];
+  countries: any[] = [];
+  states: string[] = [];
 
-
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private http: HttpClient
+  ) {
 
     this.contactForm = this.fb.group({
 
-      phone: ['', [ Validators.required, Validators.pattern(/^(?!([0-9])\1{9})[6-9][0-9]{9}$/)]],
+      phoneCode: ['+91', Validators.required],
 
-      email: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)]],
+      phone: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern(/^[2-9][0-9]{10}$/)
+        ]
+      ],
 
-      website: ['', Validators.pattern(/^(https?:\/\/)?(www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$/)],
+      email: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern(/^[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+        ]
+      ],
+
+      website: [
+        '',
+        Validators.pattern(/^(https?:\/\/)?(www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$/)
+      ],
 
       address: ['', Validators.required],
 
@@ -57,87 +61,118 @@ export class ContactDetailsComponent implements OnInit {
 
       country: ['', Validators.required],
 
-      pincode: ['', [Validators.pattern(/^[1-9][0-9]{5}$/)]]
+      pincode: [
+        '',
+        Validators.pattern(/^[1-9][0-9]{5}$/)
+      ]
 
+    }, {
+      validators: this.countryPhoneValidator.bind(this)
     });
 
-    this.contactForm.get('country')?.valueChanges.subscribe((country) => {
-    if (country === 'India') {
-      this.contactForm.get('phone')?.setValidators([
-        Validators.required,
-        Validators.pattern(/^\+91[6-9][0-9]{9}$/) // must start with +91
-      ]);
-    } else {
-      this.contactForm.get('phone')?.setValidators([
-        Validators.required,
-        Validators.pattern(/^[0-9]{7,15}$/) // generic international format
-      ]);
-    }
-    this.contactForm.get('phone')?.updateValueAndValidity();
-  });
-
   }
-
-  
 
   ngOnInit() {
 
-  const savedData = localStorage.getItem('contactDetails');
+    this.http.get<any>('data/countries.json')
+      .subscribe(data => {
 
-  if (savedData) {
+        this.countries = data;
 
-    const data = JSON.parse(savedData);
+        // Extract phone countries from same JSON
+        this.phoneCountries = data.map((c: any) => ({
+          name: c.name,
+          code: c.code,
+          flag: c.flag
+        }));
 
-    this.contactForm.patchValue(data);
+        // Restore data if returning from next step
+        if (this.initialData) {
 
-    // Load states based on saved country
-    const countryObj = this.countries.find(c => c.name === data.country);
-    this.states = countryObj ? countryObj.states : [];
+          this.contactForm.patchValue(this.initialData);
+
+          const countryObj = this.countries.find(
+            c => c.name === this.initialData.country
+          );
+
+          this.states = countryObj ? countryObj.states : [];
+
+        }
+
+      });
 
   }
+  onCountryChange() {
 
-}
+    const selectedCountry = this.contactForm.get('country')?.value;
 
-onCountryChange() {
-
-  const selectedCountry = this.contactForm.get('country')?.value;
-
-  if(selectedCountry === 'Select Country'){
-    this.states = ['Select State'];
-    this.contactForm.get('state')?.setValue('Select State');
-    return;
-  }
-
-  const countryObj = this.countries.find(c => c.name === selectedCountry);
-
-  this.states = countryObj 
-    ? ['Select State', ...countryObj.states] 
-    : ['Select State'];
-
-  this.contactForm.get('state')?.setValue('Select State');
-
-}
-  submit(){
-
-  if(this.contactForm.valid){
-
-    // save to local storage
-    localStorage.setItem(
-      'contactDetails',
-      JSON.stringify(this.contactForm.value)
+    const countryObj = this.countries.find(
+      c => c.name === selectedCountry
     );
 
-    this.next.emit();
+    this.states = countryObj ? countryObj.states : [];
 
-  }else{
+    this.contactForm.get('state')?.setValue('');
 
-    this.contactForm.markAllAsTouched();
+    // Revalidate phone-country relation
+    this.contactForm.updateValueAndValidity();
 
   }
+  countryPhoneValidator(group: FormGroup) {
 
-}
+    const country = group.get('country')?.value;
+    const phoneCode = group.get('phoneCode')?.value;
 
-  previousStep(){
+    const phoneControl = group.get('phone');
+
+    const countryObj = this.countries.find(c => c.name === country);
+
+    if (countryObj && countryObj.code !== phoneCode) {
+
+      phoneControl?.setErrors({
+        ...(phoneControl.errors || {}),
+        countryMismatch: true
+      });
+
+    } else {
+
+      if (phoneControl?.errors) {
+
+        const { countryMismatch, ...otherErrors } = phoneControl.errors;
+
+        phoneControl.setErrors(
+          Object.keys(otherErrors).length ? otherErrors : null
+        );
+
+      }
+
+    }
+
+    return null;
+
+  }
+  submit() {
+
+    if (this.contactForm.valid) {
+
+      const form = this.contactForm.value;
+
+      const fullPhone = form.phoneCode + ' ' + form.phone;
+
+      this.next.emit({
+        ...form,
+        phone: fullPhone
+      });
+
+    }
+    else {
+
+      this.contactForm.markAllAsTouched();
+
+    }
+
+  }
+  previousStep() {
     this.previous.emit();
   }
 
