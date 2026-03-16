@@ -36,7 +36,8 @@ export class ContactDetailsComponent implements OnInit {
         '',
         [
           Validators.required,
-          Validators.pattern(/^[2-9][0-9]{10}$/)
+          // Validators.pattern(/^[2-9][0-9]{10}$/)
+          Validators.pattern(/^\+?[1-9]\d{6,14}$/)
         ]
       ],
 

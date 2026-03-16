@@ -55,14 +55,14 @@ export class RegisterBusinessComponent {
       ]
     ],
 
-      description: [
-      '',
-      [
-        Validators.required,
-        Validators.minLength(10),
-        Validators.pattern(/^[A-Za-z][A-Za-z\s]*$/) // only letters and spaces
-      ]
-    ],
+    description: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(10),
+          Validators.pattern(/^[A-Za-z][A-Za-z\s.,'()%!]*$/)
+        ]
+      ],
 
       category: ['', Validators.required],
       subcategory: ['', Validators.required]
