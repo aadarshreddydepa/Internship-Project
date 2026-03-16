@@ -96,7 +96,7 @@
             </span>
 
             <span *ngIf="businessForm.get('description')?.errors?.['pattern']">
-                Description must contain only letters
+                Start of Description must contain only letters
             </span>
 
             </div>
@@ -225,14 +225,16 @@
 
       <!-- STEP 4 : PREVIEW -->
        <div *ngIf="currentStep === 4">
-
+        
         <app-preview
           [businessData]="businessData"
           [contactData]="contactData"
           [hoursData]="hoursData"
           [photoData]="photoData">
         </app-preview>
-
+        <div class="success-message" *ngIf="submitSuccessMessage">
+          {{ submitSuccessMessage }}
+        </div>
         <div class="button-container preview-buttons">
 
           <button
