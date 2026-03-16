@@ -7,7 +7,6 @@
 
 <div class="phone-wrapper">
 
-  <!-- COUNTRY CODE -->
   <ng-select
     class="phone-code"
     [items]="phoneCountries"
@@ -28,23 +27,27 @@
 
   </ng-select>
 
-  <!-- PHONE NUMBER -->
   <input
     type="text"
     formControlName="phone"
-    placeholder="Enter phone number">
+    placeholder="Enter phone number"
+    (input)="allowOnlyNumbers($event)"
+    [attr.maxlength]="contactForm.get('phoneCode')?.value === '+91' ? 10 : 15">
 
 </div>
 
-<div class="error" *ngIf="contactForm.get('phone')?.touched">
+<div class="error"
+     *ngIf="contactForm.get('phone')?.invalid &&
+            (contactForm.get('phone')?.dirty || contactForm.get('phone')?.touched)">
 
   <span *ngIf="contactForm.get('phone')?.errors?.['required']">
     Phone number is required
   </span>
 
   <span *ngIf="contactForm.get('phone')?.errors?.['pattern']">
-    Enter a valid phone number
+    Phone must be 10 digits, start with 3-9, and cannot be all zeros
   </span>
+
   <span *ngIf="contactForm.get('phone')?.errors?.['countryMismatch']">
     Country code does not match selected country
   </span>

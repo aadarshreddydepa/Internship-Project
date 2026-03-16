@@ -52,6 +52,7 @@ export class HoursComponent {
     { name: 'Sunday', selected: false, mode: 'custom', slots: [] }
   ];
 
+  errorMessage = '';
   successMessage = '';
 
   showConfig = false;
@@ -151,19 +152,25 @@ export class HoursComponent {
   }
 
   saveBusinessHours() {
-
-    const result = this.days.map(d => ({
-      day: d.name,
-      mode: d.mode,
-      slots: d.slots
-    }));
-
-    console.log("Saved Business Hours:", result);
-    this.hoursSaved.emit(result);
-    this.successMessage = "Business hours saved successfully!";
-    setTimeout(() => {
-      this.successMessage = '';
-    }, 3000);
-  }
+      const incompleteDays = this.days.filter(d =>
+        d.mode === 'custom' && d.slots.length === 0
+      );
+      if (incompleteDays.length > 0) {
+        this.errorMessage = "Please configure business hours for all days";
+        return;
+      }
+      this.errorMessage = '';
+      const result = this.days.map(d => ({
+        day: d.name,
+        mode: d.mode,
+        slots: d.slots
+      }));
+      console.log("Saved Business Hours:", result);
+      this.hoursSaved.emit(result);
+      this.successMessage = "Business hours saved successfully!";
+      setTimeout(() => {
+        this.successMessage = '';
+      }, 3000);
+    }
 
 }

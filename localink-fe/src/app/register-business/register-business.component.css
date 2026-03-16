@@ -207,3 +207,17 @@ app-photo-upload{
   display:block;
   margin-top:25px;
 }
+
+.success-message {
+  margin-bottom: 20px;
+  padding: 14px 18px;
+  background-color: #2A2A2A;
+  border: 1px solid #484948;
+  border-left: 4px solid #C8A97E;
+  border-radius: 6px;
+  color: #F8F4F0;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}

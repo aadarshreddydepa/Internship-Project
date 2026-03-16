@@ -30,6 +30,9 @@ export class RegisterBusinessComponent {
   businessForm!: FormGroup;
   businessData: any;
   contactData: any;
+
+  finalRegistrationData: any = null;
+  submitSuccessMessage = '';
   hoursErrorMessage = '';
 
   categories = [
@@ -55,14 +58,14 @@ export class RegisterBusinessComponent {
       ]
     ],
 
-    description: [
-        '',
-        [
-          Validators.required,
+      description: [
+      '',
+      [
+        Validators.required,
           Validators.minLength(10),
-          Validators.pattern(/^[A-Za-z][A-Za-z\s.,'()%!]*$/)
-        ]
-      ],
+          Validators.pattern(/^[A-Za-z][A-Za-z\s.,'()%!]*$/)// only letters and spaces
+      ]
+    ],
 
       category: ['', Validators.required],
       subcategory: ['', Validators.required]
@@ -136,16 +139,17 @@ export class RegisterBusinessComponent {
     }
 
   submitRegistration() {
-    alert("Business Registered Successfully!");
 
-    if (isPlatformBrowser(this.platformId)) {
-      localStorage.removeItem('businessDetails');
-      localStorage.removeItem('contactDetails');
-    }
+    this.finalRegistrationData = {
+      ...this.businessData,
+      ...this.contactData,
+      hours: this.hoursData,
+      photo: this.photoData
+    };
 
-    this.businessData = null;
-    this.contactData = null;
-    this.businessForm.reset();
-    this.currentStep = 1;
+    console.log("Final Business Registration Payload:", this.finalRegistrationData);
+
+    this.submitSuccessMessage = "Business registered successfully!";
+
   }
 }

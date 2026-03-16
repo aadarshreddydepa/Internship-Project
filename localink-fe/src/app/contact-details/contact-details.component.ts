@@ -36,8 +36,7 @@ export class ContactDetailsComponent implements OnInit {
         '',
         [
           Validators.required,
-          // Validators.pattern(/^[2-9][0-9]{10}$/)
-          Validators.pattern(/^\+?[1-9]\d{6,14}$/)
+          Validators.pattern(/^[3-9][0-9]{9}$/)
         ]
       ],
 
@@ -55,11 +54,8 @@ export class ContactDetailsComponent implements OnInit {
       ],
 
       address: ['', Validators.required],
-
       city: ['', Validators.required],
-
       state: ['', Validators.required],
-
       country: ['', Validators.required],
 
       pincode: [
@@ -71,7 +67,34 @@ export class ContactDetailsComponent implements OnInit {
       validators: this.countryPhoneValidator.bind(this)
     });
 
+
+    /* Dynamic phone validation */
+    this.contactForm.get('phoneCode')?.valueChanges.subscribe(code => {
+
+      const phoneControl = this.contactForm.get('phone');
+
+      if (code === '+91') {
+
+        phoneControl?.setValidators([
+          Validators.required,
+          Validators.pattern(/^[3-9][0-9]{9}$/)
+        ]);
+
+      } else {
+
+        phoneControl?.setValidators([
+          Validators.required,
+          Validators.pattern(/^(?!0+$)[0-9]{6,15}$/)
+        ]);
+
+      }
+
+      phoneControl?.updateValueAndValidity();
+
+    });
+
   }
+
 
   ngOnInit() {
 
@@ -80,14 +103,12 @@ export class ContactDetailsComponent implements OnInit {
 
         this.countries = data;
 
-        // Extract phone countries from same JSON
         this.phoneCountries = data.map((c: any) => ({
           name: c.name,
           code: c.code,
           flag: c.flag
         }));
 
-        // Restore data if returning from next step
         if (this.initialData) {
 
           this.contactForm.patchValue(this.initialData);
@@ -103,6 +124,8 @@ export class ContactDetailsComponent implements OnInit {
       });
 
   }
+
+
   onCountryChange() {
 
     const selectedCountry = this.contactForm.get('country')?.value;
@@ -115,10 +138,11 @@ export class ContactDetailsComponent implements OnInit {
 
     this.contactForm.get('state')?.setValue('');
 
-    // Revalidate phone-country relation
     this.contactForm.updateValueAndValidity();
 
   }
+
+
   countryPhoneValidator(group: FormGroup) {
 
     const country = group.get('country')?.value;
@@ -152,6 +176,21 @@ export class ContactDetailsComponent implements OnInit {
     return null;
 
   }
+
+
+  allowOnlyNumbers(event: any) {
+
+    let value = event.target.value.replace(/[^0-9]/g, '');
+
+    if (/^0+$/.test(value)) {
+      value = '';
+    }
+
+    this.contactForm.get('phone')?.setValue(value);
+
+  }
+
+
   submit() {
 
     if (this.contactForm.valid) {
@@ -165,8 +204,7 @@ export class ContactDetailsComponent implements OnInit {
         phone: fullPhone
       });
 
-    }
-    else {
+    } else {
 
       this.contactForm.markAllAsTouched();
 

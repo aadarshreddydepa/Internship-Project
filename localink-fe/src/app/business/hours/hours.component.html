@@ -183,6 +183,10 @@
 
   <div class="save-section">
 
+    <p class="error" *ngIf="errorMessage">
+      {{errorMessage}}
+    </p>
+
   <button
     class="save-btn"
     (click)="saveBusinessHours()">
