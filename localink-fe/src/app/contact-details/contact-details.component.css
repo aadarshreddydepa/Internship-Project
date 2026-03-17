@@ -1,139 +1,422 @@
-/* Page background */
-body{
-background-color:#1C1C1C;
-font-family:"Segoe UI", Arial, sans-serif;
-color:#F8F4F0;
-margin:0;
-padding:0;
-}
-.container{
-width:100%;
-padding:0;
-background:transparent;
-border:none;
-box-shadow:none;
-}
-/* Title */
-h2{
-text-align:center;
-margin-bottom:25px;
-color:#F8F4F0;
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Sora:wght@300;400;500;600&display=swap');
+
+:host {
+  --bg:             #080808;
+  --surface-1:      #101012;
+  --surface-2:      #18181C;
+  --surface-3:      #222228;
+  --border:         #2A2A30;
+  --border-hover:   #3E3E46;
+
+  --gold:           #C8955A;
+  --gold-dim:       rgba(200, 149, 90, 0.12);
+
+  --text-primary:   #EDE8DF;
+  --text-secondary: #8A8276;
+  --text-muted:     #4A4842;
+
+  --green:          #4E9E6E;
+  --green-dim:      rgba(78, 158, 110, 0.12);
+  --red:            #C0504A;
+  --red-dim:        rgba(192, 80, 74, 0.12);
+  --slate:          #5A6070;
+  --slate-dim:      rgba(90, 96, 112, 0.15);
+
+  --font-display:   'Cormorant Garamond', Georgia, serif;
+  --font-body:      'Sora', sans-serif;
 }
 
-/* Labels */
-label{
-display:block;
-margin-top:12px;
-margin-bottom:6px;
-color:#B19F91;
-font-size:14px;
+/* ── PAGE SHELL ──────────────────────────────────── */
+
+.page-shell {
+  background:  var(--bg);
+  min-height:  100vh;
+  /* padding:     48px 60px 80px; */
+  padding: 36px;
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size:   14px;
+  color:       var(--text-primary);
+  animation:   pageIn .6s ease;
 }
 
-/* Inputs */
-input,select{
-width:100%;
-padding:10px;
-background:#343434;
-border:1px solid #484948;
-border-radius:6px;
-color:#F8F4F0;
-font-size:14px;
-box-sizing:border-box;
+/* ── TOPBAR ──────────────────────────────────────── */
+
+.topbar {
+  position:        sticky;
+  top:             0;
+  z-index:         200;
+  padding:         20px 60px;
+  background:      rgba(8, 8, 8, 0.88);
+  backdrop-filter: blur(20px);
+  border-bottom:   1px solid var(--border);
 }
 
-/* Placeholder */
-input::placeholder{
-color:#B19F91;
+.topbar::after {
+  content:    "";
+  position:   absolute;
+  bottom:     -1px;
+  left:       60px;
+  width:      40px;
+  height:     2px;
+  background: var(--gold);
 }
 
-/* Input focus */
-input:focus,select:focus{
-outline:none;
-border-color:#C8A97E;
-box-shadow:0 0 4px #C8A97E;
+.topbar-title {
+  font-family:    var(--font-display);
+  font-style:     italic;
+  font-size:      24px;
+  font-weight:    400;
+  color:          var(--text-primary);
+  letter-spacing: 0.5px;
 }
 
-/* Divider */
-hr{
-border:none;
-border-top:1px solid #484948;
-margin:25px 0;
+/* ── HERO ────────────────────────────────────────── */
+
+.hero {
+  padding:       0;
+  border-bottom: 1px solid var(--border);
+  animation:     heroIn .7s ease .1s both;
 }
 
-/* City State Pincode row */
-.location-row{
-display:flex;
-gap:12px;
-margin-top:10px;
+.eyebrow {
+  font-family:    var(--font-body);
+  font-size:      10px;
+  font-weight:    500;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color:          var(--gold);
 }
 
-.location-field{
-flex:1;
-display:flex;
-flex-direction:column;
+.hero h1 {
+  font-family: var(--font-display);
+  font-style:  italic;
+  font-weight: 300;
+  font-size:   72px;
+  line-height: 1.05;
+  margin:      10px 0 12px;
+  color:       var(--text-primary);
 }
 
-/* Buttons */
-.button-container{
-display:flex;
-justify-content:space-between;
-margin-top:25px;
-}
-.phone-wrapper{
-display:flex;
-gap:10px;
+.hero p {
+  font-family:  var(--font-body);
+  font-size:    13px;
+  font-weight:  300;
+  line-height:  1.8;
+  color:        var(--text-secondary);
+  max-width:    380px;
 }
 
-.phone-code{
-width:120px;
+.gold-rule {
+  display:    block;
+  width:      48px;
+  height:     1px;
+  background: var(--gold);
+  margin-top: 28px;
 }
 
-.phone-wrapper input{
-flex:1;
+/* ── SECTION WRAPPER ─────────────────────────────── */
+
+.section {
+  margin-top: 40px;
+  animation:  fadeUp .6s ease .2s both;
 }
 
-.flag{
-margin-right:6px;
-}
-/* Previous button */
-.previous-btn{
-  background:#343434;
-  border:1px solid #484948;
-  color:#F8F4F0;
+/* ── FORM CARD ───────────────────────────────────── */
+
+.form-card {
+  background: var(--surface-1);
+  border:     1px solid var(--border);
+  padding:    36px 32px;
+  position:   relative;
 }
 
-.previous-btn:hover{
-background:#444;
+.form-card::before {
+  content:          "";
+  position:         absolute;
+  left:             0;
+  top:              0;
+  bottom:           0;
+  width:            2px;
+  background:       var(--gold);
+  transform:        scaleY(0);
+  transform-origin: bottom;
+  transition:       transform .3s ease;
 }
 
-/* Submit button */
-button{
-padding:12px 25px;
-background:#C8A97E;
-border:none;
-border-radius:6px;
-font-size:16px;
-font-weight:600;
-cursor:pointer;
-color:#1C1C1C;
+.form-card:hover::before {
+  transform: scaleY(1);
 }
 
-button:hover{
-background:#b5956c;
+/* ── LABELS ──────────────────────────────────────── */
+
+label {
+  display:        block;
+  margin-top:     18px;
+  margin-bottom:  7px;
+  font-family:    var(--font-body);
+  font-size:      10px;
+  font-weight:    500;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color:          var(--text-muted);
 }
 
-/* Error messages */
-.error{
-color:#ff6b6b;
-font-size:12px;
-margin-top:3px;
+/* ── INPUTS / NG-SELECT ──────────────────────────── */
+
+input,
+ng-select {
+  width:          100%;
+  background:     var(--surface-3);
+  border:         1px solid var(--border);
+  padding:        11px 14px;
+  font-family:    var(--font-body);
+  font-weight:    300;
+  font-size:      13px;
+  color:          var(--text-primary);
+  border-radius:  3px;
+  outline:        none;
+  transition:     border-color .2s, background .2s;
+  box-sizing:     border-box;
 }
 
-/* Success message */
-.success-message{
-margin-top:20px;
-color:#C8A97E;
-font-weight:600;
-text-align:center;
+input::placeholder {
+  color:       var(--text-muted);
+  font-weight: 300;
 }
 
+input:hover {
+  border-color: var(--border-hover);
+}
+
+input:focus {
+  border-color: var(--gold);
+  background:   var(--surface-2);
+}
+
+/* ng-select luxury overrides */
+
+ng-select {
+  padding: 0;
+}
+
+::ng-deep .ng-select .ng-select-container {
+  background:    var(--surface-3) !important;
+  border:        1px solid var(--border) !important;
+  border-radius: 3px !important;
+  min-height:    42px !important;
+  color:         var(--text-primary) !important;
+  font-family:   var(--font-body) !important;
+  font-size:     13px !important;
+  font-weight:   300 !important;
+  transition:    border-color .2s, background .2s !important;
+}
+
+::ng-deep .ng-select:hover .ng-select-container {
+  border-color: var(--border-hover) !important;
+}
+
+::ng-deep .ng-select.ng-select-focused .ng-select-container {
+  border-color: var(--gold) !important;
+  background:   var(--surface-2) !important;
+  box-shadow:   none !important;
+}
+
+::ng-deep .ng-select .ng-value-label,
+::ng-deep .ng-select .ng-input > input {
+  color:       var(--text-primary) !important;
+  font-family: var(--font-body) !important;
+  font-size:   13px !important;
+  font-weight: 300 !important;
+}
+
+::ng-deep .ng-select .ng-placeholder {
+  color:       var(--text-muted) !important;
+  font-family: var(--font-body) !important;
+  font-size:   13px !important;
+}
+
+::ng-deep .ng-select .ng-arrow-wrapper .ng-arrow {
+  border-color: var(--text-muted) transparent transparent !important;
+}
+
+::ng-deep .ng-select .ng-dropdown-panel {
+  background:    var(--surface-2) !important;
+  border:        1px solid var(--border) !important;
+  border-radius: 0 0 3px 3px !important;
+  box-shadow:    0 8px 32px rgba(0,0,0,.5) !important;
+}
+
+::ng-deep .ng-select .ng-dropdown-panel .ng-option {
+  background:  var(--surface-2) !important;
+  color:       var(--text-secondary) !important;
+  font-family: var(--font-body) !important;
+  font-size:   13px !important;
+  font-weight: 300 !important;
+  padding:     10px 14px !important;
+  transition:  background .15s !important;
+}
+
+::ng-deep .ng-select .ng-dropdown-panel .ng-option:hover,
+::ng-deep .ng-select .ng-dropdown-panel .ng-option.ng-option-marked {
+  background: var(--surface-3) !important;
+  color:      var(--text-primary) !important;
+}
+
+::ng-deep .ng-select .ng-dropdown-panel .ng-option.ng-option-selected {
+  background: var(--gold-dim) !important;
+  color:      var(--gold) !important;
+}
+
+/* ── PHONE ROW ───────────────────────────────────── */
+
+.phone-wrapper {
+  display: flex;
+  gap:     10px;
+}
+
+.phone-code {
+  width:     130px;
+  flex-shrink: 0;
+}
+
+/* ── LOCATION GRID ───────────────────────────────── */
+
+.location-row {
+  display: flex;
+  gap:     12px;
+  margin-top: 6px;
+}
+
+.location-field {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── DIVIDER ─────────────────────────────────────── */
+
+.section-divider {
+  display:    block;
+  width:      32px;
+  height:     1px;
+  background: var(--gold);
+  margin:     32px 0;
+}
+
+/* ── ERRORS ──────────────────────────────────────── */
+
+.error {
+  font-family: var(--font-body);
+  font-size:   11px;
+  font-weight: 400;
+  color:       var(--red);
+  margin-top:  5px;
+  display:     flex;
+  align-items: center;
+  gap:         5px;
+}
+
+.error::before {
+  content:       "";
+  display:       inline-block;
+  width:         4px;
+  height:        4px;
+  border-radius: 50%;
+  background:    var(--red);
+  flex-shrink:   0;
+}
+
+/* ── BUTTONS ─────────────────────────────────────── */
+
+.button-container {
+  display:         flex;
+  justify-content: space-between;
+  align-items:     center;
+  margin-top:      32px;
+  padding-top:     24px;
+  border-top:      1px solid var(--border);
+}
+
+button {
+  font-family:    var(--font-body);
+  font-size:      11px;
+  font-weight:    500;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  padding:        10px 24px;
+  border-radius:  3px;
+  cursor:         pointer;
+  border:         1px solid var(--border);
+  background:     transparent;
+  color:          var(--text-secondary);
+  transition:     all .2s;
+  white-space:    nowrap;
+}
+
+button:hover {
+  border-color: var(--gold);
+  color:        var(--gold);
+}
+
+.primary-btn {
+  background:   var(--gold-dim);
+  color:        var(--gold);
+  border-color: rgba(200, 149, 90, 0.25);
+}
+
+.primary-btn:hover {
+  background:   var(--gold);
+  color:        var(--bg);
+  border-color: var(--gold);
+}
+
+.previous-btn {
+  background:   var(--slate-dim);
+  color:        var(--slate);
+  border-color: rgba(90, 96, 112, 0.25);
+}
+
+.previous-btn:hover {
+  background:   var(--slate);
+  color:        #fff;
+  border-color: var(--slate);
+}
+
+/* ── FLAG EMOJI RESET ────────────────────────────── */
+
+.flag {
+  font-style: normal;
+}
+
+/* ── ANIMATIONS ──────────────────────────────────── */
+
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes heroIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── RESPONSIVE ──────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .page-shell    { padding: 32px 20px; }
+  .topbar        { padding: 18px 20px; }
+  .topbar::after { left: 20px; }
+  .hero h1       { font-size: 46px; }
+  .location-row  { flex-wrap: wrap; }
+  .location-field { flex: 0 0 calc(50% - 6px); }
+}

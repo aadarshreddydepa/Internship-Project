@@ -1,177 +1,179 @@
-<div class="container">
+<div class="page-shell">
 
-<h2>Contact Details</h2>
+  <!-- TOPBAR -->
+  <!-- HERO -->
+  <div class="hero">
+    <div class="eyebrow">Business Registration</div>
+    <h1>Contact Details</h1>
+    <p>Provide the official contact information for your business listing.</p>
+  </div>
 
-<form [formGroup]="contactForm">
-<label>Phone Number *</label>
+  <div class="section">
 
-<div class="phone-wrapper">
+    <div class="form-card">
 
-  <ng-select
-    class="phone-code"
-    [items]="phoneCountries"
-    bindLabel="code"
-    bindValue="code"
-    formControlName="phoneCode"
-    [searchable]="false"
-    [clearable]="false">
+      <form [formGroup]="contactForm">
 
-    <ng-template ng-label-tmp let-item="item">
-      <span class="flag">{{item.flag}}</span> {{item.code}}
-    </ng-template>
+        <label>Phone Number *</label>
 
-    <ng-template ng-option-tmp let-item="item">
-      <span class="flag">{{item.flag}}</span>
-      {{item.name}} ({{item.code}})
-    </ng-template>
+        <div class="phone-wrapper">
 
-  </ng-select>
+          <ng-select
+            class="phone-code"
+            [items]="phoneCountries"
+            bindLabel="code"
+            bindValue="code"
+            formControlName="phoneCode"
+            [searchable]="false"
+            [clearable]="false">
 
-  <input
-    type="text"
-    formControlName="phone"
-    placeholder="Enter phone number"
-    (input)="allowOnlyNumbers($event)"
-    [attr.maxlength]="contactForm.get('phoneCode')?.value === '+91' ? 10 : 15">
+            <ng-template ng-label-tmp let-item="item">
+              <span class="flag">{{item.flag}}</span> {{item.code}}
+            </ng-template>
 
-</div>
+            <ng-template ng-option-tmp let-item="item">
+              <span class="flag">{{item.flag}}</span>
+              {{item.name}} ({{item.code}})
+            </ng-template>
 
-<div class="error"
-     *ngIf="contactForm.get('phone')?.invalid &&
-            (contactForm.get('phone')?.dirty || contactForm.get('phone')?.touched)">
+          </ng-select>
 
-  <span *ngIf="contactForm.get('phone')?.errors?.['required']">
-    Phone number is required
-  </span>
+          <input
+            type="text"
+            formControlName="phone"
+            placeholder="Enter phone number"
+            (input)="allowOnlyNumbers($event)"
+            [attr.maxlength]="contactForm.get('phoneCode')?.value === '+91' ? 10 : 15">
 
-  <span *ngIf="contactForm.get('phone')?.errors?.['pattern']">
-    Phone must be 10 digits, start with 3-9, and cannot be all zeros
-  </span>
+        </div>
 
-  <span *ngIf="contactForm.get('phone')?.errors?.['countryMismatch']">
-    Country code does not match selected country
-  </span>
+        <div class="error"
+             *ngIf="contactForm.get('phone')?.invalid &&
+                    (contactForm.get('phone')?.dirty || contactForm.get('phone')?.touched)">
 
-</div>
+          <span *ngIf="contactForm.get('phone')?.errors?.['required']">
+            Phone number is required
+          </span>
 
-<label>Email *</label>
-<input type="email" formControlName="email" placeholder="Enter email">
+          <span *ngIf="contactForm.get('phone')?.errors?.['pattern']">
+            Phone must be 10 digits, start with 3-9, and cannot be all zeros
+          </span>
 
-<div class="error" *ngIf="contactForm.get('email')?.touched && contactForm.get('email')?.invalid">
-Enter a valid email
-</div>
+          <span *ngIf="contactForm.get('phone')?.errors?.['countryMismatch']">
+            Country code does not match selected country
+          </span>
 
-
-<label>Website(Optional)</label>
-<input type="text" formControlName="website" placeholder="Enter website">
-
-<div class="error" *ngIf="contactForm.get('website')?.touched && contactForm.get('website')?.invalid">
-Enter a valid website URL
-</div>
+        </div>
 
 
-<hr>
+        <label>Email *</label>
+        <input type="email" formControlName="email" placeholder="Enter email address">
 
-<label>Street Address *</label>
-<input type="text" formControlName="address" placeholder="Enter business address">
-
-<div class="error" *ngIf="contactForm.get('address')?.touched && contactForm.get('address')?.invalid">
-Address is required
-</div>
+        <div class="error" *ngIf="contactForm.get('email')?.touched && contactForm.get('email')?.invalid">
+          Enter a valid email address
+        </div>
 
 
-<!-- LOCATION ROW -->
-<div class="location-row">
+        <label>Website (Optional)</label>
+        <input type="text" formControlName="website" placeholder="https://yourbusiness.com">
+
+        <div class="error" *ngIf="contactForm.get('website')?.touched && contactForm.get('website')?.invalid">
+          Enter a valid website URL
+        </div>
+        <!-- LOCATION ROW -->
+
+        <div class="location-row">
+
+          <div class="location-field">
+
+            <label>Country *</label>
+
+            <ng-select
+              [items]="countries"
+              bindLabel="name"
+              bindValue="name"
+              placeholder="Select Country"
+              formControlName="country"
+              [searchable]="true"
+              [clearable]="false"
+              [virtualScroll]="true"
+              (change)="onCountryChange()">
+            </ng-select>
+
+            <div class="error" *ngIf="contactForm.get('country')?.touched && contactForm.get('country')?.invalid">
+              Country is required
+            </div>
+
+          </div>
+
+          <div class="location-field">
+
+            <label>State *</label>
+
+            <ng-select
+              [items]="states"
+              placeholder="Select State"
+              formControlName="state"
+              [searchable]="true"
+              [clearable]="false"
+              [disabled]="!contactForm.get('country')?.value">
+            </ng-select>
+
+            <div class="error" *ngIf="contactForm.get('state')?.touched && contactForm.get('state')?.invalid">
+              State is required
+            </div>
+
+          </div>
 
 
-<!-- COUNTRY -->
-<div class="location-field">
+          <div class="location-field">
 
-<label>Country *</label>
+            <label>City *</label>
 
-<ng-select
-  [items]="countries"
-  bindLabel="name"
-  bindValue="name"
-  placeholder="Select Country"
-  formControlName="country"
-  [searchable]="true"
-  [clearable]="false"
-  [virtualScroll]="true"
-  (change)="onCountryChange()">
-</ng-select>
+            <input type="text" formControlName="city" placeholder="City">
 
-<div class="error" *ngIf="contactForm.get('country')?.touched && contactForm.get('country')?.invalid">
-Country is required
-</div>
+            <div class="error" *ngIf="contactForm.get('city')?.touched && contactForm.get('city')?.invalid">
+              City is required
+            </div>
 
-</div>
+          </div>
 
 
-<!-- STATE -->
-<div class="location-field">
+          <div class="location-field">
 
-<label>State *</label>
+            <label>Pincode *</label>
 
-<ng-select
-  [items]="states"
-  placeholder="Select State"
-  formControlName="state"
-  [searchable]="true"
-  [clearable]="false"
-  [disabled]="!contactForm.get('country')?.value">
-</ng-select>
+            <input type="text" formControlName="pincode" placeholder="Pincode">
 
-<div class="error" *ngIf="contactForm.get('state')?.touched && contactForm.get('state')?.invalid">
-State is required
-</div>
+            <div class="error" *ngIf="contactForm.get('pincode')?.touched && contactForm.get('pincode')?.invalid">
+              Enter a valid 6 digit pincode
+            </div>
 
-</div>
+          </div>
+        </div>
 
+        <label>Street Address *</label>
+        <input type="text" formControlName="address" placeholder="Enter full street address">
 
-<!-- CITY -->
-<div class="location-field">
-
-<label>City *</label>
-
-<input type="text" formControlName="city" placeholder="City">
-
-<div class="error" *ngIf="contactForm.get('city')?.touched && contactForm.get('city')?.invalid">
-City is required
-</div>
-
-</div>
+        <div class="error" *ngIf="contactForm.get('address')?.touched && contactForm.get('address')?.invalid">
+          Address is required
+        </div>
 
 
-<!-- PINCODE -->
-<div class="location-field">
+        <div class="button-container">
 
-<label>Pincode *</label>
+          <button type="button" class="previous-btn" (click)="previousStep()">
+            Previous
+          </button>
 
-<input type="text" formControlName="pincode" placeholder="Pincode">
+          <button type="button" class="primary-btn" (click)="submit()">
+            Next Step
+          </button>
 
-<div class="error" *ngIf="contactForm.get('pincode')?.touched && contactForm.get('pincode')?.invalid">
-Enter a valid 6 digit pincode
-</div>
+        </div>
 
-</div>
+      </form>
 
-</div>
-
-
-<!-- BUTTONS -->
-<div class="button-container">
-
-<button type="button" class="previous-btn" (click)="previousStep()">
-Previous
-</button>
-
-<button type="button" (click)="submit()">
-Next Step
-</button>
-
-</div>
-
-</form>
-
+    </div>
+  </div>
 </div>
