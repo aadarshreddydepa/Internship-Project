@@ -15,7 +15,6 @@ describe('ContactDetailsComponent', () => {
         ReactiveFormsModule
       ]
     }).compileComponents();
-
     fixture = TestBed.createComponent(ContactDetailsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

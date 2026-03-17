@@ -177,7 +177,6 @@ export class ContactDetailsComponent implements OnInit {
 
   }
 
-
   allowOnlyNumbers(event: any) {
 
     let value = event.target.value.replace(/[^0-9]/g, '');
