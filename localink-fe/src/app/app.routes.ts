@@ -1,17 +1,24 @@
 import { Routes } from '@angular/router';
-import { SearchComponent } from './search/search.component';
-import { AdminDashboardComponent } from './admin/admin-dashboard/admin-dashboard.component';
 
 export const routes: Routes = [
 
-{
-path: '',
-component: SearchComponent
-},
+  {
+    path: '',
+    loadComponent: () =>
+      import('./search/search.component').then(m => m.SearchComponent)
+  },
 
-{
-path: 'admin',
-component: AdminDashboardComponent
-}
+  {
+    path: 'admin',
+    loadComponent: () =>
+      import('./admin/admin-dashboard/admin-dashboard.component').then(
+        m => m.AdminDashboardComponent
+      )
+  },
+
+  {
+    path: '**',
+    redirectTo: ''
+  }
 
 ];

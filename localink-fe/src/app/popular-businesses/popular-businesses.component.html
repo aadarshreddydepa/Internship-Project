@@ -1,38 +1,36 @@
 <section class="popular-section">
 
-<h2 class="section-title">Popular This Week</h2>
+  <div class="section-header">
+    <h2 class="section-title">Popular This Week</h2>
+    <span class="section-subtitle">{{ businesses.length }} businesses</span>
+  </div>
 
-<div class="popular-grid">
+  <div class="carousel">
 
-<div class="business-card"
-*ngFor="let business of businesses">
+    <div class="business-card" *ngFor="let business of businesses">
 
-<div class="image-placeholder">
-Image
-</div>
+      <div class="image-placeholder">
+        <img *ngIf="business.image" [src]="business.image" [alt]="business.name" />
+        <span *ngIf="!business.image">No Image</span>
+      </div>
 
-<div class="card-content">
+      <div class="card-content">
 
-<h3>{{business.name}}</h3>
+        <p class="category">{{ business.category }}</p>
 
-<p class="category">
-{{business.category}}
-</p>
+        <h3>{{ business.name }}</h3>
 
-<div class="rating">
+        <div class="divider"></div>
 
-<span class="stars">★★★★★</span>
+        <div class="rating">
+          <span class="stars">{{ getStars(business.rating) }}</span>
+          <span class="rating-number">{{ business.rating }}/5</span>
+        </div>
 
-<span class="rating-number">
-({{business.rating}})
-</span>
+      </div>
 
-</div>
+    </div>
 
-</div>
-
-</div>
-
-</div>
+  </div>
 
 </section>

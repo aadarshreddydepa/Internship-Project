@@ -1,7 +1,5 @@
 <div class="dashboard">
-
 <h1 class="title">Admin Business Dashboard</h1>
-
 <div class="tabs">
 
 <button [class.active]="currentSection==='pending'" (click)="currentSection='pending'">Pending</button>
@@ -10,28 +8,18 @@
 <button [class.active]="currentSection==='inactive'" (click)="currentSection='inactive'">Deactivated</button>
 
 </div>
-
-
 <div class="toolbar">
-
 <input type="text" placeholder="Search business..." [(ngModel)]="searchTerm">
-
 <button (click)="downloadExcel()" [disabled]="filteredBusinesses.length===0">
-Download Excel
+Export Excel
 </button>
-
 </div>
-
 
 <div *ngIf="filteredBusinesses.length===0" class="empty">
-
 No businesses available in this section.
-
 </div>
 
-
 <table *ngIf="filteredBusinesses.length>0">
-
 <thead>
 
 <tr>
@@ -48,8 +36,6 @@ No businesses available in this section.
 </tr>
 
 </thead>
-
-
 <tbody>
 
 <tr *ngFor="let b of filteredBusinesses">
@@ -70,36 +56,25 @@ No businesses available in this section.
 </td>
 
 <td class="actions">
-
 <button *ngIf="currentSection==='pending'" class="approve" (click)="approve(b.id)">
 Approve
 </button>
-
 <button *ngIf="currentSection==='pending'" class="reject" (click)="openRejectModal(b.id)">
 Reject
 </button>
-
 <button *ngIf="currentSection==='approved'" class="deactivate" (click)="deactivate(b.id)">
 Deactivate
 </button>
-
 <button *ngIf="currentSection==='inactive'" class="activate" (click)="activate(b.id)">
 Activate
 </button>
-
 </td>
-
 </tr>
-
 </tbody>
-
 </table>
 
-
 <div class="modal" *ngIf="selectedBusiness">
-
 <div class="modal-box">
-
 <h2>{{selectedBusiness.name}}</h2>
 
 <p><b>Category:</b> {{selectedBusiness.category}}</p>
@@ -107,39 +82,22 @@ Activate
 <p><b>Description:</b> {{selectedBusiness.description}}</p>
 
 <button (click)="closeModal()">Close</button>
-
 </div>
-
 </div>
-
 
 <div class="modal" *ngIf="rejectModalOpen">
-
 <div class="modal-box">
-
 <h2>Reject Business</h2>
-
 <p>Enter reason for rejection</p>
-
 <textarea [(ngModel)]="rejectComment" rows="4"></textarea>
-
 <div class="modal-actions">
-
 <button class="cancel" (click)="closeRejectModal()">Cancel</button>
-
 <button class="confirm" [disabled]="!rejectComment.trim()" (click)="submitRejection()">
 Reject
 </button>
-
+</div>
+</div>
 </div>
 
-</div>
-
-</div>
-
-
-<div class="toast" *ngIf="showToast">
-{{toastMessage}}
-</div>
-
+<div class="toast" *ngIf="showToast">{{toastMessage}}</div>
 </div>

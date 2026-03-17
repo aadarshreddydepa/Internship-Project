@@ -8,49 +8,40 @@ export type BusinessStatus =
   | 'inactive';
 
 export interface Business {
-
-  id:number;
-  name:string;
-  description:string;
-  category:string;
-  contact:string;
-  rating:number;
-  status:BusinessStatus;
-  rejectionComment?:string;
-
+  id: number;
+  name: string;
+  description: string;
+  category: string;
+  contact: string;
+  rating: number;
+  status: BusinessStatus;
+  rejectionComment?: string;
 }
 
 @Injectable({
-  providedIn:'root'
+  providedIn: 'root'
 })
-export class BusinessService{
-  [x: string]: any;
+export class BusinessService {
 
-  private businesses:Business[] = businessesData as Business[];
+  private businesses: Business[] = businessesData as Business[];
 
-  getBusinesses(){
+  getBusinesses(): Business[] {
     return this.businesses;
   }
 
-  updateStatus(id:number,status:BusinessStatus){
-
-    const business = this.businesses.find(b=>b.id===id);
-
-    if(business){
+  updateStatus(id: number, status: BusinessStatus): void {
+    const business = this.businesses.find(b => b.id === id);
+    if (business) {
       business.status = status;
     }
-
   }
 
-  rejectBusiness(id:number,comment:string){
-
-    const business = this.businesses.find(b=>b.id===id);
-
-    if(business){
+  rejectBusiness(id: number, comment: string): void {
+    const business = this.businesses.find(b => b.id === id);
+    if (business) {
       business.status = 'rejected';
       business.rejectionComment = comment;
     }
-
   }
 
 }

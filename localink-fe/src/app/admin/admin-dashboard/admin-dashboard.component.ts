@@ -1,130 +1,88 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import * as XLSX from 'xlsx';
-
-import { BusinessService,Business } from '../../services/business.service';
+import { BusinessService, Business } from '../../services/business.service';
 
 type Section = 'pending' | 'approved' | 'rejected' | 'inactive';
 
 @Component({
-  selector:'app-admin-dashboard',
-  standalone:true,
-  imports:[CommonModule,FormsModule],
-  templateUrl:'./admin-dashboard.component.html',
-  styleUrl:'./admin-dashboard.component.css'
+  selector: 'app-admin-dashboard',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './admin-dashboard.component.html',
+  styleUrl: './admin-dashboard.component.css'
 })
-export class AdminDashboardComponent{
+export class AdminDashboardComponent implements OnInit {
 
-  businesses:Business[] = [];
-
-  currentSection:Section = 'pending';
-
-  searchTerm='';
-
-  selectedBusiness:Business|null=null;
-
-  toastMessage='';
-  showToast=false;
-
-  rejectModalOpen=false;
-  rejectComment='';
-  rejectBusinessId:number|null=null;
-
-  constructor(private service:BusinessService){}
-
-  ngOnInit(){
+  businesses: Business[] = [];
+  currentSection: Section = 'pending';
+  searchTerm = '';
+  selectedBusiness: Business | null = null;
+  toastMessage = '';
+  showToast = false;
+  rejectModalOpen = false;
+  rejectComment = '';
+  rejectBusinessId: number | null = null;
+  constructor(private service: BusinessService) {}
+  ngOnInit(): void {
     this.businesses = this.service.getBusinesses();
   }
-
-  get filteredBusinesses(){
-
+  get filteredBusinesses(): Business[] {
     return this.businesses
-    .filter(b=>b.status===this.currentSection)
-    .filter(b=>
-      b.name.toLowerCase().includes(this.searchTerm.toLowerCase())
-    );
-
+      .filter(b => b.status === this.currentSection)
+      .filter(b =>
+        b.name.toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
   }
-
-  approve(id:number){
-    this.service.updateStatus(id,'approved');
+  approve(id: number): void {
+    this.service.updateStatus(id, 'approved');
     this.notify('Business Approved');
   }
-
-  deactivate(id:number){
-    this.service.updateStatus(id,'inactive');
+  deactivate(id: number): void {
+    this.service.updateStatus(id, 'inactive');
     this.notify('Business Deactivated');
   }
-
-  activate(id:number){
-    this.service.updateStatus(id,'approved');
+  activate(id: number): void {
+    this.service.updateStatus(id, 'approved');
     this.notify('Business Activated');
   }
-
-  openRejectModal(id:number){
+  openRejectModal(id: number): void {
     this.rejectBusinessId = id;
     this.rejectModalOpen = true;
   }
-
-  submitRejection(){
-
-    if(!this.rejectComment.trim()) return;
-
-    if(this.rejectBusinessId!==null){
-
-      this.service.rejectBusiness(
-        this.rejectBusinessId,
-        this.rejectComment
-      );
-
+  submitRejection(): void {
+    if (!this.rejectComment.trim()) return;
+    if (this.rejectBusinessId !== null) {
+      this.service.rejectBusiness(this.rejectBusinessId, this.rejectComment);
     }
-
-    this.rejectModalOpen=false;
-    this.rejectComment='';
-    this.rejectBusinessId=null;
+    this.rejectModalOpen = false;
+    this.rejectComment = '';
+    this.rejectBusinessId = null;
 
     this.notify('Business Rejected');
-
   }
-
-  closeRejectModal(){
-    this.rejectModalOpen=false;
-    this.rejectComment='';
+  closeRejectModal(): void {
+    this.rejectModalOpen = false;
+    this.rejectComment = '';
   }
-
-  openDetails(b:Business){
-    this.selectedBusiness=b;
+  openDetails(b: Business): void {
+    this.selectedBusiness = b;
   }
-
-  closeModal(){
-    this.selectedBusiness=null;
+  closeModal(): void {
+    this.selectedBusiness = null;
   }
-
-  notify(message:string){
-
+  notify(message: string): void {
     this.toastMessage = message;
-    this.showToast=true;
-
-    setTimeout(()=>{
-      this.showToast=false;
-    },2500)
-
+    this.showToast = true;
+    setTimeout(() => { this.showToast = false; }, 2500);
   }
-
-  downloadExcel(){
-
+  downloadExcel(): void {
     const data = this.filteredBusinesses;
-
-    if(data.length===0) return;
-
+    if (data.length === 0) return;
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
-
-    XLSX.utils.book_append_sheet(workbook,worksheet,"Businesses");
-
-    XLSX.writeFile(workbook,`${this.currentSection}-businesses.xlsx`);
-
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Businesses');
+    XLSX.writeFile(workbook, `${this.currentSection}-businesses.xlsx`);
   }
-
 }
