@@ -25,6 +25,9 @@ import { PreviewComponent } from '../business/preview/preview.component';
   styleUrls: ['./register-business.component.css']
 })
 export class RegisterBusinessComponent {
+  handlePhotoSelected(photo: string) {
+    throw new Error('Method not implemented.');
+  }
 
   currentStep = 1;
   businessForm!: FormGroup;
@@ -102,7 +105,12 @@ export class RegisterBusinessComponent {
 
   goToPrevious() {
     if (this.currentStep > 1) {
-      this.currentStep--;
+      if(this.currentStep === 4){
+        this.currentStep = 1;
+      }
+      else{
+        this.currentStep--;
+      }  
     }
   }
   saveContactAndNext(data: any) {
