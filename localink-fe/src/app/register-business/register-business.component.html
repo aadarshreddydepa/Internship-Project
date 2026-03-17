@@ -1,61 +1,57 @@
-<div class="page-shell">
-
-  <!-- TOPBAR -->
-  <div class="topbar">
-    <div class="topbar-title">Localink</div>
-  </div>
-
-  <!-- HERO -->
-  <div class="hero">
-    <div class="eyebrow">Business Registration</div>
-    <h1>Register Your Business</h1>
-    <p>Join our directory and reach more customers through the Localink network.</p>
-    <!-- <span class="gold-rule"></span> -->
-  </div>
+<div class="page-wrapper">
 
   <div class="wizard-container">
+
+    <!-- HEADER -->
+    <div class="header">
+      <h2>Register Your Business</h2>
+      <p>Join our directory and reach more customers</p>
+    </div>
 
     <!-- STEP PROGRESS -->
     <div class="stepper">
 
-      <div class="step" [class.active]="currentStep >= 1">
-        <div class="circle">1</div>
-        <span>Basic Info</span>
-      </div>
+  <div class="step" [class.active]="currentStep >= 1">
+    <div class="circle">1</div>
+    <span>Basic Info</span>
+  </div>
 
-      <div class="line"></div>
+  <div class="line"></div>
 
-      <div class="step" [class.active]="currentStep >= 2">
-        <div class="circle">2</div>
-        <span>Contact Details</span>
-      </div>
+  <div class="step" [class.active]="currentStep >= 2">
+    <div class="circle">2</div>
+    <span>Contact Details</span>
+  </div>
 
-      <div class="line"></div>
+  
+  <div class="line"></div>
 
-      <div class="step" [class.active]="currentStep >= 3">
-        <div class="circle">3</div>
-        <span>Additional Info</span>
-      </div>
+  <div class="step" [class.active]="currentStep >= 3">
+    <div class="circle">3</div>
+    <span>Additional Info</span>
+  </div>
 
-      <div class="line"></div>
+  <div class="line"></div>
 
-      <div class="step" [class.active]="currentStep >= 4">
-        <div class="circle">4</div>
-        <span>Preview</span>
-      </div>
+  <div class="step" [class.active]="currentStep >= 4">
+    <div class="circle">4</div>
+    <span>Preview</span>
+  </div>
 
-    </div>
 
+</div>
     <!-- FORM CARD -->
-    <div class="form-card" [class.step1-padding]="currentStep === 1">
-      
-      <!-- STEP 1 -->
+    <div class="form-card">
+
+      <!-- STEP 1 : BASIC INFO -->
+
       <div *ngIf="currentStep === 1">
 
         <h3>Basic Information</h3>
-        <span class="card-rule"></span>
 
         <form [formGroup]="businessForm">
+
+          <!-- BUSINESS NAME -->
 
           <div class="form-group">
 
@@ -63,23 +59,21 @@
 
             <input
               type="text"
-              placeholder="Enter your official business name"
+              placeholder="Enter business name"
               formControlName="businessName">
 
             <div class="error" *ngIf="businessForm.get('businessName')?.touched && businessForm.get('businessName')?.invalid">
-
-              <span *ngIf="businessForm.get('businessName')?.errors?.['required']">
+                <span *ngIf="businessForm.get('businessName')?.errors?.['required']">
                 Business name is required
-              </span>
-
-              <span *ngIf="businessForm.get('businessName')?.errors?.['pattern']">
+                </span>
+                <span *ngIf="businessForm.get('businessName')?.errors?.['pattern']">
                 Business name must contain only letters, spaces, &, ', or -
-              </span>
-
+                </span>
             </div>
-
           </div>
 
+
+          <!-- BUSINESS DESCRIPTION -->
 
           <div class="form-group">
 
@@ -93,22 +87,24 @@
 
             <div class="error" *ngIf="businessForm.get('description')?.touched">
 
-              <span *ngIf="businessForm.get('description')?.errors?.['required']">
-                Description is required
-              </span>
+            <span *ngIf="businessForm.get('description')?.errors?.['required']">
+              Description is required
+            </span>
 
-              <span *ngIf="businessForm.get('description')?.errors?.['minlength']">
-                Description must be at least 10 characters
-              </span>
+            <span *ngIf="businessForm.get('description')?.errors?.['minlength']">
+              Description must be at least 10 characters
+            </span>
 
-              <span *ngIf="businessForm.get('description')?.errors?.['pattern']">
+            <span *ngIf="businessForm.get('description')?.errors?.['pattern']">
                 Start of Description must contain only letters
-              </span>
-
-            </div>
+            </span>
 
           </div>
 
+          </div>
+
+
+          <!-- CATEGORY + SUBCATEGORY -->
 
           <div class="two-column">
 
@@ -131,9 +127,8 @@
                 </option>
 
               </select>
-
               <div class="error" *ngIf="businessForm.get('category')?.touched && businessForm.get('category')?.invalid">
-                Category is required
+              Category is required
               </div>
 
             </div>
@@ -157,20 +152,21 @@
 
               </select>
 
-              <div class="error" *ngIf="businessForm.get('subcategory')?.touched && businessForm.get('subcategory')?.invalid">
+               <div class="error" *ngIf="businessForm.get('subcategory')?.touched && businessForm.get('subcategory')?.invalid">
                 Subcategory is required
-              </div>
+                </div>
 
             </div>
 
           </div>
 
 
+          <!-- BUTTON -->
+
           <div class="button-container">
 
             <button
               type="button"
-              class="primary-btn"
               (click)="goToNext()">
 
               Next Step
@@ -184,7 +180,7 @@
       </div>
 
 
-      <!-- STEP 2 -->
+      <!-- STEP 2 : CONTACT DETAILS -->
 
       <div *ngIf="currentStep === 2">
 
@@ -195,28 +191,20 @@
         </app-contact-details>
 
       </div>
+    
+     
 
-
-      <!-- STEP 3 -->
+      <!-- STEP 3 : ADDITIONAL INFO -->
 
       <div *ngIf="currentStep === 3">
 
-        <h3 class="additional-h3">Additional Information</h3>
+        <h3>Additional Information</h3>
+        <app-hours [initialHours]="hoursData" (hoursSaved)="saveHours($event)"></app-hours>
+        <app-photo-upload [initialPhoto]="photoData" (photoSelected)="savePhoto($event)"></app-photo-upload>
 
-        <app-hours
-          [initialHours]="hoursData"
-          (hoursSaved)="saveHours($event)">
-        </app-hours>
-
-        <app-photo-upload
-          [initialPhoto]="photoData"
-          (photoSelected)="savePhoto($event)">
-        </app-photo-upload>
-
-        <div class="error-hours" *ngIf="hoursErrorMessage">
+        <div class="error" *ngIf="hoursErrorMessage">
           {{ hoursErrorMessage }}
         </div>
-
         <div class="button-container step3-buttons">
 
           <button
@@ -227,34 +215,26 @@
 
           </button>
 
-          <button
-            class="primary-btn"
-            (click)="goToNext()">
-
+          <button class="next-btn" (click)="goToNext()">
             Next
-
           </button>
 
         </div>
 
       </div>
 
-
-      <!-- STEP 4 -->
-
-      <div *ngIf="currentStep === 4">
-
+      <!-- STEP 4 : PREVIEW -->
+       <div *ngIf="currentStep === 4">
+        
         <app-preview
           [businessData]="businessData"
           [contactData]="contactData"
           [hoursData]="hoursData"
           [photoData]="photoData">
         </app-preview>
-
         <div class="success-message" *ngIf="submitSuccessMessage">
           {{ submitSuccessMessage }}
         </div>
-
         <div class="button-container preview-buttons">
 
           <button
@@ -264,17 +244,13 @@
           </button>
 
           <button
-            class="primary-btn"
+            class="submit-btn"
             (click)="submitRegistration()">
             Submit Registration
           </button>
 
         </div>
-
-      </div>
-
-    </div>
-
+        </div>
   </div>
 
 </div>

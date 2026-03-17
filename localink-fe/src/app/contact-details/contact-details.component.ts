@@ -189,8 +189,6 @@ export class ContactDetailsComponent implements OnInit {
     this.contactForm.get('phone')?.setValue(value);
 
   }
-
-
   submit() {
 
     if (this.contactForm.valid) {

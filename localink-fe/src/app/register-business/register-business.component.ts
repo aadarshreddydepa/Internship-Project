@@ -1,7 +1,7 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { PLATFORM_ID } from '@angular/core';
+//import { PLATFORM_ID } from '@angular/core';
 import { NgSelectModule } from '@ng-select/ng-select';
 
 import { ContactDetailsComponent } from '../contact-details/contact-details.component';
@@ -25,9 +25,6 @@ import { PreviewComponent } from '../business/preview/preview.component';
   styleUrls: ['./register-business.component.css']
 })
 export class RegisterBusinessComponent {
-  handlePhotoSelected(photo: string) {
-    throw new Error('Method not implemented.');
-  }
 
   currentStep = 1;
   businessForm!: FormGroup;
@@ -50,7 +47,7 @@ export class RegisterBusinessComponent {
 
   constructor(
     private fb: FormBuilder,
-    @Inject(PLATFORM_ID) private platformId: Object
+    //@Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.businessForm = this.fb.group({
       businessName: [
@@ -105,12 +102,7 @@ export class RegisterBusinessComponent {
 
   goToPrevious() {
     if (this.currentStep > 1) {
-      if(this.currentStep === 4){
-        this.currentStep = 1;
-      }
-      else{
-        this.currentStep--;
-      }  
+      this.currentStep--;
     }
   }
   saveContactAndNext(data: any) {
