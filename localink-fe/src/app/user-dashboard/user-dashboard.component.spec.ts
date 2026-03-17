@@ -1,7 +1,7 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { SearchComponent } from './search.component';
+import { SearchComponent } from './userdashboard.component';
 import { CategoryService, Category } from '../services/category.service';
 
 describe('SearchComponent', () => {

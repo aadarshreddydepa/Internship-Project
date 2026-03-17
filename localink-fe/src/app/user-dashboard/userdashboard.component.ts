@@ -9,10 +9,10 @@ import { PopularBusinessesComponent } from '../popular-businesses/popular-busine
   selector: 'app-search',
   standalone: true,
   imports: [CommonModule, FormsModule, PopularBusinessesComponent],
-  templateUrl: './search.component.html',
-  styleUrl: './search.component.css'
+  templateUrl: './user-dashboard.component.html',
+  styleUrl: './user-dashboard.component.css'
 })
-export class SearchComponent implements OnInit {
+export class UserDashboardComponent implements OnInit {
 
   categories: Category[] = [];
   username: string = 'Sankeerth';

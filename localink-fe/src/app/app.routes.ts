@@ -1,24 +1,17 @@
 import { Routes } from '@angular/router';
+import { RegisterBusinessComponent } from './register-business/register-business.component';
+import { ContactDetailsComponent } from './contact-details/contact-details.component';
 
 export const routes: Routes = [
 
   {
     path: '',
-    loadComponent: () =>
-      import('./search/search.component').then(m => m.SearchComponent)
+    component: RegisterBusinessComponent
   },
 
   {
-    path: 'admin',
-    loadComponent: () =>
-      import('./admin/admin-dashboard/admin-dashboard.component').then(
-        m => m.AdminDashboardComponent
-      )
-  },
-
-  {
-    path: '**',
-    redirectTo: ''
+    path: 'contact-details',
+    component: ContactDetailsComponent
   }
 
 ];
