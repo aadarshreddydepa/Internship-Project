@@ -1,27 +1,27 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { SearchComponent } from './userdashboard.component';
+import { UserDashboardComponent } from './user-dashboard.component';
 import { CategoryService, Category } from '../services/category.service';
 
 describe('SearchComponent', () => {
 
-  let component: SearchComponent;
-  let fixture: ComponentFixture<SearchComponent>;
+  let component: UserDashboardComponent;
+  let fixture: ComponentFixture<UserDashboardComponent>;
   let routerSpy = jasmine.createSpyObj('Router', ['navigate']);
   let categoryService: CategoryService;
 
   beforeEach(async () => {
 
     await TestBed.configureTestingModule({
-      imports: [SearchComponent, FormsModule],
+      imports: [UserDashboardComponent, FormsModule],
       providers: [
         CategoryService,
         { provide: Router, useValue: routerSpy }
       ]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(SearchComponent);
+    fixture = TestBed.createComponent(UserDashboardComponent);
     component = fixture.componentInstance;
     categoryService = TestBed.inject(CategoryService);
 
