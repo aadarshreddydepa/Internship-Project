@@ -238,5 +238,44 @@ padding:20px;
 .login-container{
 width:90%;
 }
+/* VALIDATION STATES */
 
+input.invalid,
+select.invalid {
+  border-color: #ff4d4f;
+  box-shadow: 0 0 6px rgba(255, 77, 79, 0.5);
+}
+
+input.valid,
+select.valid {
+  border-color: #28a745;
+  box-shadow: 0 0 6px rgba(40, 167, 69, 0.5);
+}
+
+/* ERROR TEXT */
+
+.error {
+  color: #ff4d4f;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* SERVER ERROR */
+
+.server-error {
+  color: #ff4d4f;
+  text-align: center;
+  margin-top: 10px;
+  font-weight: 500;
+}
+
+/* LOADING BUTTON */
+
+button {
+  position: relative;
+}
+
+button:disabled {
+  opacity: 0.7;
+}
 }
