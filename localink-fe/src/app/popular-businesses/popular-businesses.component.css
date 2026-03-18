@@ -1,0 +1,81 @@
+.popular-section{
+margin-top:50px;
+}
+
+.section-title{
+font-size:22px;
+margin-bottom:20px;
+}
+
+.popular-grid{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:25px;
+}
+
+/* CARD */
+
+.business-card{
+
+background:#2A2A2A;
+border:1px solid #484948;
+border-radius:12px;
+padding:16px;
+transition:all 0.25s ease;
+cursor:pointer;
+
+}
+
+.business-card:hover{
+background:#343434;
+transform:translateY(-4px);
+box-shadow:0 8px 20px rgba(0,0,0,0.4);
+}
+
+/* IMAGE */
+
+.image-placeholder{
+
+height:140px;
+border-radius:8px;
+border:1px solid #484948;
+display:flex;
+align-items:center;
+justify-content:center;
+color:#B19F91;
+margin-bottom:14px;
+background:#1C1C1C;
+
+}
+
+/* CONTENT */
+
+.card-content h3{
+margin:0;
+font-size:16px;
+font-weight:500;
+}
+
+.category{
+color:#B19F91;
+font-size:14px;
+margin:6px 0 10px 0;
+}
+
+/* RATING */
+
+.rating{
+display:flex;
+align-items:center;
+gap:6px;
+}
+
+.stars{
+color:#F4C430;
+font-size:14px;
+}
+
+.rating-number{
+color:#B19F91;
+font-size:13px;
+}

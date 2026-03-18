@@ -1,0 +1,118 @@
+.container{
+padding:30px 50px;
+background:#1C1C1C;
+min-height:100vh;
+color:#F8F4F0;
+font-family:Inter, sans-serif;
+}
+
+/* HEADER */
+
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:30px;
+}
+
+.logo{
+font-size:22px;
+font-weight:600;
+color:#C8A97E;
+}
+
+.actions{
+display:flex;
+gap:15px;
+align-items:center;
+}
+
+.add-btn{
+background:#C8A97E;
+border:none;
+padding:10px 18px;
+border-radius:8px;
+color:#1C1C1C;
+font-weight:600;
+cursor:pointer;
+}
+
+.profile{
+font-size:20px;
+}
+
+/* HERO */
+
+.hero{
+background:linear-gradient(135deg,#2A2A2A,#343434);
+padding:40px;
+border-radius:12px;
+margin-bottom:40px;
+}
+
+.hero h1{
+margin:0;
+font-size:32px;
+}
+
+.hero p{
+color:#B19F91;
+margin-top:10px;
+}
+
+/* CATEGORY */
+
+.categories h2{
+margin-bottom:20px;
+}
+
+.category-grid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:20px;
+}
+
+.category-card{
+display:flex;
+align-items:center;
+gap:20px;
+background:#2A2A2A;
+padding:25px;
+border-radius:12px;
+border:1px solid #484948;
+transition:all 0.2s ease;
+cursor:pointer;
+}
+
+.category-card:hover{
+background:#343434;
+transform:translateY(-3px);
+}
+
+.icon{
+font-size:28px;
+background:#C8A97E;
+color:#1C1C1C;
+padding:12px;
+border-radius:10px;
+}
+
+.text h3{
+margin:0;
+font-size:18px;
+}
+
+.text p{
+margin:5px 0 0;
+color:#B19F91;
+}
+
+/* POPULAR */
+
+.popular{
+margin-top:40px;
+}
+
+.coming{
+color:#B19F91;
+}

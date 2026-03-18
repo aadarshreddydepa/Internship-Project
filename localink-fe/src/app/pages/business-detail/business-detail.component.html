@@ -1,0 +1,79 @@
+<div *ngIf="business" class="detail-container">
+
+  <!-- BACK BUTTON -->
+  <a routerLink="/" class="back">← Back to Results</a>
+
+  <div class="detail-grid">
+
+    <!-- IMAGE SECTION -->
+    <div class="image-section">
+
+      <div class="main-image">
+        Main Image
+      </div>
+
+      <div class="gallery">
+        <div class="thumb">1</div>
+        <div class="thumb">2</div>
+        <div class="thumb">3</div>
+      </div>
+
+    </div>
+
+
+    <!-- BUSINESS INFO -->
+    <div class="info-section">
+
+      <h1>{{business.name}} <span class="verified">✔ Verified</span></h1>
+
+      <p class="category">
+        {{business.category}} → {{business.subcategory}}
+      </p>
+
+      <div class="rating">
+        ⭐⭐⭐⭐☆ {{business.rating}} ({{business.reviews}} reviews)
+      </div>
+
+      <p class="description">
+        {{business.description}}
+      </p>
+
+      <div class="contact-grid">
+
+        <div>
+          <b>📞 Phone</b>
+          <p>{{business.phone}}</p>
+        </div>
+
+        <div>
+          <b>✉ Email</b>
+          <p>{{business.email}}</p>
+        </div>
+
+        <div>
+          <b>📍 Address</b>
+          <p>{{business.address}}</p>
+        </div>
+
+        <div>
+          <b>🕒 Hours</b>
+          <p>{{business.hours}}</p>
+        </div>
+
+        <div>
+          <b>🌐 Website</b>
+          <p>{{business.website}}</p>
+        </div>
+
+      </div>
+
+      <div class="actions">
+        <button class="contact-btn">Contact Business</button>
+        <button class="direction-btn">Get Directions</button>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

@@ -1,54 +1,76 @@
-.page{
+:host{
+  display:block;
   background:#1C1C1C;
   min-height:100vh;
-  padding:30px;
+  padding:40px;
   color:#F8F4F0;
 }
 
-.header{
+.container{
+  max-width:1200px;
+  margin:auto;
+}
+
+/* HEADER */
+
+.page-header{
   display:flex;
-  gap:20px;
-  align-items:center;
-  margin-bottom:30px;
+  flex-direction:column;
+  gap:6px;
+  margin-bottom:20px;
 }
 
-.back-btn{
-  background:none;
-  border:none;
+.back{
   color:#B19F91;
-  font-size:16px;
-  cursor:pointer;
+  text-decoration:none;
+  font-size:14px;
 }
 
-.subtitle{
+.title-section h1{
+  font-size:30px;
+  font-weight:600;
+  margin:0;
+  
+}
+
+.title-section p{
   color:#B19F91;
   margin-top:4px;
 }
 
-.business-list{
-  display:flex;
-  flex-direction:column;
-  gap:20px;
+.divider{
+  height:1px;
+  background:#2A2A2A;
+  margin-bottom:25px;
 }
 
+
+/* BUSINESS CARD */
+
 .business-card{
-  background:#2A2A2A;
+  display:flex;
+  align-items:center;
+  gap:20px;
+  background:linear-gradient(145deg,#2A2A2A,#343434);
   border:1px solid #484948;
   border-radius:12px;
   padding:20px;
-  display:flex;
-  gap:20px;
-  transition:0.2s;
+  margin-bottom:18px;
+  transition:all .2s ease;
 }
 
 .business-card:hover{
-  background:#343434;
+  border-color:#C8A97E;
+  transform:translateY(-2px);
 }
 
-.image-box{
+
+/* IMAGE */
+
+.image{
   width:90px;
   height:90px;
-  background:#343434;
+  border:1px solid #484948;
   border-radius:10px;
   display:flex;
   align-items:center;
@@ -56,19 +78,21 @@
   color:#B19F91;
 }
 
-.business-info{
+
+/* INFO */
+
+.info{
   flex:1;
 }
 
 .title-row{
   display:flex;
-  align-items:center;
   gap:10px;
+  align-items:center;
 }
 
-.title-row h2{
+.title-row h3{
   margin:0;
-  font-size:18px;
 }
 
 .verified{
@@ -80,27 +104,67 @@
 }
 
 .desc{
-  margin:6px 0 10px;
   color:#B19F91;
+  margin:6px 0;
 }
 
 .rating{
-  color:#F8F4F0;
+  color:#F4C430;
   margin-bottom:10px;
 }
 
-.star{
-  color:#F4C430;
-  margin-right:4px;
-}
 
-.reviews{
-  color:#B19F91;
-}
+/* DETAILS */
 
 .details{
   display:flex;
-  gap:30px;
-  font-size:14px;
+  gap:40px;
   color:#B19F91;
+}
+
+
+/* ARROW */
+
+.arrow{
+  font-size:22px;
+  color:#B19F91;
+}
+
+h1{
+  font-size:32px;
+  font-weight:600;
+}
+
+h3{
+  font-size:18px;
+}
+
+.desc{
+  color:#B19F91;
+}
+
+.pagination{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-top:30px;
+}
+
+.pagination button{
+  background:#2A2A2A;
+  border:1px solid #484948;
+  padding:8px 14px;
+  color:#F8F4F0;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+.pagination button:hover{
+  border-color:#C8A97E;
+}
+
+.pagination .active{
+  background:#C8A97E;
+  color:#1C1C1C;
+  border:none;
 }

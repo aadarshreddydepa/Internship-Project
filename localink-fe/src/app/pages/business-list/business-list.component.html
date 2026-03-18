@@ -1,68 +1,84 @@
-<div class="page">
+<div class="container">
 
-  <div class="header">
+  <!-- HEADER -->
+  <div class="page-header">
 
-    <button class="back-btn" onclick="history.back()">
+    <a [routerLink]="['/subcategory', category]" class="back">
       ← Back
-    </button>
+    </a>
 
-    <div>
-      <h1>{{subcategory}}</h1>
-      <p class="subtitle">
-        {{businesses.length}} businesses found
-      </p>
+    <div class="title-section">
+      <h1>{{ subcategory | titlecase }}</h1>
+      <p>{{ businesses.length }} businesses found</p>
     </div>
 
   </div>
 
-  <div class="business-list">
+  <div class="divider"></div>
 
-    <div class="business-card" *ngFor="let b of businesses">
 
-      <div class="image-box">
-        Image
+  <!-- BUSINESS LIST -->
+
+  <div class="business-card"
+       *ngFor="let b of paginatedBusinesses"
+       [routerLink]="['/business', b.name]"
+       style="cursor:pointer">
+
+    <!-- IMAGE -->
+    <div class="image">
+      Image
+    </div>
+
+
+    <!-- BUSINESS INFO -->
+    <div class="info">
+
+      <div class="title-row">
+        <h3>{{ b.name }}</h3>
       </div>
 
-      <div class="business-info">
+      <p class="desc">{{ b.description }}</p>
 
-        <div class="title-row">
+      <div class="rating">
+        ⭐ {{ b.rating }} ({{ b.reviews }} reviews)
+      </div>
 
-          <h2>{{b.name}}</h2>
+      <div class="details">
 
-          <span *ngIf="b.verified" class="verified">
-            Verified
-          </span>
+        <span>📞 {{ b.phone }}</span>
 
-        </div>
+        <span>📍 {{ b.address }}</span>
 
-        <p class="desc">
-          {{b.desc}}
-        </p>
-
-        <div class="rating">
-
-          <span class="star">★</span>
-
-          {{b.rating}}
-          <span class="reviews">
-            ({{b.reviews}} reviews)
-          </span>
-
-        </div>
-
-        <div class="details">
-
-          <span>📞 {{b.phone}}</span>
-
-          <span>📍 {{b.address}}</span>
-
-          <span>⏰ {{b.hours}}</span>
-
-        </div>
+        <span>🕒 {{ b.hours }}</span>
 
       </div>
 
     </div>
+
+    <div class="arrow">›</div>
+
+  </div>
+
+
+  <!-- PAGINATION -->
+
+  <div class="pagination" *ngIf="totalPages > 1">
+
+    <button (click)="changePage(currentPage-1)">
+      Previous
+    </button>
+
+    <button
+      *ngFor="let page of [].constructor(totalPages); let i = index"
+      (click)="changePage(i+1)"
+      [class.active]="currentPage === i+1"
+    >
+      {{ i+1 }}
+    </button>
+
+    <button (click)="changePage(currentPage+1)">
+      Next
+    </button>
 
   </div>
 

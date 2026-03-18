@@ -2,11 +2,21 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SubcategoryListComponent } from './subcategory-list.component';
 import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
+import { SubcategoryService } from '../../services/subcategory.service';
 
 describe('SubcategoryListComponent', () => {
 
   let component: SubcategoryListComponent;
   let fixture: ComponentFixture<SubcategoryListComponent>;
+
+  const mockSubcategoryService = {
+    getSubcategories: () => of({
+      medical: [
+        { name: 'Clinic', count: 41 },
+        { name: 'Pharmacy', count: 22 }
+      ]
+    })
+  };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -15,10 +25,16 @@ describe('SubcategoryListComponent', () => {
         {
           provide: ActivatedRoute,
           useValue: {
-            paramMap: of({
-              get: (key: string) => 'Medical'
-            })
+            snapshot: {
+              paramMap: {
+                get: () => 'medical'
+              }
+            }
           }
+        },
+        {
+          provide: SubcategoryService,
+          useValue: mockSubcategoryService
         }
       ]
     }).compileComponents();
@@ -30,10 +46,6 @@ describe('SubcategoryListComponent', () => {
 
   it('should create the SubcategoryListComponent', () => {
     expect(component).toBeTruthy();
-  });
-
-  it('should set categoryName from route parameter', () => {
-    expect(component.categoryName).toBe('Medical');
   });
 
   it('should load subcategories for the selected category', () => {

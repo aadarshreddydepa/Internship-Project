@@ -1,32 +1,68 @@
-import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { MOCK_BUSINESSES } from '../../data/mock-businesses';
+
+import { BusinessListService } from '../../services/business-list.service';
 
 @Component({
-  selector:'app-business-list',
-  standalone:true,
-  imports:[CommonModule],
-  templateUrl:'./business-list.component.html',
-  styleUrls:['./business-list.component.css']
+  selector: 'app-business-list',
+  standalone: true,
+  imports: [CommonModule, RouterModule],
+  templateUrl: './business-list.component.html',
+  styleUrls: ['./business-list.component.css']
 })
-export class BusinessListComponent{
+export class BusinessListComponent implements OnInit {
 
-subcategory='';
-businesses:any[]=[];
+  category = '';
+  subcategory = '';
 
-constructor(private route:ActivatedRoute){}
+  businesses: any[] = [];
+  paginatedBusinesses: any[] = [];
 
-ngOnInit(){
+  currentPage = 1;
+  pageSize = 5;
+  totalPages = 1;
 
-this.route.paramMap.subscribe(params=>{
+  constructor(
+    private route: ActivatedRoute,
+    private service: BusinessListService
+  ) {}
 
-this.subcategory=params.get('subcategory') || '';
+  ngOnInit() {
 
-this.businesses=MOCK_BUSINESSES[this.subcategory] || [];
+    this.category = this.route.snapshot.paramMap.get('category')!;
+    this.subcategory = this.route.snapshot.paramMap.get('subcategory')!;
 
-});
+    this.service.getBusinesses().subscribe(data => {
 
-}
+      this.businesses =
+        data[this.category]?.[this.subcategory] || [];
+
+      this.totalPages = Math.ceil(this.businesses.length / this.pageSize);
+
+      this.updatePage();
+
+    });
+
+  }
+
+  updatePage() {
+
+    const start = (this.currentPage - 1) * this.pageSize;
+    const end = start + this.pageSize;
+
+    this.paginatedBusinesses = this.businesses.slice(start, end);
+
+  }
+
+  changePage(page:number){
+
+    if(page < 1 || page > this.totalPages) return;
+
+    this.currentPage = page;
+
+    this.updatePage();
+
+  }
 
 }
