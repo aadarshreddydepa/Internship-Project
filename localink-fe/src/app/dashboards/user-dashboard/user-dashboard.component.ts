@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { CategoryService, Category } from '../services/category.service';
-import { PopularBusinessesComponent } from '../popular-businesses/popular-businesses.component';
+import { CategoryService, Category } from '../../services/category.service';
+import { PopularBusinessesComponent } from '../../popular-businesses/popular-businesses.component';
 
 @Component({
   selector: 'app-search',

@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
-import { SignupComponent } from './pages/signup/signup.component';
+import { SignupComponent } from './signup/signup.component';
 import { LoginComponent } from './login/login.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 
 import { CategoriesComponent } from './pages/categories/categories.component';
@@ -11,9 +10,9 @@ import { BusinessListComponent } from './pages/business-list/business-list.compo
 import { ProfileComponent } from './pages/profile/profile.component';
 import { ChangePasswordComponent } from './pages/change-password/change-password.component';
 import { ContactDetailsComponent } from './contact-details/contact-details.component';
-import { ClientDashboardComponent } from './client-dashboard/client-dashboard.component';
+import { ClientDashboardComponent } from './dashboards/client-dashboard/client-dashboard.component';
 import { RegisterBusinessComponent } from './register-business/register-business.component';
-import { UserDashboardComponent } from './user-dashboard/user-dashboard.component';
+import { UserDashboardComponent } from './dashboards/user-dashboard/user-dashboard.component';
 import { EditBusinessBusinessComponent } from './edit-business/edit-business.component';
 
 
@@ -22,11 +21,6 @@ export const routes: Routes = [
   {
     path: '',
     component: LoginComponent
-  },
-
-  {
-    path: 'dashboard',
-    component: DashboardComponent
   },
   {
      path: 'signup',

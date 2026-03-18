@@ -2,7 +2,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { UserDashboardComponent } from './user-dashboard.component';
-import { CategoryService, Category } from '../services/category.service';
+import { CategoryService, Category } from '../../services/category.service';
 
 describe('SearchComponent', () => {
 
