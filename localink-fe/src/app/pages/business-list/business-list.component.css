@@ -1,0 +1,170 @@
+:host{
+  display:block;
+  background:#1C1C1C;
+  min-height:100vh;
+  padding:40px;
+  color:#F8F4F0;
+}
+
+.container{
+  max-width:1200px;
+  margin:auto;
+}
+
+/* HEADER */
+
+.page-header{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  margin-bottom:20px;
+}
+
+.back{
+  color:#B19F91;
+  text-decoration:none;
+  font-size:14px;
+}
+
+.title-section h1{
+  font-size:30px;
+  font-weight:600;
+  margin:0;
+  
+}
+
+.title-section p{
+  color:#B19F91;
+  margin-top:4px;
+}
+
+.divider{
+  height:1px;
+  background:#2A2A2A;
+  margin-bottom:25px;
+}
+
+
+/* BUSINESS CARD */
+
+.business-card{
+  display:flex;
+  align-items:center;
+  gap:20px;
+  background:linear-gradient(145deg,#2A2A2A,#343434);
+  border:1px solid #484948;
+  border-radius:12px;
+  padding:20px;
+  margin-bottom:18px;
+  transition:all .2s ease;
+}
+
+.business-card:hover{
+  border-color:#C8A97E;
+  transform:translateY(-2px);
+}
+
+
+/* IMAGE */
+
+.image{
+  width:90px;
+  height:90px;
+  border:1px solid #484948;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#B19F91;
+}
+
+
+/* INFO */
+
+.info{
+  flex:1;
+}
+
+.title-row{
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+
+.title-row h3{
+  margin:0;
+}
+
+.verified{
+  background:#C8A97E;
+  color:#1C1C1C;
+  font-size:12px;
+  padding:3px 8px;
+  border-radius:6px;
+}
+
+.desc{
+  color:#B19F91;
+  margin:6px 0;
+}
+
+.rating{
+  color:#F4C430;
+  margin-bottom:10px;
+}
+
+
+/* DETAILS */
+
+.details{
+  display:flex;
+  gap:40px;
+  color:#B19F91;
+}
+
+
+/* ARROW */
+
+.arrow{
+  font-size:22px;
+  color:#B19F91;
+}
+
+h1{
+  font-size:32px;
+  font-weight:600;
+}
+
+h3{
+  font-size:18px;
+}
+
+.desc{
+  color:#B19F91;
+}
+
+.pagination{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-top:30px;
+}
+
+.pagination button{
+  background:#2A2A2A;
+  border:1px solid #484948;
+  padding:8px 14px;
+  color:#F8F4F0;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+.pagination button:hover{
+  border-color:#C8A97E;
+}
+
+.pagination .active{
+  background:#C8A97E;
+  color:#1C1C1C;
+  border:none;
+}

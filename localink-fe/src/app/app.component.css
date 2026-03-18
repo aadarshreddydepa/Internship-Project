@@ -1,126 +1,124 @@
-    /* CENTER THE PAGE */
+/* ===== GOOGLE FONTS (EXACT AS PROVIDED) ===== */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Sora:wght@300;400;500;600&display=swap');
 
-    :host{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-    }
+/* ===== ROOT PALETTE ===== */
+:host {
+  --bg-primary: #1C1C1C;
+  --surface-secondary: #2A2A2A;
+  --surface-elevated: #343434;
 
-    /* LOGIN CONTAINER */
+  --text-primary: #F8F4F0;
+  --text-secondary: #B19F91;
 
-    .login-container{
-    width:360px;
-    background:rgba(42,42,42,0.9);
-    padding:30px;
-    border-radius:10px;
-    box-shadow:0px 4px 15px rgba(0,0,0,0.5);
-    }
+  --border: #484948;
 
-    /* TITLE */
+  --accent: #C8A97E;
 
-    h2{
-    color:#F8F4F0;
-    margin-bottom:20px;
-    text-align:center;
-    }
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'Sora', sans-serif;
+}
 
-    /* LABEL */
+/* ===== GLOBAL ===== */
+body {
+  margin: 0;
+  background: var(--bg-primary);
+  font-family: var(--font-body);
+  color: var(--text-primary);
+}
 
-    label{
-    font-size:14px;
-    color:#B19F91;
-    display:block;
-    margin-top:12px;
-    }
+/* ===== HEADER ===== */
+.top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 
-    /* INPUT */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
-    input,
-    select{
-    width:100%;
-    height:42px;
-    padding:0 12px;
-    margin-top:6px;
-    background:#343434;
-    border:1px solid #484948;
-    border-radius:6px;
-    color:#F8F4F0;
-    font-size:14px;
-    box-sizing:border-box;
-    }
+  padding: 18px 60px;
 
-    /* FOCUS */
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border);
+}
 
-    input:focus,
-    select:focus{
-    outline:none;
-    border-color:#C8A97E;
-    }
+/* ===== LOGO (PERFECT MATCH FIX) ===== */
+.logo {
+  font-family: 'Cormorant Garamond', serif;
 
-    /* SELECT */
+  font-size: 24px;
+  font-weight: 600;      /* bold */
+  font-style: normal;    /* not italic */
 
-    .select-wrapper{
-    position:relative;
-    }
+  color: var(--accent);
 
-    .select-wrapper select{
-    appearance:none;
-    cursor:pointer;
-    }
+  letter-spacing: 0.3px;
+  line-height: 1;
 
-    .select-wrapper::after{
-    content:"▼";
-    position:absolute;
-    right:12px;
-    top:50%;
-    transform:translateY(-50%);
-    color:#C8A97E;
-    font-size:12px;
-    pointer-events:none;
-    }
+  /* 🔥 CRITICAL: makes bold actually look bold */
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 
-    /* PASSWORD */
+  /* 🔥 slight thickness boost (very subtle) */
+  text-shadow: 0 0 0.01px currentColor;
+}
+/* ===== RIGHT SECTION ===== */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
 
-    .password-wrapper{
-    position:relative;
-    }
+/* ===== WELCOME TEXT (BODY FONT ONLY) ===== */
+.welcome {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
 
-    .password-wrapper input{
-    padding-right:40px;
-    }
+/* ===== PROFILE BUTTON ===== */
+.profile-btn {
+  width: 36px;
+  height: 36px;
 
-    .toggle-password{
-    position:absolute;
-    right:12px;
-    top:50%;
-    transform:translateY(-50%);
-    cursor:pointer;
-    color:#C8A97E;
-    }
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-    /* BUTTON */
+  background: var(--surface-secondary);
+  border: 1px solid var(--border);
+  border-radius: 50%;
 
-    button{
-    width:100%;
-    padding:12px;
-    background:#C8A97E;
-    border:none;
-    border-radius:6px;
-    margin-top:20px;
-    cursor:pointer;
-    font-weight:600;
-    }
+  color: var(--text-secondary);
+  cursor: pointer;
 
-    button:disabled{
-    background:#555;
-    cursor:not-allowed;
-    }
+  transition: all 0.2s ease;
+}
 
-    /* ERROR */
+.profile-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.5;
+}
 
-    .error{
-    color:#ff5c5c;
-    font-size:13px;
-    margin-top:5px;
-    }
+/* Hover */
+.profile-btn:hover {
+  background: var(--surface-elevated);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .top-bar {
+    padding: 14px 20px;
+  }
+
+  .welcome {
+    display: none;
+  }
+}

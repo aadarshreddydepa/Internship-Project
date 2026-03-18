@@ -1,0 +1,82 @@
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h2>Client Dashboard</h2>
+
+    <button class="btn-primary add-btn" (click)="addBusiness()">
+      + Add Business
+    </button>
+  </div>
+
+  <!-- BUSINESS LIST -->
+  <div *ngIf="businesses.length; else emptyState" class="business-list">
+
+    <div class="card" *ngFor="let b of businesses">
+
+      <h3>{{ b.businessName }}</h3>
+
+      <p>{{ b.category }} - {{ b.subcategory }}</p>
+
+      <span class="status">{{ b.status }}</span>
+
+      <div class="actions">
+        <button class="btn-outline" (click)="viewBusiness(b.id)">
+          View
+        </button>
+
+        <button class="btn-primary" (click)="editBusiness(b.id)">
+          Edit
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- EMPTY STATE -->
+  <ng-template #emptyState>
+    <div class="empty">
+      <h3>No Businesses Yet</h3>
+      <p>Start by adding your first business</p>
+
+      <button class="btn-primary" (click)="addBusiness()">
+        Add Business
+      </button>
+    </div>
+  </ng-template>
+
+
+  <!-- ✅ VIEW PANEL (NEW) -->
+  <div class="view-overlay" *ngIf="selectedBusiness">
+
+    <div class="view-card">
+
+      <div class="view-header">
+        <h3>{{ selectedBusiness.businessName }}</h3>
+        <button class="close-btn" (click)="closeView()">✕</button>
+      </div>
+
+      <div class="view-content">
+
+        <p><strong>Category:</strong> {{ selectedBusiness.category }}</p>
+        <p><strong>Subcategory:</strong> {{ selectedBusiness.subcategory }}</p>
+        <p><strong>Status:</strong> {{ selectedBusiness.status }}</p>
+
+        <hr>
+
+        <p><strong>Description:</strong> {{ selectedBusiness.description }}</p>
+
+        <hr>
+
+        <p><strong>Phone:</strong> {{ selectedBusiness.contact?.phone }}</p>
+        <p><strong>Email:</strong> {{ selectedBusiness.contact?.email }}</p>
+        <p><strong>City:</strong> {{ selectedBusiness.contact?.city }}</p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
