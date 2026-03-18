@@ -1,4 +1,8 @@
 import { Routes } from '@angular/router';
+import { LoginComponent } from './login/login.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+
 import { CategoriesComponent } from './pages/categories/categories.component';
 import { SubcategoryListComponent } from './pages/subcategory-list/subcategory-list.component';
 import { BusinessListComponent } from './pages/business-list/business-list.component';
@@ -16,6 +20,23 @@ export const routes: Routes = [
 
   {
     path: '',
+    component: LoginComponent
+  },
+
+  {
+    path: 'dashboard',
+    component: DashboardComponent
+  },
+
+  {
+    path: 'forgot-password',
+    component: ForgotPasswordComponent
+  },
+
+  {
+    path: '**',
+    redirectTo: ''
+  }
     component: CategoriesComponent
   },
 

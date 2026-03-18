@@ -1,0 +1,79 @@
+<div class="login-wrapper">
+
+  <!-- LEFT SIDE -->
+  <div class="welcome-section">
+
+    <h1>
+      <span class="small-text">Welcome to</span><br>
+      <span class="brand">Localink</span>
+    </h1>
+
+    <p class="tagline">Discover businesses around you</p>
+
+  </div>
+
+  <!-- RIGHT SIDE -->
+  <div class="login-page">
+
+    <div class="login-container">
+
+      <h2 class="login-title">Login</h2>
+
+      <form [formGroup]="loginForm" (ngSubmit)="login()">
+
+        <label>Account Type</label>
+        <div class="select-wrapper">
+          <select formControlName="userType">
+            <option value="" disabled hidden>Select account type</option>
+            <option value="user">User</option>
+            <option value="client">Client</option>
+          </select>
+        </div>
+
+        <label>Email</label>
+        <input
+          type="email"
+          placeholder="Enter email"
+          formControlName="usernameOrEmail"
+        />
+
+        <label>Password</label>
+        <div class="password-wrapper">
+
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            placeholder="Enter password"
+            formControlName="password"
+          />
+
+          <!-- ✅ ONLY ONE ICON -->
+          <span class="toggle-password" (click)="togglePassword()">
+            <i *ngIf="showPassword" class="fa-regular fa-eye-slash"></i>
+            <i *ngIf="!showPassword" class="fa-regular fa-eye"></i>
+          </span>
+
+        </div>
+
+        <div class="forgot-password">
+          <a class="forgot-link" routerLink="/forgot-password">
+            Forgot your password?
+          </a>
+        </div>
+
+        <button type="submit" [disabled]="loginForm.invalid">
+          Login
+        </button>
+
+        <!-- SIGNUP -->
+        <div class="signup-section">
+          Don't have an account?
+          <a routerLink="/signup" class="signup-link">Sign up</a>
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+</div>
