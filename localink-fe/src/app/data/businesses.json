@@ -1,0 +1,18 @@
+{
+  "medical": {
+    "clinic": [
+      {
+        "name": "City Medical Clinic",
+        "description": "Comprehensive healthcare services",
+        "rating": 4.5,
+        "reviews": 125
+      },
+      {
+        "name": "HealthCare Plus",
+        "description": "24/7 emergency medical services",
+        "rating": 4.8,
+        "reviews": 203
+      }
+    ]
+  }
+}

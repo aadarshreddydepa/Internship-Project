@@ -1,0 +1,46 @@
+<div class="container">
+
+  <a routerLink="/" class="back">
+    ← Back to Categories
+  </a>
+
+  <h1 class="title">
+    {{displayCategoryName}}
+  </h1>
+
+  <p class="subtitle">
+    Select a subcategory to view businesses
+  </p>
+
+  <div class="breadcrumb">
+    Home › {{displayCategoryName}}
+  </div>
+
+
+  <div class="grid">
+
+    <div
+      class="card"
+      *ngFor="let sub of subcategories"
+      [routerLink]="['/businesses', categoryId, sub.name.toLowerCase()]"
+    >
+
+      <div class="card-content">
+
+        <div>
+          <h3>{{ sub.name }}</h3>
+          <p class="count">{{ sub.count }} businesses</p>
+        </div>
+
+        <div class="arrow">
+          ›
+        </div>
+
+      </div>
+
+      <div class="skeleton"></div>
+
+    </div>
+
+  </div>
+
