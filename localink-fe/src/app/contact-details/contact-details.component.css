@@ -1,0 +1,137 @@
+/* Page background */
+body{
+background-color:#1C1C1C;
+font-family:"Segoe UI", Arial, sans-serif;
+color:#F8F4F0;
+margin:0;
+padding:0;
+}
+.container{
+width:100%;
+padding:0;
+background:transparent;
+border:none;
+box-shadow:none;
+}
+/* Title */
+h2{
+text-align:center;
+margin-bottom:25px;
+color:#F8F4F0;
+}
+
+/* Labels */
+label{
+display:block;
+margin-top:12px;
+margin-bottom:6px;
+color:#B19F91;
+font-size:14px;
+}
+
+/* Inputs */
+input,select{
+width:100%;
+padding:10px;
+background:#343434;
+border:1px solid #484948;
+border-radius:6px;
+color:#F8F4F0;
+font-size:14px;
+box-sizing:border-box;
+}
+
+/* Placeholder */
+input::placeholder{
+color:#B19F91;
+}
+
+/* Input focus */
+input:focus,select:focus{
+outline:none;
+border-color:#C8A97E;
+box-shadow:0 0 4px #C8A97E;
+}
+
+/* Divider */
+hr{
+border:none;
+border-top:1px solid #484948;
+margin:25px 0;
+}
+
+/* City State Pincode row */
+.location-row{
+display:flex;
+gap:12px;
+margin-top:10px;
+}
+
+.location-field{
+flex:1;
+display:flex;
+flex-direction:column;
+}
+
+/* Buttons */
+.button-container{
+display:flex;
+justify-content:space-between;
+margin-top:25px;
+}
+.phone-wrapper{
+display:flex;
+gap:10px;
+}
+
+.phone-code{
+width:120px;
+}
+
+.phone-wrapper input{
+flex:1;
+}
+.flag{
+margin-right:6px;
+}
+/* Previous button */
+.previous-btn{
+  background:#343434;
+  border:1px solid #484948;
+  color:#F8F4F0;
+}
+
+.previous-btn:hover{
+background:#444;
+}
+
+/* Submit button */
+button{
+padding:12px 25px;
+background:#C8A97E;
+border:none;
+border-radius:6px;
+font-size:16px;
+font-weight:600;
+cursor:pointer;
+color:#1C1C1C;
+}
+
+button:hover{
+background:#b5956c;
+}
+
+/* Error messages */
+.error{
+color:#ff6b6b;
+font-size:12px;
+margin-top:3px;
+}
+/* Success message */
+.success-message{
+margin-top:20px;
+color:#C8A97E;
+font-weight:600;
+text-align:center;
+}
+
