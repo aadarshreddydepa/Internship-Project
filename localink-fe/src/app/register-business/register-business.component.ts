@@ -1,13 +1,14 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-//import { PLATFORM_ID } from '@angular/core';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { HttpClient } from '@angular/common/http';
 
 import { ContactDetailsComponent } from '../contact-details/contact-details.component';
 import { HoursComponent } from '../business/hours/hours.component';
 import { PhotoUploadComponent } from '../business/photo-upload/photo-upload.component';
 import { PreviewComponent } from '../business/preview/preview.component';
+
 
 @Component({
   selector: 'app-register-business',
@@ -35,20 +36,17 @@ export class RegisterBusinessComponent {
   submitSuccessMessage = '';
   hoursErrorMessage = '';
 
-  categories = [
-    { name: 'Food', subcategories: ['Restaurant', 'Cafe', 'Bakery'] },
-    { name: 'Retail', subcategories: ['Clothing', 'Electronics', 'Supermarket'] },
-    { name: 'Services', subcategories: ['Salon', 'Repair', 'Consulting'] }
-  ];
+  // categories = [
+  //   { name: 'Food', subcategories: ['Restaurant', 'Cafe', 'Bakery'] },
+  //   { name: 'Retail', subcategories: ['Clothing', 'Electronics', 'Supermarket'] },
+  //   { name: 'Services', subcategories: ['Salon', 'Repair', 'Consulting'] }
+  // ];
+  categories: any[] = [];
+  subcategories: string[] = [];
   hoursData: any = [];
   photoData: string | null = null;
 
-  subcategories: string[] = [];
-
-  constructor(
-    private fb: FormBuilder,
-    //@Inject(PLATFORM_ID) private platformId: Object
-  ) {
+  constructor(private fb: FormBuilder, private http: HttpClient) {
     this.businessForm = this.fb.group({
       businessName: [
       '',
@@ -70,6 +68,13 @@ export class RegisterBusinessComponent {
       category: ['', Validators.required],
       subcategory: ['', Validators.required]
     });
+  }
+
+   ngOnInit(): void {
+    // If you want to do any initialization later
+    this.http.get<any>('data/categories.json').subscribe(data => {
+  this.categories = data.categories;
+});
   }
 
   onCategoryChange() {
