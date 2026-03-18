@@ -39,8 +39,7 @@ export const routes: Routes = [
 
   {
     path: '**',
-    redirectTo: ''
-  }
+    redirectTo: '',
     component: CategoriesComponent
   },
 
@@ -65,8 +64,7 @@ export const routes: Routes = [
 // }
  {
  path:'change-password',
- component:ChangePasswordComponent
-    component: RegisterBusinessComponent
+ component:ChangePasswordComponent,
   },
 
   {
