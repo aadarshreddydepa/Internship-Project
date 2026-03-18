@@ -114,7 +114,6 @@ export class RegisterBusinessComponent {
     this.contactData = data;
     this.currentStep = 3;
   }
-
   saveHours(hours: any) {
     this.hoursData = hours;
     this.hoursErrorMessage = '';
