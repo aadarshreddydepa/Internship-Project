@@ -7,7 +7,6 @@ import { PhotoUploadComponent } from "./business/photo-upload/photo-upload.compo
   selector: 'app-root',
   standalone: true,
   imports: [RouterOutlet],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  templateUrl: './app.component.html'
 })
 export class AppComponent {}

@@ -1,6 +1,10 @@
 import { Routes } from '@angular/router';
-import { RegisterBusinessComponent } from './register-business/register-business.component';
 import { ContactDetailsComponent } from './contact-details/contact-details.component';
+import { ClientDashboardComponent } from './client-dashboard/client-dashboard.component';
+import { RegisterBusinessComponent } from './register-business/register-business.component';
+import { UserDashboardComponent } from './user-dashboard/user-dashboard.component';
+import { EditBusinessBusinessComponent } from './edit-business/edit-business.component';
+
 
 export const routes: Routes = [
 
@@ -10,8 +14,14 @@ export const routes: Routes = [
   },
 
   {
-    path: 'contact-details',
-    component: ContactDetailsComponent
-  }
+    path: 'contact-details',component: ContactDetailsComponent
+  },
+  { path: 'user-dashboard', component: UserDashboardComponent },
+  { path: 'client-dashboard', component: ClientDashboardComponent },
+  { path: 'register-business', component: RegisterBusinessComponent },
+  {
+  path: 'edit-business/:id',
+  component: EditBusinessBusinessComponent
+}
 
 ];
