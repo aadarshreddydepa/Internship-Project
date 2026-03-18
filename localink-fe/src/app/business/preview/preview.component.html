@@ -1,0 +1,89 @@
+<div class="preview-wrapper">
+  <h2 class="preview-title">Review Your Details</h2>
+  <div class="preview-card">
+    <!-- BUSINESS INFO -->
+    <div class="section">
+      <h3>Business Information</h3>
+
+      <div class="info-row">
+        <span class="label">Business Name</span>
+        <span class="value">{{businessData?.businessName}}</span>
+      </div>
+
+      <div class="info-row">
+        <span class="label">Description</span>
+        <span class="value">{{businessData?.description}}</span>
+      </div>
+
+      <div class="info-row">
+        <span class="label">Category</span>
+        <span class="value">{{businessData?.category}}</span>
+      </div>
+
+      <div class="info-row">
+        <span class="label">Subcategory</span>
+        <span class="value">{{businessData?.subcategory}}</span>
+      </div>
+    </div>
+
+    <!-- CONTACT DETAILS -->
+    <div class="section">
+      <h3>Contact Details</h3>
+
+      <div class="info-row">
+        <span class="label">Phone</span>
+        <span class="value">{{contactData?.phone}}</span>
+      </div>
+
+      <div class="info-row">
+        <span class="label">Email</span>
+        <span class="value">{{contactData?.email}}</span>
+      </div>
+
+      <div class="info-row">
+        <span class="label">Website</span>
+        <span class="value">{{contactData?.website || '—'}}</span>
+      </div>
+
+      <div class="info-row">
+        <span class="label">Address</span>
+        <span class="value">
+          {{contactData?.address}}, {{contactData?.city}},
+          {{contactData?.state}}, {{contactData?.pincode}},
+          {{contactData?.country}}
+        </span>
+      </div>
+    </div>
+
+    <!-- BUSINESS HOURS -->
+    <div class="section">
+      <h3>Business Hours</h3>
+      <div class="hours-row" *ngFor="let day of hoursData">
+        <span class="day">{{day.day}}</span>
+
+        <span class="time" *ngIf="day.mode === 'closed'">
+          Closed
+        </span>
+
+        <span class="time" *ngIf="day.mode === '24h'">
+          24 Hours
+        </span>
+        
+        <span class="time" *ngIf="day.mode === 'custom'">
+          <span *ngFor="let s of day.slots; let last = last">
+            {{s.open}} - {{s.close}}
+            <span *ngIf="!last"> , </span>
+          </span>
+        </span>
+      </div>
+    </div>
+
+    <!-- BUSINESS PHOTO -->
+    <div class="section">
+      <h3>Business Photo</h3>
+      <div class="photo-box" *ngIf="photoData">
+        <img [src]="photoData" alt="Business Photo">
+      </div>
+    </div>
+  </div>
+</div>

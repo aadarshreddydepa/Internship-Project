@@ -1,14 +1,15 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { SignupComponent } from './pages/signup/signup.component';
+import { RouterLink, RouterOutlet } from '@angular/router';
+import { HoursComponent } from "./business/hours/hours.component";
+import { PhotoUploadComponent } from "./business/photo-upload/photo-upload.component";
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [RouterOutlet,RouterLink],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrls: ['./app.component.css']
 })
-export class AppComponent {
-  title = 'localink-fe';
-}
+export class AppComponent {}

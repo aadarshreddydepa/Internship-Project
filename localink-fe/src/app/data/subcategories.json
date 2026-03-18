@@ -1,0 +1,53 @@
+{
+  "Medical": [
+    { "name": "Clinic", "businesses": 44 },
+    { "name": "Pharmacy", "businesses": 57 },
+    { "name": "Diagnostic Center", "businesses": 30 },
+    { "name": "Dental Clinic", "businesses": 39 },
+    { "name": "Eye Care", "businesses": 16 },
+    { "name": "Physiotherapy", "businesses": 37 }
+  ],
+
+  "Food & Dining": [
+    { "name": "Restaurant", "businesses": 36 },
+    { "name": "Cafe", "businesses": 31 },
+    { "name": "Fast Food", "businesses": 17 },
+    { "name": "Catering", "businesses": 41 },
+    { "name": "Bakery", "businesses": 31 },
+    { "name": "Food Truck", "businesses": 16 }
+  ],
+
+  "General Store": [
+    { "name": "Supermarket", "businesses": 28 },
+    { "name": "Convenience Store", "businesses": 16 },
+    { "name": "Grocery", "businesses": 43 },
+    { "name": "Department Store", "businesses": 45 },
+    { "name": "Organic Store", "businesses": 20 }
+  ],
+
+  "Tutoring": [
+    { "name": "Math Tutor", "businesses": 53 },
+    { "name": "Science Tutor", "businesses": 11 },
+    { "name": "Language Classes", "businesses": 44 },
+    { "name": "Music Lessons", "businesses": 28 },
+    { "name": "Art Classes", "businesses": 37 },
+    { "name": "Coding Classes", "businesses": 28 }
+  ],
+
+  "Repair Services": [
+    { "name": "Phone Repair", "businesses": 27 },
+    { "name": "Computer Repair", "businesses": 35 },
+    { "name": "Appliance Repair", "businesses": 46 },
+    { "name": "Car Repair", "businesses": 31 },
+    { "name": "Plumbing", "businesses": 11 },
+    { "name": "Electrical", "businesses": 59 }
+  ],
+
+  "Home & Garden": [
+    { "name": "Interior Design", "businesses": 39 },
+    { "name": "Furniture", "businesses": 14 },
+    { "name": "Gardening", "businesses": 24 },
+    { "name": "Cleaning Services", "businesses": 54 },
+    { "name": "Pest Control", "businesses": 48 }
+  ]
+}
