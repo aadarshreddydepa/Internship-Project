@@ -1,0 +1,185 @@
+/* =========================
+   CONTAINER
+========================= */
+
+.container {
+  padding: 40px 60px;
+  background: #121212;
+  min-height: 100vh;
+  color: #F8F4F0;
+  font-family: system-ui;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.header h2 {
+  font-size: 26px;
+  font-weight: 600;
+  color: #C8A97E;
+}
+
+/* =========================
+   GRID
+========================= */
+
+.business-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+/* =========================
+   CARD
+========================= */
+
+.card {
+  background: #1F1F1F;
+  border: 1px solid #343434;
+  border-radius: 12px;
+  padding: 20px;
+  transition: 0.25s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  background: #2A2A2A;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+}
+
+.card h3 {
+  margin-bottom: 10px;
+}
+
+.card p {
+  color: #B19F91;
+  font-size: 14px;
+}
+
+/* =========================
+   STATUS
+========================= */
+
+.status {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 12px;
+  color: #C8A97E;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.actions {
+  margin-top: 15px;
+  display: flex;
+  gap: 10px;
+}
+
+.btn-primary {
+  background: #C8A97E;
+  color: #121212;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-primary:hover {
+  background: #d6b98f;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid #484948;
+  color: #F8F4F0;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-outline:hover {
+  border-color: #C8A97E;
+  color: #C8A97E;
+}
+
+/* ADD BUTTON */
+
+.add-btn {
+  padding: 10px 20px;
+  font-weight: 500;
+}
+
+/* =========================
+   EMPTY STATE
+========================= */
+
+.empty {
+  text-align: center;
+  margin-top: 80px;
+  color: #B19F91;
+}
+
+.empty h3 {
+  color: #C8A97E;
+  margin-bottom: 10px;
+}
+/* =========================
+   VIEW MODAL
+========================= */
+
+.view-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.view-card {
+  width: 500px;
+  background: #1F1F1F;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #343434;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+}
+
+.view-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  color: #F8F4F0;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.view-content p {
+  margin: 8px 0;
+  color: #B19F91;
+}
+
+.view-content strong {
+  color: #C8A97E;
+}

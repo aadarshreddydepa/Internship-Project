@@ -1,0 +1,171 @@
+<div class="container">
+
+  <h2>Contact Details</h2>
+
+  <form [formGroup]="contactForm">
+    <label>Phone Number *</label>
+
+    <div class="phone-wrapper">
+
+      <ng-select
+        class="phone-code"
+        [items]="phoneCountries"
+        bindLabel="code"
+        bindValue="code"
+        formControlName="phoneCode"
+        [searchable]="false"
+        [clearable]="false">
+
+        <ng-template ng-label-tmp let-item="item">
+          <span class="flag">{{item.flag}}</span> {{item.code}}
+        </ng-template>
+
+        <ng-template ng-option-tmp let-item="item">
+          <span class="flag">{{item.flag}}</span>
+          {{item.name}} ({{item.code}})
+        </ng-template>
+
+      </ng-select>
+
+      <input
+        type="text"
+        formControlName="phone"
+        placeholder="Enter phone number"
+        (input)="allowOnlyNumbers($event)"
+        [attr.maxlength]="contactForm.get('phoneCode')?.value === '+91' ? 10 : 15">
+
+    </div>
+
+    <div class="error"
+        *ngIf="contactForm.get('phone')?.invalid &&
+                (contactForm.get('phone')?.dirty || contactForm.get('phone')?.touched)">
+
+      <span *ngIf="contactForm.get('phone')?.errors?.['required']">
+        Phone number is required
+      </span>
+
+      <span *ngIf="contactForm.get('phone')?.errors?.['pattern']">
+        Phone must be 10 digits, start with 3-9, and cannot be all zeros
+      </span>
+
+      <span *ngIf="contactForm.get('phone')?.errors?.['countryMismatch']">
+        Country code does not match selected country
+      </span>
+
+    </div>
+
+    <label>Email *</label>
+    <input type="email" formControlName="email" placeholder="Enter email">
+
+    <div class="error" *ngIf="contactForm.get('email')?.touched && contactForm.get('email')?.invalid">
+    Enter a valid email
+    </div>
+
+
+    <label>Website(Optional)</label>
+    <input type="text" formControlName="website" placeholder="Enter website">
+
+    <div class="error" *ngIf="contactForm.get('website')?.touched && contactForm.get('website')?.invalid">
+    Enter a valid website URL
+    </div>
+    <!-- LOCATION ROW -->
+    <div class="location-row">
+
+
+    <!-- COUNTRY -->
+    <div class="location-field">
+
+    <label>Country *</label>
+    
+    <ng-select
+      [items]="countries"
+      bindLabel="name"
+      bindValue="name"
+      placeholder="Select Country"
+      formControlName="country"
+      [searchable]="true"
+      [clearable]="false"
+      [virtualScroll]="true"
+      (change)="onCountryChange()">
+    </ng-select>
+
+    <div class="error" *ngIf="contactForm.get('country')?.touched && contactForm.get('country')?.invalid">
+    Country is required
+    </div>
+
+    </div>
+
+
+    <!-- STATE -->
+    <div class="location-field">
+
+    <label>State *</label>
+
+    <ng-select
+      [items]="states"
+      placeholder="Select State"
+      formControlName="state"
+      [searchable]="true"
+      [clearable]="false"
+      [disabled]="!contactForm.get('country')?.value">
+    </ng-select>
+
+    <div class="error" *ngIf="contactForm.get('state')?.touched && contactForm.get('state')?.invalid">
+    State is required
+    </div>
+
+    </div>
+
+
+    <!-- CITY -->
+    <div class="location-field">
+
+    <label>City *</label>
+
+    <input type="text" formControlName="city" placeholder="City">
+
+    <div class="error" *ngIf="contactForm.get('city')?.touched && contactForm.get('city')?.invalid">
+    City is required
+    </div>
+
+    </div>  
+
+
+    <!-- PINCODE -->
+    <div class="location-field">
+
+    <label>Pincode *</label>
+
+    <input type="text" formControlName="pincode" placeholder="Pincode">
+
+    <div class="error" *ngIf="contactForm.get('pincode')?.touched && contactForm.get('pincode')?.invalid">
+    Enter a valid 6 digit pincode
+    </div>
+
+    </div>
+
+    </div>
+
+    <label>Street Address *</label>
+    <input type="text" formControlName="address" placeholder="Enter business address">
+
+    <div class="error" *ngIf="contactForm.get('address')?.touched && contactForm.get('address')?.invalid">
+    Address is required
+    </div>
+
+    <!-- BUTTONS -->
+    <div class="button-container">
+
+    <button type="button" class="previous-btn" (click)="previousStep()">
+    Previous
+    </button>
+
+    <button type="button" (click)="submit()">
+    Next Step
+    </button>
+
+    </div>
+
+  </form>
+
+</div>

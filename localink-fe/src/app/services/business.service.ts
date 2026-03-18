@@ -1,6 +1,11 @@
 import { Injectable } from '@angular/core';
+import businessesData from '../../assets/data/businesses.json';
 
-export type BusinessStatus = 'pending' | 'approved' | 'rejected' | 'inactive';
+export type BusinessStatus =
+  | 'pending'
+  | 'approved'
+  | 'rejected'
+  | 'inactive';
 
 export interface Business {
   id: number;
@@ -10,6 +15,7 @@ export interface Business {
   contact: string;
   rating: number;
   status: BusinessStatus;
+  rejectionComment?: string;
 }
 
 @Injectable({
@@ -17,43 +23,25 @@ export interface Business {
 })
 export class BusinessService {
 
-  private businesses: Business[] = [
-    {
-      id: 1,
-      name: 'City Medical Clinic',
-      description: '24/7 healthcare clinic',
-      category: 'Medical',
-      contact: '9999999999',
-      rating: 4.5,
-      status: 'pending'
-    },
-    {
-      id: 2,
-      name: 'Fresh Grocery Mart',
-      description: 'Daily grocery store',
-      category: 'General Store',
-      contact: '8888888888',
-      rating: 4.2,
-      status: 'approved'
-    },
-    {
-      id: 3,
-      name: 'Math Genius Academy',
-      description: 'Math tutoring center',
-      category: 'Tutoring',
-      contact: '7777777777',
-      rating: 4.8,
-      status: 'pending'
-    }
-  ];
+  private businesses: Business[] = businessesData as Business[];
 
-  getAllBusinesses(): Business[] {
+  getBusinesses(): Business[] {
     return this.businesses;
   }
 
   updateStatus(id: number, status: BusinessStatus): void {
     const business = this.businesses.find(b => b.id === id);
-    if (business) business.status = status;
+    if (business) {
+      business.status = status;
+    }
+  }
+
+  rejectBusiness(id: number, comment: string): void {
+    const business = this.businesses.find(b => b.id === id);
+    if (business) {
+      business.status = 'rejected';
+      business.rejectionComment = comment;
+    }
   }
 
 }

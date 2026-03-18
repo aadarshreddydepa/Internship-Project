@@ -1,7 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { BusinessService, Business, BusinessStatus } from '../../services/business.service';
+import * as XLSX from 'xlsx';
+import { BusinessService, Business } from '../../services/business.service';
+
+type Section = 'pending' | 'approved' | 'rejected' | 'inactive';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -10,78 +13,76 @@ import { BusinessService, Business, BusinessStatus } from '../../services/busine
   templateUrl: './admin-dashboard.component.html',
   styleUrl: './admin-dashboard.component.css'
 })
-export class AdminDashboardComponent {
+export class AdminDashboardComponent implements OnInit {
 
   businesses: Business[] = [];
-
+  currentSection: Section = 'pending';
   searchTerm = '';
-  selectedStatus = 'all';
-
   selectedBusiness: Business | null = null;
-
   toastMessage = '';
-  toastType = '';
   showToast = false;
-
+  rejectModalOpen = false;
+  rejectComment = '';
+  rejectBusinessId: number | null = null;
   constructor(private service: BusinessService) {}
+  ngOnInit(): void {
+    this.businesses = this.service.getBusinesses();
+  }
+  get filteredBusinesses(): Business[] {
+    return this.businesses
+      .filter(b => b.status === this.currentSection)
+      .filter(b =>
+        b.name.toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
+  }
+  approve(id: number): void {
+    this.service.updateStatus(id, 'approved');
+    this.notify('Business Approved');
+  }
+  deactivate(id: number): void {
+    this.service.updateStatus(id, 'inactive');
+    this.notify('Business Deactivated');
+  }
+  activate(id: number): void {
+    this.service.updateStatus(id, 'approved');
+    this.notify('Business Activated');
+  }
+  openRejectModal(id: number): void {
+    this.rejectBusinessId = id;
+    this.rejectModalOpen = true;
+  }
+  submitRejection(): void {
+    if (!this.rejectComment.trim()) return;
+    if (this.rejectBusinessId !== null) {
+      this.service.rejectBusiness(this.rejectBusinessId, this.rejectComment);
+    }
+    this.rejectModalOpen = false;
+    this.rejectComment = '';
+    this.rejectBusinessId = null;
 
-  ngOnInit() {
-    this.businesses = this.service.getAllBusinesses();
+    this.notify('Business Rejected');
   }
-//-------Status Update Methods------
-  updateStatus(id: number, status: BusinessStatus, message: string, type: string) {
-    this.service.updateStatus(id, status);
-    this.notify(message, type);
+  closeRejectModal(): void {
+    this.rejectModalOpen = false;
+    this.rejectComment = '';
   }
-  approve(id: number) {
-    this.updateStatus(id, 'approved', 'Business approved', 'success');
-  }
-  reject(id: number) {
-    this.updateStatus(id, 'rejected', 'Business rejected', 'error');
-  }
-  deactivate(id: number) {
-    this.updateStatus(id, 'inactive', 'Business deactivated', 'warning');
-  }
-  //-------Stats Counter------
-  get totalCount() {
-    return this.businesses.length;
-  }
-  get pendingCount() {
-    return this.businesses.filter(b => b.status === 'pending').length;
-  }
-  get approvedCount() {
-    return this.businesses.filter(b => b.status === 'approved').length;
-  }
-  get inactiveCount() {
-    return this.businesses.filter(b => b.status === 'inactive').length;
-  }
- //---------Filtering-------
-  get filteredBusinesses() {
-    return this.businesses.filter(b => {
-      const search =
-        b.name.toLowerCase().includes(this.searchTerm.toLowerCase());
-      const status =
-        this.selectedStatus === 'all' || b.status === this.selectedStatus;
-      return search && status;
-    });
-  }
-     //-----MODAL-----
-  openBusinessDetails(b: Business) {
+  openDetails(b: Business): void {
     this.selectedBusiness = b;
   }
-
-  closeModal() {
+  closeModal(): void {
     this.selectedBusiness = null;
   }
-    //------TOAST-----
-  notify(message: string, type: string) {
-
+  notify(message: string): void {
     this.toastMessage = message;
-    this.toastType = type;
     this.showToast = true;
-
-    setTimeout(() => {
-      this.showToast = false;
-    }, 2500);
+    setTimeout(() => { this.showToast = false; }, 2500);
+  }
+  downloadExcel(): void {
+    const data = this.filteredBusinesses;
+    if (data.length === 0) return;
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Businesses');
+    XLSX.writeFile(workbook, `${this.currentSection}-businesses.xlsx`);
   }
 }
