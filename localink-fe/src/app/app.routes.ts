@@ -65,6 +65,10 @@ export const routes: Routes = [
   component: EditBusinessBusinessComponent
 },
 {
+  path:'categories',
+  component:CategoriesComponent
+},
+{
     path: '**',
     redirectTo: '',
   }
