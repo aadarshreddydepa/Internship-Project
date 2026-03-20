@@ -1,493 +1,434 @@
-/* =========================
-   ROOT
-   ========================= */
+/* ========================= */
+/* BASE */
+/* ========================= */
 
 :host {
   display: block;
 }
 
-/* =========================
-   LAYOUT (SPLIT SCREEN)
-   ========================= */
-
 .signup-wrapper {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  min-height: 100vh;
-
-  background: url('/images/sign-up.jpg') center/cover no-repeat;
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background: #050505;
+  font-family: 'Inter', sans-serif;
 }
 
+/* ========================= */
 /* LEFT SIDE */
+/* ========================= */
 
 .signup-left {
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: #050505;
 }
 
-/* Branding */
+/* PLASMA */
 
-.branding {
-  color: #F8F4F0;
-  text-align: center;
-  max-width: 300px;
+.plasma-bg {
+  position: absolute;
+  width: 160%;
+  height: 160%;
+  top: -30%;
+  left: -30%;
+
+  background:
+    radial-gradient(circle at 30% 40%, rgba(200,169,126,0.25), transparent),
+    radial-gradient(circle at 70% 30%, rgba(255,215,160,0.18), transparent),
+    radial-gradient(circle at 50% 80%, rgba(200,169,126,0.15), transparent);
+
+  filter: blur(80px);
+  animation: plasmaMove 20s ease-in-out infinite alternate;
 }
 
-.branding h1 {
-  font-size: 36px;
-  margin-bottom: 10px;
-  color: #C8A97E; /* palette color */
-
-  /* text-shadow: 0 2px 12px rgba(0,0,0,0.6); */
-  text-shadow:
-    0 2px 12px rgba(0,0,0,0.6),
-    0 0 8px rgba(200,169,126,0.3);
+@keyframes plasmaMove {
+  from { transform: translate(0,0); }
+  to { transform: translate(-80px, -60px); }
 }
 
-.branding p {
-  color: #B19F91;
-  font-size: 16px;
+/* PARTICLES */
+
+.particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }
 
+.particles::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+
+  background-image: radial-gradient(#C8A97E 1px, transparent 1px);
+  background-size: 60px 60px;
+
+  opacity: 0.2;
+}
+
+/* CANVAS */
+
+.lines-canvas {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* CURSOR */
+
+.cursor-glow {
+  position: absolute;
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(200,169,126,0.25), transparent);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+/* TEXT */
+
+.left-content {
+  position: absolute;
+  bottom: 80px;
+  left: 60px;
+  color: white;
+}
+
+.left-content h1 {
+  font-size: 40px;
+}
+
+.left-content p {
+  opacity: 0.6;
+}
+
+/* ========================= */
 /* RIGHT SIDE */
+/* ========================= */
 
 .signup-right {
+  flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+  overflow: hidden;
+
+  background:
+    radial-gradient(circle at 70% 30%, rgba(200,169,126,0.15), transparent 60%),
+    radial-gradient(circle at 30% 80%, rgba(255,215,160,0.1), transparent 60%),
+    #050505;
 }
 
-/* =========================
-   SIGNUP CARD
-   ========================= */
+/* ========================= */
+/* CARD */
+/* ========================= */
 
 .signup-container {
-  width: 550px;
+  width: 650px;              /* 🔥 wider */
   max-width: 95%;
-  padding: 0px 17px 15px 17px;
+  padding: 26px 28px;       /* balanced padding */
 
-  background: rgba(52,52,52,0.9);
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(14px);
+  background: linear-gradient(
+    145deg,
+    rgba(20,20,20,0.85),
+    rgba(40,30,20,0.7)
+  );
 
-  border: 1px solid #484948;
-  border-radius: 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(200,169,126,0.25);
 
-  box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+  box-shadow:
+    0 0 40px rgba(200,169,126,0.15),
+    0 25px 80px rgba(0,0,0,0.85);
 
-  animation: fadeIn 0.4s ease;
+  position: relative;
 }
 
-/* Title */
+/* SHIMMER */
 
-h2 {
+.signup-container::after {
+  content: "";
+  position: absolute;
+  top: -150%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,255,255,0.04),
+    transparent
+  );
+
+  animation: shimmer 10s linear infinite;
+  pointer-events: none;
+}
+
+.signup-right::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+
+  background-image: url("https://www.transparenttextures.com/patterns/noise.png");
+  opacity: 0.06;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%) rotate(25deg); }
+  100% { transform: translateX(100%) rotate(25deg); }
+}
+
+/* ========================= */
+/* TOGGLE */
+/* ========================= */
+
+.type-switch {
+  position: relative;
+  display: flex;
+  margin: 20px auto;
+  width: fit-content;
+  min-width: 240px;
+
+  background: rgba(255,255,255,0.06);
+  border-radius: 30px;
+  padding: 4px;
+}
+
+.switch-option {
+  flex: 1;
   text-align: center;
+  padding: 10px 18px;
+  z-index: 2;
+  cursor: pointer;
+  font-size: 13px;
+  color: #aaa;
+  transition: 0.3s;
+  border-radius: 30px;
+}
+
+.switch-option.active {
+  color: black;
+  font-weight: 600;
+}
+
+.switch-option:hover {
+  color: white;
+}
+
+/* SLIDER */
+
+.switch-indicator {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+
+  width: calc(50% - 4px);
+  height: calc(100% - 8px);
+
+  background: linear-gradient(90deg, #C8A97E, #e6c89f);
+  border-radius: 30px;
+  transition: all 0.3s ease;
+}
+
+.switch-indicator.client {
+  left: calc(50%);
+}
+
+/* ========================= */
+/* DYNAMIC SUBTITLE */
+/* ========================= */
+
+.dynamic-text {
+  text-align: center;
+  margin-top: 6px;
+  opacity: 0.8;
+  animation: fadeText 0.3s ease;
+}
+
+@keyframes fadeText {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 0.8;
+    transform: translateY(0);
+  }
+}
+
+/* ========================= */
+/* FORM */
+/* ========================= */
+
+.form-row,
+.address-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;               /* 🔥 reduced spacing */
   margin-bottom: 10px;
-
-  color: #F8F4F0;
-  font-weight: 500;
 }
-
-
-/* Subtitle */
-
-.subtitle {
-  text-align: center;
-  color: #B19F91;
-
-  margin-bottom: 20px;
-  font-size: 14px;
-}
-
-
-/* Labels */
-
-label {
-  display: block;
-  margin-bottom: 6px;
-
-  color: #B19F91;
-  font-size: 14px;
-}
-
-
-/* Form spacing */
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 2px;
 }
 
-
-/* Two column layout */
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px;
-
-  margin-bottom: 10px;
+.street-group {
+  grid-column: span 2;   /* 🔥 uses full width inside grid */
 }
 
-
-/* Address label */
-
-.address-label {
-  color: #B19F91;
-  font-size: 14px;
-
-  margin-top: 5px;
-  margin-bottom: 8px;
+.form-group label {
+  font-size: 11px;
+  margin-bottom: 3px;
 }
 
-
-/* Address grid */
-
-.address-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  /* grid-template-columns: 1fr 1fr; */
-  gap: 12px;
-
-  margin-bottom: 10px;
+.form-group input,
+.form-group select {
+  height: 38px;            /* 🔥 smaller inputs */
+  padding: 6px 10px;
+  font-size: 12px;
 }
 
-
-/* Inputs and selects */
-
-input,
-select {
-  width: 100%;
-  padding: 10px 12px;
-
-  background: #2A2A2A;
-  border: 1px solid #484948;
-  border-radius: 6px;
-
-  color: #F8F4F0;
-  font-size: 14px;
-
-  outline: none;
-  box-sizing: border-box;
-  /*  */
-  transition: all 0.2 ease;
-}
-
-input:hover,
-select:hover {
-  border-color: #6b6b6b;
-}
-
-
-/* Focus styling */
-
-input:focus,
-select:focus {
+.form-group input:focus,
+.form-group select:focus {
   border-color: #C8A97E;
-  /* box-shadow: 0 0 0 1px #C8A97E; */
-  box-shadow: 0 0 0 2px rgba(200,169,126,0.25);
+  box-shadow: 0 0 8px rgba(200,169,126,0.4);
 }
 
-/* Invalid input highlight */
-
-input.ng-invalid.ng-touched,
-select.ng-invalid.ng-touched {
-  border-color: #ff6b6b;
+.form-group input:hover {
+  border-color: rgba(200,169,126,0.4);
 }
 
+/* ========================= */
+/* FORM ANIMATION */
+/* ========================= */
 
-/* Password field layout */
+.form-animate {
+  margin-top: 20px;
+  animation-duration: 0.35s;
+  animation-timing-function: ease;
+}
+
+.form-animate.user {
+  animation-name: slideFromLeft;
+}
+
+.form-animate.client {
+  animation-name: slideFromRight;
+}
+
+@keyframes slideFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ========================= */
+/* PASSWORD */
+/* ========================= */
 
 .password-wrapper {
-  /* display: flex;
-  align-items: center;
-  gap: 10px;
-
-  width: 100%; */
   position: relative;
-}
-
-.password-wrapper input {
-  /* flex: 1; */
-  width: 100%;
-  padding-right: 40px;
 }
 
 .eye-icon {
   position: absolute;
-  right: 12px;
+  right: 10px;
   top: 50%;
   transform: translateY(-50%);
-  cursor: pointer;
-  color: #B19F91;
-}
-
-.eye-icon:hover {
-  color: #C8A97E;
-}
-
-/* Show / Hide password button */
-
-.toggle-btn {
-  background: none;
-  border: none;
-
   color: #C8A97E;
   cursor: pointer;
-
-  font-size: 12px;
-  font-weight: 600;
-
-  white-space: nowrap;
 }
 
-.toggle-btn:hover {
-  color: #e0c59b;
-}
-
-
-/* Error messages */
-
-.error {
-  margin-top: 4px;
-}
-
-.error span {
-  color: #ff6b6b;
-  font-size: 12px;
-  display: block;
-}
-
-
-/* Submit button */
+/* ========================= */
+/* BUTTON */
+/* ========================= */
 
 .signup-btn {
   width: 100%;
+  margin-top: 10px;
   padding: 12px;
 
-  margin-top: 4px;
-
-  background: #C8A97E;
-  color: #1C1C1C;
-
   border: none;
-  border-radius: 6px;
-
-  font-weight: 600;
-  font-size: 15px;
-
-  cursor: pointer;
-
-  /* transition: background 0.2s ease; */
-  transition: all 0.2s ease;
-}
-
-
-/* Button hover */
-
-.signup-btn:hover {
-  background: #d6b88f;
-  /*  */
-  transform: translateY(-1px);
-}
-
-
-/* Disabled button */
-
-.signup-btn:disabled {
-  background: #555;
-  color: #999;
-
-  cursor: not-allowed;
-}
-
-/* Popup overlay */
-
-.popup-overlay {
-
-  position: fixed;
-  top: 0;
-  left: 0;
-
-  width: 100%;
-  height: 100%;
-
-  background: rgba(0,0,0,0.6);
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  z-index: 1000;
-
-}
-
-
-/* Popup box */
-
-.popup-box {
-
-  background: #343434;
-  color: #F8F4F0;
-
-  padding: 30px 40px;
-
   border-radius: 10px;
 
-  text-align: center;
-
-  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-  animation: popupFade 0.3s ease;
-}
-
-
-.popup-box h3 {
-  margin-bottom: 10px;
-}
-
-
-.popup-box button {
-
-  margin-top: 15px;
-
-  padding: 10px 20px;
-
-  border: none;
-  border-radius: 6px;
-
-  background: #C8A97E;
-  color: #1C1C1C;
-
-  cursor: pointer;
+  background: linear-gradient(90deg, #C8A97E, #e6c89f);
+  color: black;
   font-weight: 600;
-
+  cursor: pointer;
+  transition: 0.3s;
 }
 
-.popup-box button:hover {
-  background: #d6b88f;
+.signup-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(200,169,126,0.3);
 }
 
-.street-group {
-  margin-bottom: 12px;
+.signup-btn:disabled {
+  opacity: 0.5;
 }
 
+/* ========================= */
+/* ERROR */
+/* ========================= */
 
-/* =========================
-   NG-SELECT STYLING (LOCAL)
-   ========================= */
-
-:host ::ng-deep .ng-select .ng-select-container {
-  background: #2A2A2A;
-  border: 1px solid #484948;
-  color: #F8F4F0;
-  min-height: 40px;
-  font-size: 14px;
+.error {
+  color: #ff4d4f;
+  font-size: 11px;
+  margin-top: 3px;
 }
 
-:host ::ng-deep .ng-select .ng-select-container:hover {
-  border-color: #6b6b6b;
+/* ========================= */
+/* FIX CLICK BLOCK */
+/* ========================= */
+
+.plasma-bg,
+.particles,
+.lines-canvas,
+.cursor-glow {
+  pointer-events: none;
 }
 
-:host ::ng-deep .ng-select.ng-select-focused .ng-select-container {
-  border-color: #C8A97E;
-  box-shadow: 0 0 0 2px rgba(200,169,126,0.25);
-}
+/* ========================= */
+/* MOBILE */
+/* ========================= */
 
-:host ::ng-deep .ng-select .ng-value-label {
-  color: #F8F4F0;
-  font-size: 14px;
-}
-
-:host ::ng-deep .ng-select .ng-placeholder {
-  color: #9a9a9a;
-  font-size: 14px;
-}
-
-:host ::ng-deep .ng-select .ng-arrow-wrapper .ng-arrow {
-  border-top-color: #B19F91;
-}
-
-/* Dropdown panel */
-
-:host ::ng-deep .ng-dropdown-panel {
-  background: #2A2A2A !important;
-  border: 1px solid #484948 !important;
-}
-
-/* each option */
-
-:host ::ng-deep .ng-dropdown-panel .ng-option {
-  background: #2A2A2A !important;
-  color: #F8F4F0 !important;
-  font-size: 14px !important;
-}
-
-/* hover option */
-
-:host ::ng-deep .ng-dropdown-panel .ng-option.ng-option-marked {
-  background: #3a3a3a !important;
-  color: #F8F4F0 !important;
-}
-
-/* selected option */
-
-:host ::ng-deep .ng-dropdown-panel .ng-option.ng-option-selected {
-  background: #C8A97E !important;
-  color: #1C1C1C !important;
-}
-
-/* selected + hover */
-
-:host ::ng-deep .ng-dropdown-panel .ng-option.ng-option-selected.ng-option-marked {
-  background: #C8A97E !important;
-  color: #1C1C1C !important;
-}
-
-/* limit dropdown height to ~5 options */
-
-:host ::ng-deep .ng-dropdown-panel .ng-dropdown-panel-items {
-  max-height: 160px !important;
-}
-
-/* =========================
-   ANIMATIONS
-   ========================= */
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-}
-
-@keyframes popupFade {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-}
-
-/* =========================
-   MOBILE
-   ========================= */
-
-@media (max-width: 768px) {
-
+@media (max-width: 900px) {
   .signup-wrapper {
-    grid-template-columns: 1fr;
+    flex-direction: column;
   }
 
   .signup-left {
     display: none;
   }
 
-  .form-row {
-    grid-template-columns: 1fr;
-  }
-
+  .form-row,
   .address-row {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
   }
 }

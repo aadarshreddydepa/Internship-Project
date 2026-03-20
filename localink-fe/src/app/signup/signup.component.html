@@ -2,313 +2,253 @@
 
   <!-- LEFT SIDE -->
   <div class="signup-left">
-    <div class="branding">
-      <h1>Localink</h1>
-      <p>Discover businesses around you</p>
+    <div class="plasma-bg"></div>
+    <div class="particles"></div>
+    <canvas class="lines-canvas"></canvas>
+    <div class="cursor-glow"></div>
+
+    <div class="left-content">
+      <h1>Join Localink</h1>
+      <p>Build your business presence with ease</p>
     </div>
   </div>
 
   <!-- RIGHT SIDE -->
   <div class="signup-right">
+
     <div class="signup-container">
 
+      <!-- TITLE -->
       <h2>Sign Up</h2>
-      <p class="subtitle">Create your account to continue</p>
 
-      <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
-          <!-- Account Type + Name -->
-        <div class="form-row">
-          <div class="form-group">
-            <label>Account Type *</label>
-            <select formControlName="userType">
-              <option value="" disabled hidden>Choose type</option>
-              <option value="user">User</option>
-              <option value="client">Client</option>
-            </select>
-            <div class="error" *ngIf="f['userType'].touched && f['userType']?.errors">
-              <span>Please select account type</span>
+      <!-- ✅ DYNAMIC SUBTITLE -->
+      <p class="subtitle dynamic-text">
+        {{
+          selectedType === 'client'
+            ? 'Create account to register your business'
+            : 'Create account for discovering businesses near you'
+        }}
+      </p>
+
+      <!-- TOGGLE -->
+      <div class="type-switch">
+
+        <div
+          class="switch-option"
+          [class.active]="selectedType === 'user'"
+          (click)="selectType('user')">
+          User
+        </div>
+
+        <div
+          class="switch-option"
+          [class.active]="selectedType === 'client'"
+          (click)="selectType('client')">
+          Client
+        </div>
+
+        <div
+          class="switch-indicator"
+          [class.client]="selectedType === 'client'">
+        </div>
+
+      </div>
+
+      <!-- FORM -->
+      <div *ngIf="selectedType"
+           class="form-animate"
+           [ngClass]="selectedType"
+           [attr.data-type]="selectedType">
+
+        <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+
+          <!-- Name -->
+          <div class="form-row">
+            <div class="form-group">
+              <label>
+                {{ selectedType === 'client' ? 'Business Owner Name *' : 'Name *' }}
+              </label>
+              <input
+                type="text"
+                formControlName="name"
+                placeholder="Enter name"
+                (blur)="trimField('name')"
+              >
+              <div class="error" *ngIf="f['name'].touched && f['name']?.errors">
+                <span *ngIf="f['name'].errors?.['required']">Name is required</span>
+                <span *ngIf="f['name'].errors?.['pattern']">Enter valid name</span>
+              </div>
             </div>
           </div>
 
-          <div class="form-group">
-            <label>
-              {{ f['userType'].value === 'client' ? 'Business Owner Name *' : 'Name *' }}
-            </label>
+          <!-- Phone + Email -->
+          <div class="form-row">
+
+            <div class="form-group">
+              <label>Phone *</label>
+              <input type="tel" formControlName="phone" placeholder="Enter phone number">
+              <div class="error" *ngIf="f['phone'].touched && f['phone']?.errors">
+                <span *ngIf="f['phone'].errors?.['required']">Phone number is required</span>
+                <span *ngIf="f['phone'].errors?.['pattern']">Phone must be exactly 10 digits</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Email *</label>
+              <input
+                type="email"
+                formControlName="email"
+                placeholder="Enter email"
+                (blur)="trimField('email')"
+              >
+              <div class="error" *ngIf="f['email'].touched && f['email']?.errors">
+                <span *ngIf="f['email'].errors?.['required']">Email is required</span>
+                <span *ngIf="f['email'].errors?.['pattern']">Enter a valid email address</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Address -->
+          <div class="address-row">
+
+            <!-- Country -->
+            <div class="form-group">
+              <label>Country *</label>
+              <ng-select
+                [items]="countries"
+                bindLabel="name"
+                bindValue="name"
+                placeholder="Select Country"
+                formControlName="country"
+                (ngModelChange)="onCountryChange($event)"
+                [searchable]="true"
+                [clearable]="false"
+                [virtualScroll]="true"
+                [dropdownPosition]="'auto'">
+              </ng-select>
+
+              <div class="error" *ngIf="f['country'].touched && f['country']?.errors">
+                <span *ngIf="f['country'].errors?.['required']">Country is required</span>
+              </div>
+            </div>
+
+            <!-- State -->
+            <div class="form-group">
+              <label>State *</label>
+              <ng-select
+                [items]="states"
+                placeholder="Select State"
+                formControlName="state"
+                [disabled]="!signupForm.get('country')?.value"
+                [searchable]="false"
+                [clearable]="false">
+              </ng-select>
+
+              <div class="error" *ngIf="f['state'].touched && f['state']?.errors">
+                <span *ngIf="f['state'].errors?.['required']">State is required</span>
+              </div>
+            </div>
+
+            <!-- City -->
+            <div class="form-group">
+              <label>City *</label>
+              <input type="text" formControlName="city" placeholder="City" (blur)="trimField('city')">
+              <div class="error" *ngIf="f['city'].touched && f['city']?.errors">
+                <span *ngIf="f['city'].errors?.['required']">City is required</span>
+              </div>
+            </div>
+
+            <!-- Pincode -->
+            <div class="form-group">
+              <label>Pincode *</label>
+              <input type="text" formControlName="pincode" placeholder="Pincode">
+              <div class="error" *ngIf="f['pincode'].touched && f['pincode']?.errors">
+                <span *ngIf="f['pincode'].errors?.['required']">Pincode is required</span>
+                <span *ngIf="f['pincode'].errors?.['pattern']">
+                  Pincode must be 6 digits and cannot start with 0
+                </span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Street -->
+          <div class="form-group street-group">
+            <label>Street Address *</label>
             <input
               type="text"
-              formControlName="name"
-              placeholder="Enter name"
-              (blur)="trimField('name')"
+              formControlName="street"
+              placeholder="Street address"
+              (blur)="trimField('street')"
             >
-            <div class="error" *ngIf="f['name'].touched && f['name']?.errors">
-              <span *ngIf="f['name'].errors?.['required']">
-                Name is required
-              </span>
-              <span *ngIf="f['name'].errors?.['pattern']">
-                Enter valid name
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Phone + Email -->
-        <div class="form-row">
-          <div class="form-group">
-            <label>Phone *</label>
-            <input
-              type="tel"
-              formControlName="phone"
-              placeholder="Enter phone number"
-            >
-            <div class="error" *ngIf="f['phone'].touched && f['phone']?.errors">
-              <span *ngIf="f['phone'].errors?.['required']">
-                Phone number is required
-              </span>
-              <span *ngIf="f['phone'].errors?.['pattern']">
-                Phone must be exactly 10 digits
-              </span>
+            <div class="error" *ngIf="f['street'].touched && f['street']?.errors">
+              <span *ngIf="f['street'].errors?.['required']">Street address is required</span>
             </div>
           </div>
 
-          <div class="form-group">
-            <label>Email *</label>
-            <input
-              type="email"
-              formControlName="email"
-              placeholder="Enter email"
-              (blur)="trimField('email')"
-            >
-            <div class="error" *ngIf="f['email'].touched && f['email']?.errors">
-              <span *ngIf="f['email'].errors?.['required']">
-                Email is required
-              </span>
-              <span *ngIf="f['email'].errors?.['pattern']">
-                Enter a valid email address
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Address -->
-        <!-- Commented this because it was conflicting with street address -->
-        <!-- <label class="address-label">Address</label> -->
-        
-        <div class="address-row">
-          
-          <!-- Country -->
-          <div class="form-group">
-            <label>Country *</label>
-            <!-- <input
-            type="text"
-            formControlName="country"
-            placeholder="Country"
-            (blur)="trimField('country')"
-            > -->
-            <ng-select
-              [items]="countries"
-              bindLabel="name"
-              bindValue="name"
-              placeholder="Select Country"
-              formControlName="country"
-              (ngModelChange)="onCountryChange($event)"
-              [searchable]="true"
-              [clearable]="false"
-              [virtualScroll]="true"
-              [dropdownPosition]="'auto'"
-              >
-            </ng-select>
-            <div class="error" *ngIf="f['country'].touched && f['country']?.errors">
-              
-              <span *ngIf="f['country'].errors?.['required']">
-                Country is required
-              </span>
-              
-              <span *ngIf="f['country'].errors?.['pattern']">
-                Enter valid address
-              </span>
-              
-            </div>
-            
-          </div>
-          
-          <!-- State -->
-          <div class="form-group">
-            <label>State *</label>
-            <!-- <input
-            type="text"
-            formControlName="state"
-            placeholder="State"
-            (blur)="trimField('state')"
-            > -->
-            <ng-select
-              [items]="states"
-              placeholder="Select State"
-              formControlName="state"
-              [disabled]="!signupForm.get('country')?.value"
-              [searchable]="false"
-              [clearable]="false">
-            </ng-select>
-            
-            <div class="error" *ngIf="f['state'].touched && f['state']?.errors">
-              
-              <span *ngIf="f['state'].errors?.['required']">
-                State is required
-              </span>
-              
-              <span *ngIf="f['state'].errors?.['pattern']">
-                Enter valid address
-              </span>
-              
-            </div>
-            
-          </div>
-          
-          
-          
-          <!-- City -->
-          <div class="form-group">
-            <label>City *</label>
-            <input
-            type="text"
-            formControlName="city"
-            placeholder="City"
-            (blur)="trimField('city')"
-            >
-            
-            <div class="error" *ngIf="f['city'].touched && f['city']?.errors">
-              
-              <span *ngIf="f['city'].errors?.['required']">
-                City is required
-              </span>
-              
-              <span *ngIf="f['city'].errors?.['pattern']">
-                Enter valid address
-              </span>
-              
-            </div>
-            
-          </div>
-          
-          <!-- Pincode -->
-          <div class="form-group">
-            <label>Pincode *</label>
-            <input
-            type="text"
-            formControlName="pincode"
-            placeholder="Pincode"
-            >
-            
-            <div class="error" *ngIf="f['pincode'].touched && f['pincode']?.errors">
-              
-              <span *ngIf="f['pincode'].errors?.['required']">
-                Pincode is required
-              </span>
-              
-              <span *ngIf="f['pincode'].errors?.['pattern']">
-                Pincode must be 6 digits and cannot start with 0
-              </span>
-              
-            </div>
-            
-          </div>
-          
-        </div>
-        
-        <div class="form-group street-group">
-          <label>Street Address *</label>
-          <input
-            type="text"
-            formControlName="street"
-            placeholder="Street address"
-            (blur)="trimField('street')"
-          >
-          <div class="error" *ngIf="f['street'].touched && f['street']?.errors">
-            <span *ngIf="f['street'].errors?.['required']">
-              Street address is required
-            </span>
-            <span *ngIf="f['street'].errors?.['pattern']">
-              Enter valid address
-            </span>
-          </div>
-        </div>
-        
-        <!-- Password Row -->
-        <div class="form-row">
-          
           <!-- Password -->
-          <div class="form-group">
-            
-            <label>Password *</label>
-            
-            <div class="password-wrapper">
-              
-              <input
-              [type]="showPassword ? 'text' : 'password'"
-              formControlName="password"
-                placeholder="Enter password"
-                (blur)="trimField('password')"
-              >
-              <span
-                class="eye-icon"
-                (click)="togglePassword()">
-                <i class="fa" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
-              </span>
-            </div>
-            <div class="error" *ngIf="f['password'].touched && f['password']?.errors">
-              <span *ngIf="f['password'].errors?.['required']">
-                Password is required
-              </span>
-              <span *ngIf="f['password'].errors?.['minlength']">
-                Password must be at least 8 characters
-              </span>
-              <span *ngIf="f['password'].errors?.['pattern']">
-                Password must contain uppercase, lowercase, number and special character
-              </span>
-            </div>
-          </div>
+          <div class="form-row">
 
-          <!-- Confirm Password -->
-          <div class="form-group">
-            <label>Confirm Password *</label>
-            <div class="password-wrapper">
-              <input
-                [type]="showConfirmPassword ? 'text' : 'password'"
-                formControlName="confirmPassword"
-                placeholder="Confirm password"
-              >
-              <span
-                class="eye-icon"
-                (click)="toggleConfirmPassword()">
-                <i class="fa" [ngClass]="showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
-              </span>
+            <div class="form-group">
+              <label>Password *</label>
+              <div class="password-wrapper">
+                <input
+                  [type]="showPassword ? 'text' : 'password'"
+                  formControlName="password"
+                  placeholder="Enter password"
+                  (blur)="trimField('password')"
+                >
+                <span class="eye-icon" (click)="togglePassword()">
+                  <i class="fa" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+                </span>
+              </div>
             </div>
-            <div class="error"
+
+            <div class="form-group">
+              <label>Confirm Password *</label>
+              <div class="password-wrapper">
+                <input
+                  [type]="showConfirmPassword ? 'text' : 'password'"
+                  formControlName="confirmPassword"
+                  placeholder="Confirm password"
+                >
+                <span class="eye-icon" (click)="toggleConfirmPassword()">
+                  <i class="fa" [ngClass]="showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+                </span>
+              </div>
+
+              <div class="error"
                 *ngIf="f['confirmPassword'].touched && signupForm.errors?.['passwordMismatch']">
-              <span>Passwords do not match</span>
+                <span>Passwords do not match</span>
+              </div>
             </div>
+
           </div>
-        </div>
 
-        <!-- Submit Button -->
-        <button
-          type="submit"
-          class="signup-btn"
-          [disabled]="signupForm.invalid">
-          Sign Up
-        </button>
+          <!-- Submit -->
+          <button
+            type="submit"
+            class="signup-btn"
+            [disabled]="signupForm.invalid">
+            Sign Up
+          </button>
 
-      </form>
+        </form>
+
+      </div>
 
     </div>
+
   </div>
 
 </div>
+
+<!-- SUCCESS POPUP -->
 <div class="popup-overlay" *ngIf="showSuccessPopup">
   <div class="popup-box">
     <h3>Account Created</h3>
     <p>Your account has been successfully created.</p>
-    <button (click)="closePopup()">
-      OK
-    </button>
+    <button (click)="closePopup()">OK</button>
   </div>
 </div>

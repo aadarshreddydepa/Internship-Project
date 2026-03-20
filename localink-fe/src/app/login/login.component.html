@@ -1,88 +1,94 @@
 <div class="login-wrapper">
 
   <!-- LEFT -->
-  <div class="welcome-section">
-    <h1>
-      <span class="small-text">Welcome to</span><br>
-      <span class="brand">Localink</span>
-    </h1>
-    <p class="tagline">Discover businesses around you</p>
+  <div class="login-left">
+    <div class="plasma-bg"></div>
+    <div class="particles"></div>
+    <canvas class="lines-canvas"></canvas>
+    <div class="cursor-glow"></div>
+
+    <div class="left-content">
+      <h1>Welcome Back</h1>
+      <p>Experience premium business discovery</p>
+    </div>
   </div>
 
   <!-- RIGHT -->
-  <div class="login-page">
+  <div class="login-right">
+    <div class="login-card" id="loginCard">
 
-    <div class="login-container">
+      <!-- LOGIN -->
+      <ng-container *ngIf="currentView === 'login'">
 
-      <h2 class="login-title">Login</h2>
+        <h1 class="logo">LocaLink</h1>
+        <p class="subtitle">Premium Business Platform</p>
 
-      <form [formGroup]="loginForm" (ngSubmit)="login()" novalidate>
+        <form [formGroup]="loginForm" (ngSubmit)="login()">
 
-        <!-- ACCOUNT TYPE -->
-        <label>Account Type</label>
-        <div class="select-wrapper">
-          <select formControlName="userType"
-                  [class.invalid]="isInvalid('userType')"
-                  [class.valid]="isValid('userType')">
-            <option value="" disabled>Select account type</option>
-            <option value="user">User</option>
-            <option value="client">Client</option>
-          </select>
-        </div>
-        <div class="error" *ngIf="isInvalid('userType')">
-          {{ getError('userType') }}
-        </div>
+          <!-- EMAIL -->
+          <div class="input-group">
+            <label>Email</label>
+            <input type="email"
+              formControlName="usernameOrEmail"
+              [class.invalid]="isInvalid('usernameOrEmail')" />
 
-        <!-- EMAIL -->
-        <label>Email</label>
-        <input type="email"
-               placeholder="Enter email"
-               formControlName="usernameOrEmail"
-               [class.invalid]="isInvalid('usernameOrEmail')"
-               [class.valid]="isValid('usernameOrEmail')" />
+            <div class="error-text" *ngIf="isInvalid('usernameOrEmail')">
+              {{ getError('usernameOrEmail') }}
+            </div>
+          </div>
 
-        <div class="error" *ngIf="isInvalid('usernameOrEmail')">
-          {{ getError('usernameOrEmail') }}
-        </div>
+          <!-- PASSWORD -->
+          <div class="input-group">
+            <label>Password</label>
 
-        <!-- PASSWORD -->
-        <label>Password</label>
-        <div class="password-wrapper">
-          <input
-            [type]="showPassword ? 'text' : 'password'"
-            placeholder="Enter password"
-            formControlName="password"
-            [class.invalid]="isInvalid('password')"
-            [class.valid]="isValid('password')"
-          />
+            <div class="input-wrapper">
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                formControlName="password"
+                [class.invalid]="isInvalid('password')" />
 
-          <span class="toggle-password" (click)="togglePassword()">
-            <i *ngIf="showPassword" class="fa-regular fa-eye-slash"></i>
-            <i *ngIf="!showPassword" class="fa-regular fa-eye"></i>
-          </span>
-        </div>
+              <span class="eye-icon" (click)="togglePassword()">
+                <i class="fa" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+              </span>
+            </div>
 
-        <div class="error" *ngIf="isInvalid('password')">
-          {{ getError('password') }}
-        </div>
+            <div class="error-text" *ngIf="isInvalid('password')">
+              {{ getError('password') }}
+            </div>
+          </div>
 
-        <!-- BACKEND ERROR -->
-        <div class="server-error" *ngIf="errorMessage">
-          {{ errorMessage }}
-        </div>
+          <!-- SERVER ERROR -->
+          <div class="server-error" *ngIf="errorMessage">
+            {{ errorMessage }}
+          </div>
 
-        <!-- BUTTON -->
-        <button type="submit" [disabled]="isLoading">
-          <span *ngIf="!isLoading">Login</span>
-          <span *ngIf="isLoading">Logging in...</span>
-        </button>
+          <!-- BUTTON -->
+          <button type="submit"
+            [disabled]="isLoading || loginForm.invalid"
+            class="btn-login">
+            Sign In
+          </button>
 
-        <div class="signup-section">
-          Don't have an account?
-          <a routerLink="/signup" class="signup-link">Sign up</a>
-        </div>
+          <!-- FOOTER -->
+          <div class="form-footer">
+            <a (click)="goToForgotPassword()" class="link highlight">
+              Forgot Password
+            </a>
 
-      </form>
+            <span class="divider">|</span>
+
+            <a routerLink="/signup" class="link highlight">
+              Create Account
+            </a>
+          </div>
+
+        </form>
+      </ng-container>
+
+      <!-- FORGOT PASSWORD -->
+      <ng-container *ngIf="currentView === 'forgot'">
+        <app-forgot-password (backToLogin)="backToLogin()"></app-forgot-password>
+      </ng-container>
 
     </div>
   </div>

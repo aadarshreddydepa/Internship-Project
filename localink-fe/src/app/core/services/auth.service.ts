@@ -1,52 +1,30 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  constructor() {}
+  private baseUrl = 'http://localhost:5085/api/auth';
+
+  constructor(private http: HttpClient) {}
 
   login(data: any): Observable<any> {
-
-    const dummyEmail = "test@gmail.com";
-    const dummyPassword = "Test@123";
-
-    if (data.usernameOrEmail === dummyEmail && data.password === dummyPassword) {
-
-      const token = this.generateJWT(data);
-
-      console.log("Generated JWT Token:");
-      console.log(token);
-
-      return of({ token: token });
-
-    } else {
-
-      return throwError(() => new Error("Invalid credentials"));
-
-    }
+    return this.http.post(`${this.baseUrl}/login`, data);
   }
+  register(data: any) {
+  return this.http.post(`${this.baseUrl}/register`, data);
+}
+verifyEmail(email: string) {
+  return this.http.post(
+    'http://localhost:5085/api/auth/verify-email',
+    { email: email } // 🔥 MUST BE OBJECT
+  );
+}
 
-  generateJWT(payload: any): string {
-
-    const header = {
-      alg: "HS256",
-      typ: "JWT"
-    };
-
-    const body = {
-      email: payload.usernameOrEmail,
-      role: payload.userType,
-      exp: Math.floor(Date.now() / 1000) + (60 * 60)
-    };
-
-    const encodedHeader = btoa(JSON.stringify(header));
-    const encodedPayload = btoa(JSON.stringify(body));
-    const signature = btoa("dummySignature");
-
-    return `${encodedHeader}.${encodedPayload}.${signature}`;
-  }
-
+resetPassword(data: any) {
+  return this.http.post('http://localhost:5085/api/auth/reset-password', data);
+}
 }

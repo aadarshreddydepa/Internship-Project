@@ -31,11 +31,11 @@ export const routes: Routes = [
     component: ForgotPasswordComponent
   },
 
-  {
-    path: '**',
-    redirectTo: '',
-    component: CategoriesComponent
-  },
+  // {
+  //   path: '**',
+  //   redirectTo: '',
+  //   component: CategoriesComponent
+  // },
 
   {
     path: 'subcategory/:id',

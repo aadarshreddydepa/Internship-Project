@@ -21,11 +21,13 @@
             ],
             "tsConfig": "tsconfig.app.json",
             "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
-            ],
+  {
+    "glob": "**/*",
+    "input": "src/assets",
+    "output": "/assets"
+  }
+],
+            
             "styles": [
               "src/styles.css",
               "node_modules/@ng-select/ng-select/themes/default.theme.css"
@@ -101,5 +103,5 @@
   },
   "cli": {
     "analytics": "14efd640-8220-46ca-b7d0-eb8f28f1eb8b"
-  },
+  }
 }
