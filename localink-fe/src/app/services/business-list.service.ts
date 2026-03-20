@@ -1,18 +1,21 @@
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Injectable } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BusinessListService {
 
-  private url = '/data/businesses.json';
+  private apiUrl = 'http://localhost:5138/api/Business';
 
   constructor(private http: HttpClient) {}
 
-  getBusinesses(): Observable<any> {
-    return this.http.get<any>(this.url);
+  getBusinessesBySubcategory(subcategoryId: number) {
+    return this.http.get<any[]>(`${this.apiUrl}?subcategoryId=${subcategoryId}`);
   }
 
+  
+  getBusinessById(id: number) {
+    return this.http.get<any>(`${this.apiUrl}/${id}`);
+  }
 }
