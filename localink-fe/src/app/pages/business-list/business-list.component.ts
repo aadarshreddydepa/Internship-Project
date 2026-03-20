@@ -28,24 +28,39 @@ export class BusinessListComponent implements OnInit {
     private service: BusinessListService
   ) {}
 
+  categoryId!: number;
+  categoryName = '';
+  subcategoryName = '';
+
+
   ngOnInit() {
 
-    this.category = this.route.snapshot.paramMap.get('category')!;
-    this.subcategory = this.route.snapshot.paramMap.get('subcategory')!;
+    this.categoryId = Number(
+      this.route.snapshot.paramMap.get('categoryId')
+    );
 
-    this.service.getBusinesses().subscribe(data => {
+    const subcategoryId = Number(
+      this.route.snapshot.paramMap.get('subcategoryId')
+    );
 
-      this.businesses =
-        data[this.category]?.[this.subcategory] || [];
+    this.categoryName =
+      this.route.snapshot.queryParamMap.get('categoryName') || '';
 
-      this.totalPages = Math.ceil(this.businesses.length / this.pageSize);
+    this.subcategoryName =
+      this.route.snapshot.queryParamMap.get('subcategoryName') || '';
 
-      this.updatePage();
-
-    });
-
+    this.service.getBusinessesBySubcategory(subcategoryId)
+      .subscribe({
+        next: (data) => {
+          this.businesses = data;
+          this.totalPages = Math.ceil(this.businesses.length / this.pageSize);
+          this.updatePage();
+        },
+        error: (err) => {
+          console.error('Error fetching businesses', err);
+        }
+      });
   }
-
   updatePage() {
 
     const start = (this.currentPage - 1) * this.pageSize;
