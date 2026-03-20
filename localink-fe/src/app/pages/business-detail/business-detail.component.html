@@ -1,72 +1,84 @@
 <div *ngIf="business" class="detail-container">
 
-  <!-- BACK BUTTON -->
-  <a routerLink="/" class="back">← Back to Results</a>
+  <!-- BACK -->
+  <a
+    [routerLink]="['/businesses', categoryId, subcategoryId]"
+    [queryParams]="{
+      categoryName: categoryName,
+      subcategoryName: subcategoryName
+    }"
+    class="back"
+  >
+    ← Back to Businesses
+  </a>
+
+  <!-- BREADCRUMB -->
+  <p class="category">
+    {{ business.categoryName | titlecase }} › {{ business.subcategoryName | titlecase }}
+  </p>
 
   <div class="detail-grid">
 
-    <!-- IMAGE SECTION -->
+    <!-- IMAGE -->
     <div class="image-section">
 
       <div class="main-image">
-        Main Image
+        <img
+          *ngIf="business.primaryImage"
+          [src]="business.primaryImage"
+        />
+
+        <div *ngIf="!business.primaryImage">
+          No Image Available
+        </div>
       </div>
 
       <div class="gallery">
-        <div class="thumb">1</div>
-        <div class="thumb">2</div>
-        <div class="thumb">3</div>
+        <div class="thumb">Preview</div>
+        <div class="thumb">Preview</div>
+        <div class="thumb">Preview</div>
       </div>
 
     </div>
 
-
-    <!-- BUSINESS INFO -->
+    <!-- INFO -->
     <div class="info-section">
 
-      <h1>{{business.name}} <span class="verified">✔ Verified</span></h1>
+      <h1>
+        {{ business.name }}
+        <span class="verified">Verified</span>
+      </h1>
 
-      <p class="category">
-        {{business.category}} → {{business.subcategory}}
-      </p>
-
-      <div class="rating">
-        ⭐⭐⭐⭐☆ {{business.rating}} ({{business.reviews}} reviews)
-      </div>
+      <span class="gold-rule"></span>
 
       <p class="description">
-        {{business.description}}
+        {{ business.description || 'No description available' }}
       </p>
 
+      <!-- CONTACT GRID -->
       <div class="contact-grid">
 
         <div>
-          <b>📞 Phone</b>
-          <p>{{business.phone}}</p>
+          <b>Phone</b>
+          <p>{{ business.phoneNumber || 'Not provided' }}</p>
         </div>
 
         <div>
-          <b>✉ Email</b>
-          <p>{{business.email}}</p>
+          <b>Email</b>
+          <p>{{ business.email || 'Not provided' }}</p>
         </div>
 
         <div>
-          <b>📍 Address</b>
-          <p>{{business.address}}</p>
-        </div>
-
-        <div>
-          <b>🕒 Hours</b>
-          <p>{{business.hours}}</p>
-        </div>
-
-        <div>
-          <b>🌐 Website</b>
-          <p>{{business.website}}</p>
+          <b>Location</b>
+          <p>
+            {{ business.city || 'N/A' }},
+            {{ business.state || '' }}
+          </p>
         </div>
 
       </div>
 
+      <!-- ACTIONS -->
       <div class="actions">
         <button class="contact-btn">Contact Business</button>
         <button class="direction-btn">Get Directions</button>
