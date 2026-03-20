@@ -14,6 +14,7 @@ import { ClientDashboardComponent } from './dashboards/client-dashboard/client-d
 import { RegisterBusinessComponent } from './register-business/register-business.component';
 import { UserDashboardComponent } from './dashboards/user-dashboard/user-dashboard.component';
 import { EditBusinessBusinessComponent } from './edit-business/edit-business.component';
+import { BusinessDetailComponent } from './pages/business-detail/business-detail.component';
 
 
 export const routes: Routes = [
@@ -34,43 +35,48 @@ export const routes: Routes = [
     path: 'subcategory/:id',
     component: SubcategoryListComponent
   },
-
   {
-    path: 'businesses/:category/:subcategory',
+    path: 'businesses/:categoryId/:subcategoryId',
     component: BusinessListComponent
   },
-  
-
-{
-  path:'profile',
-  component:ProfileComponent
-},
-//   {
-//   path: 'business/:name',
-//   component: BusinessDetailComponent
-// }
- {
- path:'change-password',
- component:ChangePasswordComponent,
-  },
-
   {
-    path: 'contact-details',component: ContactDetailsComponent
+    path:'profile',
+    component:ProfileComponent
   },
-  { path: 'user-dashboard', component: UserDashboardComponent },
-  { path: 'client-dashboard', component: ClientDashboardComponent },
-  { path: 'register-business', component: RegisterBusinessComponent },
   {
-  path: 'edit-business/:id',
-  component: EditBusinessBusinessComponent
-},
-{
-  path:'categories',
-  component:CategoriesComponent
-},
-{
+    path:'change-password',
+    component:ChangePasswordComponent,
+  },
+  {
+    path: 'contact-details',
+    component: ContactDetailsComponent
+  },
+  { 
+    path: 'user-dashboard', 
+    component: UserDashboardComponent 
+  },
+  { 
+    path: 'client-dashboard',
+    component: ClientDashboardComponent 
+  },
+  { 
+    path: 'register-business', 
+    component: RegisterBusinessComponent 
+  },
+  {
+    path: 'edit-business/:id',
+    component: EditBusinessBusinessComponent
+  },
+  {
+    path:'categories',
+    component:CategoriesComponent
+  },
+  { 
+    path: 'business/:id', 
+    component: BusinessDetailComponent 
+  },
+  {
     path: '**',
     redirectTo: '',
   }
-
 ];
