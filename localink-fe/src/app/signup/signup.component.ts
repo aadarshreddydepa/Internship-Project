@@ -22,6 +22,7 @@ export class SignupComponent implements OnInit {
   // ✅ Default USER selected
   selectedType: 'user' | 'client' = 'user';
 
+
   countries = [
     { name: 'India', states: ['Tamil Nadu','Karnataka','Kerala','Maharashtra'] },
     { name: 'United States', states: ['California','Texas','Florida','New York'] },
@@ -34,6 +35,47 @@ export class SignupComponent implements OnInit {
     { name: 'Singapore', states: ['Central','North East','North West','South East'] },
     { name: 'UAE', states: ['Dubai','Abu Dhabi','Sharjah','Ajman'] }
   ];
+  currentStep = 1;
+
+stepFields: any = {
+  1: ['name', 'phone', 'email'],
+  2: ['country', 'state', 'city', 'pincode', 'street'],
+  3: ['password', 'confirmPassword']
+};
+
+nextStep() {
+  const fields = this.stepFields[this.currentStep];
+
+  let isValid = true;
+
+  fields.forEach((field: string) => {
+    const control = this.signupForm.get(field);
+
+    if (control) {
+      control.markAsTouched();
+      control.updateValueAndValidity();
+
+      if (control.invalid) {
+        isValid = false;
+      }
+    }
+  });
+
+  // password match check (step 3 only)
+  if (this.currentStep === 3 && this.signupForm.errors?.['passwordMismatch']) {
+    isValid = false;
+  }
+
+  if (!isValid) return; // ❌ BLOCK
+
+  this.currentStep++;
+}
+
+prevStep() {
+  if (this.currentStep > 1) {
+    this.currentStep--;
+  }
+}
 
   states: string[] = [];
 
@@ -106,13 +148,21 @@ export class SignupComponent implements OnInit {
   }
 
   // ✅ Toggle handler
-  selectType(type: 'user' | 'client') {
-    this.selectedType = type;
+  isTypeLocked = false;
 
-    this.signupForm.patchValue({
-      userType: type
-    });
+selectType(type: 'user' | 'client') {
+  if (this.isTypeLocked) return;
+
+  this.selectedType = type;
+
+  this.signupForm.patchValue({
+    userType: type
+  });
+
+  if (type === 'client') {
+    this.isTypeLocked = true; // 🔒 lock toggle
   }
+}
 
   passwordMatchValidator(form: AbstractControl): ValidationErrors | null {
     const password = form.get('password')?.value;
@@ -137,8 +187,9 @@ export class SignupComponent implements OnInit {
           this.showSuccessPopup = true;
 
           setTimeout(() => {
-            this.router.navigate(['/']);
-          }, 2000);
+  this.showSuccessPopup = false;
+  this.router.navigate(['/login']);
+}, 1500);
         },
         error: (err) => {
           console.error(err);
