@@ -6,16 +6,21 @@ import { Injectable } from '@angular/core';
 })
 export class BusinessListService {
 
-  private apiUrl = 'http://localhost:5138/api/Business';
+  private baseUrl = 'http://localhost:5138/api/v1';
 
   constructor(private http: HttpClient) {}
 
+  //  GET /api/v1/subcategories/{subcategoryId}/businesses
   getBusinessesBySubcategory(subcategoryId: number) {
-    return this.http.get<any[]>(`${this.apiUrl}?subcategoryId=${subcategoryId}`);
+    return this.http.get<any[]>(
+      `${this.baseUrl}/subcategories/${subcategoryId}/businesses`
+    );
   }
 
-  
+  //  GET /api/v1/businesses/{id}
   getBusinessById(id: number) {
-    return this.http.get<any>(`${this.apiUrl}/${id}`);
+    return this.http.get<any>(
+      `${this.baseUrl}/businesses/${id}`
+    );
   }
 }

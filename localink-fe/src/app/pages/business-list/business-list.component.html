@@ -27,11 +27,9 @@
      *ngFor="let b of paginatedBusinesses"
      [routerLink]="['/business', b.id]"
       [queryParams]="{
-        categoryName: b.categoryName,
-        subcategoryName: b.subcategoryName,
-        subcategoryId: b.subcategoryId,
-        categoryId : categoryId
-      }">
+      categoryName: b.categoryName,
+      subcategoryName: b.subcategoryName
+    }">
 
     <!--IMAGE LEFT -->
     <div class="image">

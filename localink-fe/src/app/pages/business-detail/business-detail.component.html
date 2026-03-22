@@ -12,68 +12,62 @@
     ← Back to Businesses
   </a>
 
-  <!-- BREADCRUMB -->
-  <p class="category">
+    <p class="category">
     {{ business.categoryName | titlecase }} › {{ business.subcategoryName | titlecase }}
   </p>
 
-  <div class="detail-grid">
+  <!-- MAIN CARD -->
+  <div class="main-card">
 
-    <!-- IMAGE -->
+    <!-- LEFT: IMAGE -->
     <div class="image-section">
-
       <div class="main-image">
+
         <img
           *ngIf="business.primaryImage"
           [src]="business.primaryImage"
         />
 
-        <div *ngIf="!business.primaryImage">
-          No Image Available
+        <div *ngIf="!business.primaryImage" class="image-placeholder">
+          <span>📷</span>
+          <p>No Image Available</p>
         </div>
-      </div>
 
-      <div class="gallery">
-        <div class="thumb">Preview</div>
-        <div class="thumb">Preview</div>
-        <div class="thumb">Preview</div>
       </div>
-
     </div>
 
-    <!-- INFO -->
+    <!-- RIGHT: DETAILS -->
     <div class="info-section">
 
-      <h1>
-        {{ business.name }}
-        <span class="verified">Verified</span>
-      </h1>
+      <div class="title-row">
+        <h1>Business Name : {{ business.name }}</h1>
+      </div>
 
-      <span class="gold-rule"></span>
+      
 
       <p class="description">
-        {{ business.description || 'No description available' }}
+        <span>Description: </span> {{ business.description || 'No description available' }}
+        reyifgeurohfljwioefhowugfohwiefjluiowehfuiwegfteshrdyfukgiygf jyf ytfyu giu y tftg ihu yfvb hiuf tvusydhofwehfoiwejhfiowehfuwgeofheifhweoifh wewhehweofoiwehfiwh fhwrhfowirhfowrhfwrhfhwrf hwr hfoiwehfoiwejpiwehfoiwehfoiwhfwehofwhehwwoih
       </p>
 
-      <!-- CONTACT GRID -->
-      <div class="contact-grid">
+      <!-- CONTACT DETAILS (TEXT STYLE) -->
+      <div class="contact-details">
 
-        <div>
-          <b>Phone</b>
-          <p>{{ business.phoneNumber || 'Not provided' }}</p>
+        <div class="row">
+          <span class="label">Phone</span>
+          <span class="value">{{ business.phoneNumber || '—' }}</span>
         </div>
 
-        <div>
-          <b>Email</b>
-          <p>{{ business.email || 'Not provided' }}</p>
+        <div class="row">
+          <span class="label">Email</span>
+          <span class="value">{{ business.email || '—' }}</span>
         </div>
 
-        <div>
-          <b>Location</b>
-          <p>
-            {{ business.city || 'N/A' }},
-            {{ business.state || '' }}
-          </p>
+        <div class="row">
+          <span class="label">Location</span>
+          <span class="value">
+            {{ business.city || 'N/A' }}, {{ business.state || '' }}
+          </span>
         </div>
 
       </div>

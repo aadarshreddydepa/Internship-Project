@@ -14,11 +14,15 @@ export interface Subcategory {
 })
 export class SubcategoryService {
 
-  private apiUrl = 'http://localhost:5138/api/subcategory';
+  //  Updated base URL (matches backend)
+  private apiUrl = 'http://localhost:5138/api/v1/categories';
 
   constructor(private http: HttpClient) {}
 
+  // Proper typing added
   getSubcategories(categoryId: number): Observable<Subcategory[]> {
-    return this.http.get<Subcategory[]>(`${this.apiUrl}/${categoryId}`);
+    return this.http.get<Subcategory[]>(
+      `${this.apiUrl}/${categoryId}/subcategories`
+    );
   }
 }

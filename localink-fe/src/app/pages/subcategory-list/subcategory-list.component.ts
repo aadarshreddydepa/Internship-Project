@@ -16,6 +16,7 @@ export class SubcategoryListComponent implements OnInit {
   categoryId!: number;
   subcategories: Subcategory[] = [];
   displayCategoryName = '';
+
   constructor(
     private route: ActivatedRoute,
     private subcategoryService: SubcategoryService,
@@ -24,8 +25,10 @@ export class SubcategoryListComponent implements OnInit {
 
   ngOnInit(): void {
 
-    
+    // Get categoryId from route
     this.categoryId = Number(this.route.snapshot.paramMap.get('id'));
+
+    // Get category name
     this.categoryService.getCategories().subscribe({
       next: (categories) => {
         const selected = categories.find(c => c.id === this.categoryId);
@@ -36,9 +39,10 @@ export class SubcategoryListComponent implements OnInit {
       }
     });
 
+    // Get subcategories
     this.subcategoryService.getSubcategories(this.categoryId).subscribe({
-      next: (data) => {
-        this.subcategories = data.map(sub => ({
+      next: (data: Subcategory[]) => {
+        this.subcategories = data.map((sub: Subcategory) => ({
           ...sub
         }));
       },
@@ -47,5 +51,4 @@ export class SubcategoryListComponent implements OnInit {
       }
     });
   }
-  
 }
