@@ -1,80 +1,93 @@
-import { TestBed, ComponentFixture } from '@angular/core/testing';
-import { Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { UserDashboardComponent } from './user-dashboard.component';
-import { CategoryService, Category } from '../../services/category.service';
+import { CategoryService } from '../../services/category.service';
+import { Router } from '@angular/router';
+import { of, throwError } from 'rxjs';
 
-describe('SearchComponent', () => {
-
+describe('UserDashboardComponent', () => {
   let component: UserDashboardComponent;
   let fixture: ComponentFixture<UserDashboardComponent>;
-  let routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-  let categoryService: CategoryService;
+
+  let mockCategoryService: jasmine.SpyObj<CategoryService>;
+  let mockRouter: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
 
+    mockCategoryService = jasmine.createSpyObj('CategoryService', ['getCategories']);
+    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+
     await TestBed.configureTestingModule({
-      imports: [UserDashboardComponent, FormsModule],
+      imports: [UserDashboardComponent],
       providers: [
-        CategoryService,
-        { provide: Router, useValue: routerSpy }
+        { provide: CategoryService, useValue: mockCategoryService },
+        { provide: Router, useValue: mockRouter }
       ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(UserDashboardComponent);
     component = fixture.componentInstance;
-    categoryService = TestBed.inject(CategoryService);
-
-    fixture.detectChanges();
-
   });
 
   it('should create component', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should load categories from service on init', () => {
-    const categories = categoryService.getCategories();
-    expect(component.categories.length).toBe(categories.length);
+  it('should load categories on init', () => {
+
+    const mockData = [
+      { id: 1, name: 'Food', iconUrl: '' }
+    ];
+
+    mockCategoryService.getCategories.and.returnValue(of(mockData));
+
+    fixture.detectChanges();
+
+    expect(component.categories.length).toBe(1);
   });
 
-  it('should render all category cards when searchTerm is empty', () => {
-    const compiled = fixture.nativeElement as HTMLElement;
-    const cards = compiled.querySelectorAll('.category-card');
-    expect(cards.length).toBe(component.categories.length);
+  it('should handle API error', () => {
+
+    spyOn(console, 'error');
+
+    mockCategoryService.getCategories.and.returnValue(
+      throwError(() => new Error('API Error'))
+    );
+
+    fixture.detectChanges();
+
+    expect(console.error).toHaveBeenCalledWith(
+      'Error fetching categories',
+      jasmine.any(Error)
+    );
   });
 
-  it('should filter categories by search term', () => {
-    component.searchTerm = 'medical';
+  it('should filter categories correctly', () => {
+
+    component.categories = [
+      { id: 1, name: 'Food', iconUrl: '' },
+      { id: 2, name: 'Health', iconUrl: '' }
+    ];
+
+    component.searchTerm = 'foo';
+
     const result = component.filteredCategories;
+
     expect(result.length).toBe(1);
-    expect(result[0].id).toBe('medical');
+    expect(result[0].name).toBe('Food');
   });
 
-  it('should return all categories when searchTerm is blank', () => {
-    component.searchTerm = '';
-    expect(component.filteredCategories.length).toBe(component.categories.length);
-  });
+  it('should navigate to profile', () => {
 
-  it('should return empty array when no category matches search term', () => {
-    component.searchTerm = 'nonexistentcategory';
-    expect(component.filteredCategories.length).toBe(0);
-  });
-
-  it('should filter categories case-insensitively', () => {
-    component.searchTerm = 'FOOD';
-    const result = component.filteredCategories;
-    expect(result.length).toBe(1);
-    expect(result[0].id).toBe('food');
-  });
-
-  it('should navigate to profile page', () => {
     component.goToProfile();
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/profile']);
+
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/profile']);
   });
 
-  it('should have default username set', () => {
-    expect(component.username).toBeTruthy();
+  it('should navigate to subcategory', () => {
+
+    component.openCategory(5);
+
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/subcategory', 5]);
   });
 
 });

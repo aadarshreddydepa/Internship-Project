@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\build\localink_be.props" />
-</Project>

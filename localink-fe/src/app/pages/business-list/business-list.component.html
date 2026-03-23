@@ -3,13 +3,17 @@
   <!-- HEADER -->
   <div class="page-header">
 
-    <a [routerLink]="['/subcategory', category]" class="back">
-      ← Back
-    </a>
+    <a [routerLink]="['/subcategory', categoryId]" class="back">
+    ← Back to Sub-categories
+  </a>
 
     <div class="title-section">
-      <h1>{{ subcategory | titlecase }}</h1>
+      <h1>{{ subcategoryName | titlecase }}</h1>
       <p>{{ businesses.length }} businesses found</p>
+
+      <div class="breadcrumb">
+        {{ categoryName | titlecase }} › {{ subcategoryName | titlecase }}
+      </div>
     </div>
 
   </div>
@@ -20,37 +24,39 @@
   <!-- BUSINESS LIST -->
 
   <div class="business-card"
-       *ngFor="let b of paginatedBusinesses"
-       [routerLink]="['/business', b.name]"
-       style="cursor:pointer">
+     *ngFor="let b of paginatedBusinesses"
+     [routerLink]="['/business', b.id]"
+      [queryParams]="{
+      categoryName: b.categoryName,
+      subcategoryName: b.subcategoryName,
+      categoryId: categoryId,
+      subcategoryId: subcategoryId
+    }">
 
-    <!-- IMAGE -->
+    <!--IMAGE LEFT -->
     <div class="image">
-      Image
+      <img *ngIf="b.primaryImage" [src]="b.primaryImage" />
+      <span *ngIf="!b.primaryImage">No Image</span>
     </div>
 
-
-    <!-- BUSINESS INFO -->
+    <!--  RIGHT CONTENT -->
     <div class="info">
 
       <div class="title-row">
         <h3>{{ b.name }}</h3>
       </div>
 
-      <p class="desc">{{ b.description }}</p>
+      <p class="category">
+        {{ b.subcategoryName | titlecase}}
+      </p>
 
-      <div class="rating">
-        ⭐ {{ b.rating }} ({{ b.reviews }} reviews)
-      </div>
+      <p class="desc">
+        {{ b.description | titlecase }}
+      </p>
 
       <div class="details">
-
-        <span>📞 {{ b.phone }}</span>
-
-        <span>📍 {{ b.address }}</span>
-
-        <span>🕒 {{ b.hours }}</span>
-
+        <span>📞 {{ b.phoneNumber }}</span>
+        <span>📍 {{ b.city }}, {{ b.state }}</span>
       </div>
 
     </div>
