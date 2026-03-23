@@ -30,13 +30,6 @@ export const routes: Routes = [
     path: 'forgot-password',
     component: ForgotPasswordComponent
   },
-
-  // {
-  //   path: '**',
-  //   redirectTo: '',
-  //   component: CategoriesComponent
-  // },
-
   {
     path: 'subcategory/:id',
     component: SubcategoryListComponent
@@ -70,6 +63,10 @@ export const routes: Routes = [
   {
   path: 'edit-business/:id',
   component: EditBusinessBusinessComponent
-}
+},
+{
+    path: '**',
+    redirectTo: '',
+  }
 
 ];
