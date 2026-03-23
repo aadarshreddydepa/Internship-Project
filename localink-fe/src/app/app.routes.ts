@@ -2,11 +2,9 @@ import { Routes } from '@angular/router';
 import { SignupComponent } from './signup/signup.component';
 import { LoginComponent } from './login/login.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
-
 import { CategoriesComponent } from './pages/categories/categories.component';
 import { SubcategoryListComponent } from './pages/subcategory-list/subcategory-list.component';
 import { BusinessListComponent } from './pages/business-list/business-list.component';
-// import { BusinessDetailComponent } from './pages/business-detail/business-detail.component';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { ChangePasswordComponent } from './pages/change-password/change-password.component';
 import { ContactDetailsComponent } from './contact-details/contact-details.component';
@@ -14,6 +12,7 @@ import { ClientDashboardComponent } from './dashboards/client-dashboard/client-d
 import { RegisterBusinessComponent } from './register-business/register-business.component';
 import { UserDashboardComponent } from './dashboards/user-dashboard/user-dashboard.component';
 import { EditBusinessBusinessComponent } from './edit-business/edit-business.component';
+import { BusinessDetailComponent } from './pages/business-detail/business-detail.component';
 
 
 export const routes: Routes = [
@@ -30,46 +29,52 @@ export const routes: Routes = [
     path: 'forgot-password',
     component: ForgotPasswordComponent
   },
-
-  // {
-  //   path: '**',
-  //   redirectTo: '',
-  //   component: CategoriesComponent
-  // },
-
   {
     path: 'subcategory/:id',
     component: SubcategoryListComponent
   },
-
   {
-    path: 'businesses/:category/:subcategory',
+    path: 'businesses/:categoryId/:subcategoryId',
     component: BusinessListComponent
   },
-  
-
-{
-  path:'profile',
-  component:ProfileComponent
-},
-//   {
-//   path: 'business/:name',
-//   component: BusinessDetailComponent
-// }
- {
- path:'change-password',
- component:ChangePasswordComponent,
-  },
-
   {
-    path: 'contact-details',component: ContactDetailsComponent
+    path:'profile',
+    component:ProfileComponent
   },
-  { path: 'user-dashboard', component: UserDashboardComponent },
-  { path: 'client-dashboard', component: ClientDashboardComponent },
-  { path: 'register-business', component: RegisterBusinessComponent },
   {
-  path: 'edit-business/:id',
-  component: EditBusinessBusinessComponent
-}
-
+    path:'change-password',
+    component:ChangePasswordComponent,
+  },
+  {
+    path: 'contact-details',
+    component: ContactDetailsComponent
+  },
+  { 
+    path: 'user-dashboard', 
+    component: UserDashboardComponent 
+  },
+  { 
+    path: 'client-dashboard',
+    component: ClientDashboardComponent 
+  },
+  { 
+    path: 'register-business', 
+    component: RegisterBusinessComponent 
+  },
+  {
+    path: 'edit-business/:id',
+    component: EditBusinessBusinessComponent
+  },
+  {
+    path:'categories',
+    component:CategoriesComponent
+  },
+  { 
+    path: 'business/:id', 
+    component: BusinessDetailComponent 
+  },
+  {
+    path: '**',
+    redirectTo: '',
+  }
 ];

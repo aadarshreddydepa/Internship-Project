@@ -22,9 +22,21 @@ export class UserDashboardComponent implements OnInit {
     private categoryService: CategoryService,
     private router: Router
   ) {}
+
   ngOnInit(): void {
-    this.categories = this.categoryService.getCategories();
+    this.loadCategories();
   }
+  loadCategories(): void {
+    this.categoryService.getCategories().subscribe({
+      next: (data) => {
+        this.categories = data;
+      },
+      error: (err) => {
+        console.error('Error fetching categories', err);
+      }
+    });
+  }
+
   get filteredCategories(): Category[] {
     const term = this.searchTerm.trim().toLowerCase();
     if (!term) return this.categories;
@@ -32,10 +44,17 @@ export class UserDashboardComponent implements OnInit {
       c.name.toLowerCase().includes(term)
     );
   }
+
   goToProfile(): void {
     this.router.navigate(['/profile']);
   }
+
   scrollToTop(): void {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  //  NAVIGATION (IMPORTANT)
+  openCategory(categoryId: number): void {
+    this.router.navigate(['/subcategory', categoryId]);
   }
 }
