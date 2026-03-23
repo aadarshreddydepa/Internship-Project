@@ -2,37 +2,33 @@
 /* body{
   font-family: 'Inter', sans-serif;
 } */
-
-/* NG SELECT DEFAULT THEME */
 @import "@ng-select/ng-select/themes/default.theme.css";
-
 body{
   margin:0;
-  background:#1C1C1C;
+  /* background:#1C1C1C; */
   color:#F8F4F0;
   font-family:system-ui, -apple-system, sans-serif;
 }
 
 *{
   box-sizing:border-box;
-
+}
+/* NG SELECT DEFAULT THEME */
 
 
 /* Full page background */
 html, body{
-height:100%;
-margin:0;
-padding:0;
-background-color:#1C1C1C;
-font-family:"Segoe UI", Arial, sans-serif;
-color:#F8F4F0;
+  height:100%;
+  margin:0;
+  padding:0;
+  background: transparent; /* 🔥 IMPORTANT */
 }
 
 /* Angular root component */
 app-root{
 display:block;
 min-height:100vh;
-background-color:#1C1C1C;
+/* background-color:#1C1C1C; */
 }
 
 /* ----------------------------- */
@@ -119,5 +115,4 @@ color:#B19F91 !important;
 .ng-dropdown-panel .ng-dropdown-panel-items{
 max-height:200px !important;
 overflow-y:auto !important;
-}
 }
