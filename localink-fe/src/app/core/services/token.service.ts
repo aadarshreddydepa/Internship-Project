@@ -6,18 +6,14 @@ import { Injectable } from '@angular/core';
 export class TokenService {
 
   setToken(token: string) {
-
-    localStorage.setItem("jwt_token", token);
-    console.log("Token stored in LocalStorage");
+    localStorage.setItem('token', token);
   }
 
   getToken() {
-
-    return localStorage.getItem("jwt_token");
-
+    return localStorage.getItem('token');
   }
-  clearToken() {
 
-    localStorage.removeItem("jwt_token");
+  logout() {
+    localStorage.removeItem('token');
   }
 }

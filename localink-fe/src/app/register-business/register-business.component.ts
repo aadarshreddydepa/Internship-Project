@@ -4,11 +4,13 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { HttpClient } from '@angular/common/http';
 
+import { BusinessService } from '../services/register-business.service'; // adjust path if needed
+
 import { ContactDetailsComponent } from '../contact-details/contact-details.component';
 import { HoursComponent } from '../business/hours/hours.component';
 import { PhotoUploadComponent } from '../business/photo-upload/photo-upload.component';
 import { PreviewComponent } from '../business/preview/preview.component';
-
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-register-business',
@@ -36,45 +38,45 @@ export class RegisterBusinessComponent {
   submitSuccessMessage = '';
   hoursErrorMessage = '';
 
-  // categories = [
-  //   { name: 'Food', subcategories: ['Restaurant', 'Cafe', 'Bakery'] },
-  //   { name: 'Retail', subcategories: ['Clothing', 'Electronics', 'Supermarket'] },
-  //   { name: 'Services', subcategories: ['Salon', 'Repair', 'Consulting'] }
-  // ];
   categories: any[] = [];
   subcategories: string[] = [];
   hoursData: any = [];
   photoData: string | null = null;
 
-  constructor(private fb: FormBuilder, private http: HttpClient) {
-    this.businessForm = this.fb.group({
-      businessName: [
-      '',
-      [
-        Validators.required,
-        Validators.pattern(/^[A-Za-z\s&'-]+$/)  // letters, spaces, &, ', -
-      ]
-    ],
+  constructor(
+    private fb: FormBuilder,
+    private http: HttpClient,
+    private businessService: BusinessService,
+    private router: Router
+  ) {
+      this.businessForm = this.fb.group({
+        businessName: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern(/^[A-Za-z\s&'-]+$/)  // letters, spaces, &, ', -
+        ]
+      ],
 
-      description: [
-      '',
-      [
-        Validators.required,
-          Validators.minLength(10),
-          Validators.pattern(/^[A-Za-z][A-Za-z\s.,'()%!]*$/)// only letters and spaces
-      ]
-    ],
+        description: [
+        '',
+        [
+          Validators.required,
+            Validators.minLength(10),
+            Validators.pattern(/^[A-Za-z][A-Za-z\s.,'()%!]*$/)// only letters and spaces
+        ]
+      ],
 
-      category: ['', Validators.required],
-      subcategory: ['', Validators.required]
-    });
-  }
+        category: ['', Validators.required],
+        subcategory: ['', Validators.required]
+      });
+    }
 
-   ngOnInit(): void {
-    // If you want to do any initialization later
-    this.http.get<any>('data/categories.json').subscribe(data => {
-  this.categories = data.categories;
-});
+    ngOnInit(): void {
+      // If you want to do any initialization later
+      this.http.get<any>('data/categories.json').subscribe(data => {
+    this.categories = data.categories;
+  });
   }
 
   onCategoryChange() {
@@ -144,16 +146,57 @@ export class RegisterBusinessComponent {
 
   submitRegistration() {
 
-    this.finalRegistrationData = {
-      ...this.businessData,
-      ...this.contactData,
-      hours: this.hoursData,
-      photo: this.photoData
-    };
+  console.log("CONTACT DATA:", this.contactData);
+  console.log("SUBMIT CLICKED");
 
-    console.log("Final Business Registration Payload:", this.finalRegistrationData);
+  this.finalRegistrationData = {
+    businessName: this.businessData.businessName,
+    description: this.businessData.description,
+    category: this.businessData.category,
+    subcategory: this.businessData.subcategory,
 
-    this.submitSuccessMessage = "Business registered successfully!";
+    phoneCode: this.contactData.phoneCode,
+    //phoneNumber: this.contactData.phone,
+    //phoneNumber: this.contactData.phone ? this.contactData.phone.replace(/[^\d]/g, '').slice(-10) : '',
+    phoneNumber: this.contactData.phone.replace(this.contactData.phoneCode, ''),
+    email: this.contactData.email,
+    website: this.contactData.website,
 
+    address: this.contactData.address,
+
+    city: this.contactData.city,
+    state: this.contactData.state,
+    country: this.contactData.country,
+    pincode: this.contactData.pincode,
+
+    hours: this.hoursData,
+    photo: this.photoData
+  };
+
+  console.log("Sending Data:", this.finalRegistrationData);
+  this.businessService.registerBusiness(this.finalRegistrationData).subscribe({
+    next: (res) => {
+      console.log("Success:", res);
+
+      //  Show success message
+      this.submitSuccessMessage = "Business registered successfully!";
+
+      //  Redirect after 2 seconds
+      setTimeout(() => {
+        this.router.navigate(['/client-dashboard']); // make sure route exists
+      }, 2000);
+    },
+    error: (err) => {
+      console.error("FULL ERROR:", err);
+
+      if (err.error) {
+        alert(typeof err.error === 'string' 
+          ? err.error 
+          : JSON.stringify(err.error));
+      } else {
+        alert("Unknown error occurred");
+      }
+    }
+  });
   }
 }
