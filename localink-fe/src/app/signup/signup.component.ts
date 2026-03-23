@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { Router } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-signup',
@@ -12,77 +13,35 @@ import { AuthService } from '../core/services/auth.service';
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.css']
 })
-export class SignupComponent implements OnInit {
+export class SignupComponent implements OnInit, AfterViewInit {
 
   signupForm: FormGroup;
+
   showPassword = false;
   showConfirmPassword = false;
   showSuccessPopup = false;
 
-  // ✅ Default USER selected
+  // ✅ JSON DATA
+  locationData: any[] = [];
+  countries: string[] = [];
+  states: string[] = [];
+
   selectedType: 'user' | 'client' = 'user';
-
-
-  countries = [
-    { name: 'India', states: ['Tamil Nadu','Karnataka','Kerala','Maharashtra'] },
-    { name: 'United States', states: ['California','Texas','Florida','New York'] },
-    { name: 'Canada', states: ['Ontario','Quebec','British Columbia','Alberta'] },
-    { name: 'Australia', states: ['New South Wales','Victoria','Queensland','Western Australia'] },
-    { name: 'United Kingdom', states: ['England','Scotland','Wales','Northern Ireland'] },
-    { name: 'Germany', states: ['Bavaria','Berlin','Hamburg','Hesse'] },
-    { name: 'France', states: ['Île-de-France','Normandy','Brittany','Occitanie'] },
-    { name: 'Japan', states: ['Tokyo','Osaka','Hokkaido','Kyoto'] },
-    { name: 'Singapore', states: ['Central','North East','North West','South East'] },
-    { name: 'UAE', states: ['Dubai','Abu Dhabi','Sharjah','Ajman'] }
-  ];
   currentStep = 1;
 
-stepFields: any = {
-  1: ['name', 'phone', 'email'],
-  2: ['country', 'state', 'city', 'pincode', 'street'],
-  3: ['password', 'confirmPassword']
-};
+  stepFields: any = {
+    1: ['name', 'phone', 'email'],
+    2: ['country', 'state', 'city', 'pincode', 'street'],
+    3: ['password', 'confirmPassword']
+  };
 
-nextStep() {
-  const fields = this.stepFields[this.currentStep];
-
-  let isValid = true;
-
-  fields.forEach((field: string) => {
-    const control = this.signupForm.get(field);
-
-    if (control) {
-      control.markAsTouched();
-      control.updateValueAndValidity();
-
-      if (control.invalid) {
-        isValid = false;
-      }
-    }
-  });
-
-  // password match check (step 3 only)
-  if (this.currentStep === 3 && this.signupForm.errors?.['passwordMismatch']) {
-    isValid = false;
-  }
-
-  if (!isValid) return; // ❌ BLOCK
-
-  this.currentStep++;
-}
-
-prevStep() {
-  if (this.currentStep > 1) {
-    this.currentStep--;
-  }
-}
-
-  states: string[] = [];
+  isTypeLocked = false;
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private http: HttpClient
   ) {
     this.signupForm = this.fb.group({
       userType: ['', Validators.required],
@@ -103,25 +62,12 @@ prevStep() {
         Validators.pattern('^[0-9]{10}$')
       ]],
 
-      street: ['', [
-        Validators.required,
-        Validators.pattern('^\\S(.*\\S)?$')
-      ]],
+      countryCode: ['+91', Validators.required],
 
-      city: ['', [
-        Validators.required,
-        Validators.pattern('^\\S(.*\\S)?$')
-      ]],
-
-      state: ['', [
-        Validators.required,
-        Validators.pattern('^\\S(.*\\S)?$')
-      ]],
-
-      country: ['', [
-        Validators.required,
-        Validators.pattern('^\\S(.*\\S)?$')
-      ]],
+      street: ['', Validators.required],
+      city: ['', Validators.required],
+      state: ['', Validators.required],
+      country: ['', Validators.required],
 
       pincode: ['', [
         Validators.required,
@@ -131,8 +77,7 @@ prevStep() {
       password: ['', [
         Validators.required,
         Validators.minLength(8),
-        Validators.pattern('^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$'),
-        Validators.pattern('^\\S(.*\\S)?$')
+        Validators.pattern('^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$')
       ]],
 
       confirmPassword: ['', Validators.required]
@@ -140,56 +85,95 @@ prevStep() {
     }, { validators: this.passwordMatchValidator });
   }
 
-  // ✅ Set default userType on load
+  // ✅ LOAD JSON
   ngOnInit() {
-    this.signupForm.patchValue({
-      userType: 'user'
-    });
+    this.signupForm.patchValue({ userType: 'user' });
+
+    this.http.get<any[]>('assets/countries.json').subscribe(data => {
+  this.locationData = data;
+  this.countries = data; // full objects for ng-select
+});
   }
 
-  // ✅ Toggle handler
-  isTypeLocked = false;
+  // ✅ COUNTRY CHANGE
+ onCountryChange(event: any) {
 
-selectType(type: 'user' | 'client') {
-  if (this.isTypeLocked) return;
+  // 🔥 handle both string and object
+  const countryName = typeof event === 'string' ? event : event?.name;
 
-  this.selectedType = type;
+  const country = this.locationData.find(
+    (c: any) => c.name === countryName
+  );
+
+  console.log('Selected country:', countryName);
+  console.log('Matched object:', country);
+
+  this.states = country?.states || [];
 
   this.signupForm.patchValue({
-    userType: type
+    state: ''
   });
-
-  if (type === 'client') {
-    this.isTypeLocked = true; // 🔒 lock toggle
-  }
 }
 
+  // STEP NAVIGATION
+  nextStep() {
+    const fields = this.stepFields[this.currentStep];
+    let isValid = true;
+
+    fields.forEach((field: string) => {
+      const control = this.signupForm.get(field);
+      if (control) {
+        control.markAsTouched();
+        if (control.invalid) isValid = false;
+      }
+    });
+
+    if (this.currentStep === 3 && this.signupForm.errors?.['passwordMismatch']) {
+      isValid = false;
+    }
+
+    if (!isValid) return;
+    this.currentStep++;
+  }
+
+  prevStep() {
+    if (this.currentStep > 1) this.currentStep--;
+  }
+
+  // TYPE SWITCH
+  selectType(type: 'user' | 'client') {
+    if (this.isTypeLocked) return;
+
+    this.selectedType = type;
+    this.signupForm.patchValue({ userType: type });
+
+    if (type === 'client') this.isTypeLocked = true;
+  }
+
+  // PASSWORD VALIDATION
   passwordMatchValidator(form: AbstractControl): ValidationErrors | null {
     const password = form.get('password')?.value;
     const confirmPassword = form.get('confirmPassword')?.value;
-
     return password === confirmPassword ? null : { passwordMismatch: true };
   }
 
-  onCountryChange(countryName: string) {
-    const selectedCountry = this.countries.find(c => c.name === countryName);
-    this.states = selectedCountry ? selectedCountry.states : [];
-
-    this.signupForm.patchValue({ state: '' });
-  }
-
+  // SUBMIT
   onSubmit() {
     if (this.signupForm.valid) {
-      const formData = this.signupForm.value;
+
+      const { countryCode, ...rest } = this.signupForm.value;
+
+      const formData = {
+        ...rest,
+        country_code: countryCode
+      };
 
       this.authService.register(formData).subscribe({
         next: () => {
           this.showSuccessPopup = true;
-
           setTimeout(() => {
-  this.showSuccessPopup = false;
-  this.router.navigate(['/login']);
-}, 1500);
+            this.router.navigate(['/login']);
+          }, 1500);
         },
         error: (err) => {
           console.error(err);
@@ -199,32 +183,24 @@ selectType(type: 'user' | 'client') {
     }
   }
 
+  // PASSWORD TOGGLE
   togglePassword() {
     this.showPassword = !this.showPassword;
-    this.showSuccessPopup = false;
   }
 
   toggleConfirmPassword() {
     this.showConfirmPassword = !this.showConfirmPassword;
-    this.showSuccessPopup = false;
-  }
-
-  closePopup() {
-    this.showSuccessPopup = false;
-  }
-
-  trimField(fieldName: string) {
-    const control = this.signupForm.get(fieldName);
-    if (control && typeof control.value === 'string') {
-      control.setValue(control.value.trim());
-    }
   }
 
   get f() {
     return this.signupForm.controls;
   }
 
-  // 🎨 KEEP YOUR CANVAS ANIMATION (UNCHANGED)
+  closePopup() {
+  this.showSuccessPopup = false;
+}
+
+  // 🎨 CANVAS ANIMATION (UNCHANGED)
   ngAfterViewInit() {
     const glow = document.querySelector('.cursor-glow') as HTMLElement;
 
