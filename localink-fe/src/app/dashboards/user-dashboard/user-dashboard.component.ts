@@ -53,7 +53,7 @@ export class UserDashboardComponent implements OnInit {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  // ✅ NAVIGATION (IMPORTANT)
+  //  NAVIGATION (IMPORTANT)
   openCategory(categoryId: number): void {
     this.router.navigate(['/subcategory', categoryId]);
   }

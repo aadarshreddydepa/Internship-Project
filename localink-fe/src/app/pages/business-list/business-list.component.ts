@@ -31,7 +31,7 @@ export class BusinessListComponent implements OnInit {
   categoryId!: number;
   categoryName = '';
   subcategoryName = '';
-
+  subcategoryId!: number;
 
   ngOnInit() {
 
@@ -39,7 +39,7 @@ export class BusinessListComponent implements OnInit {
       this.route.snapshot.paramMap.get('categoryId')
     );
 
-    const subcategoryId = Number(
+    this.subcategoryId = Number(
       this.route.snapshot.paramMap.get('subcategoryId')
     );
 
@@ -49,7 +49,7 @@ export class BusinessListComponent implements OnInit {
     this.subcategoryName =
       this.route.snapshot.queryParamMap.get('subcategoryName') || '';
 
-    this.service.getBusinessesBySubcategory(subcategoryId)
+    this.service.getBusinessesBySubcategory(this.subcategoryId)
       .subscribe({
         next: (data) => {
           this.businesses = data;
@@ -77,7 +77,5 @@ export class BusinessListComponent implements OnInit {
     this.currentPage = page;
 
     this.updatePage();
-
   }
-
 }
