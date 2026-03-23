@@ -1,11 +1,11 @@
 <div class="container">
 
-  <a routerLink="/" class="back">
+  <a routerLink="/user-dashboard" class="back">
     ← Back to Categories
   </a>
 
   <h1 class="title">
-    {{displayCategoryName}}
+    {{ displayCategoryName | titlecase }}
   </h1>
 
   <p class="subtitle">
@@ -13,34 +13,44 @@
   </p>
 
   <div class="breadcrumb">
-    Home › {{displayCategoryName}}
+    Home › {{ displayCategoryName | titlecase }}
   </div>
-
 
   <div class="grid">
 
     <div
       class="card"
       *ngFor="let sub of subcategories"
-      [routerLink]="['/businesses', categoryId, sub.name.toLowerCase()]"
+      [routerLink]="['/businesses', categoryId, sub.id]"
+      [queryParams]="{
+        categoryName: displayCategoryName,
+        subcategoryName: sub.name
+      }"
     >
 
       <div class="card-content">
 
-        <div>
-          <h3>{{ sub.name }}</h3>
-          <p class="count">{{ sub.count }} businesses</p>
-        </div>
+        <div style="display:flex; align-items:center; gap:12px;">
 
-        <div class="arrow">
-          ›
+          <div class="icon">
+            <img *ngIf="sub.iconUrl" [src]="sub.iconUrl" width="24" height="24" />
+          </div>
+
+          <div>
+            <h3>{{ sub.name }}</h3>
+            <p class="count">
+              {{ sub.count ? sub.count + ' Businesses' : 'No businesses found' }}
+            </p>
+          </div>
+
+          <div class="arrow">›</div>
+
         </div>
 
       </div>
-
-      <div class="skeleton"></div>
 
     </div>
 
   </div>
 
+</div>

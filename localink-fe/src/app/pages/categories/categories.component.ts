@@ -19,7 +19,14 @@ export class CategoriesComponent {
     private categoryService: CategoryService,
     private router: Router
   ) {
-    this.categories = this.categoryService.getCategories();
+    this.categoryService.getCategories().subscribe({
+      next: (data) => {
+        this.categories = data;
+      },
+      error: (err) => {
+        console.error('Error fetching categories', err);
+      }
+    });
   }
 
   openCategory(category: Category) {
