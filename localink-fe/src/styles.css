@@ -2,7 +2,7 @@
 /* body{
   font-family: 'Inter', sans-serif;
 } */
- @import "@ng-select/ng-select/themes/default.theme.css";
+@import "@ng-select/ng-select/themes/default.theme.css";
 body{
   margin:0;
   /* background:#1C1C1C; */

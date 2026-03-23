@@ -59,7 +59,7 @@ export class ProfileComponent implements OnInit {
     'Japan': { code: '+81', digits: 10 }
   };
 
-  // 🔥 PINCODE CONFIG
+  //  PINCODE CONFIG
   pincodeConfig:any = {
     'India': { length: 6 },
     'United States': { length: 5 },

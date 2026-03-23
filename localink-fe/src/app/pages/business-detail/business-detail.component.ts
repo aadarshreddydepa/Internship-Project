@@ -1,31 +1,49 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { BusinessListService } from '../../services/business-list.service';
 
 @Component({
   selector: 'app-business-detail',
   standalone: true,
-  imports: [CommonModule],
-  templateUrl: './business-detail.component.html'
+  imports: [CommonModule, RouterModule],
+  templateUrl: './business-detail.component.html',
+  styleUrls:['./business-detail.component.css']
 })
 export class BusinessDetailComponent implements OnInit {
 
   business: any;
+  categoryName = '';
+  subcategoryName = '';
+  categoryId!: number;
 
   constructor(
     private route: ActivatedRoute,
     private businessService: BusinessListService
   ) {}
 
+subcategoryId!: number;
+
   ngOnInit() {
 
-    const name = this.route.snapshot.queryParamMap.get('name');
+    const id = Number(this.route.snapshot.paramMap.get('id'));
 
-    this.businessService.getBusinesses().subscribe(data => {
-      this.business = data.find((b:any) => b.name === name);
+    this.categoryName =
+      this.route.snapshot.queryParamMap.get('categoryName') || '';
+
+    this.subcategoryName =
+      this.route.snapshot.queryParamMap.get('subcategoryName') || '';
+
+    this.subcategoryId = Number(
+      this.route.snapshot.queryParamMap.get('subcategoryId')
+    );
+    this.categoryId = Number(
+      this.route.snapshot.queryParamMap.get('categoryId')
+    );
+    this.businessService.getBusinessById(id).subscribe({
+      next: (data) => {
+        this.business = data;
+      }
     });
-
   }
-
 }

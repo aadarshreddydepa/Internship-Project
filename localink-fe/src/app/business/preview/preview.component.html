@@ -79,9 +79,9 @@
     </div>
 
     <!-- BUSINESS PHOTO -->
-    <div class="section">
+    <div class="section" *ngIf="photoData">
       <h3>Business Photo</h3>
-      <div class="photo-box" *ngIf="photoData">
+      <div class="photo-box">
         <img [src]="photoData" alt="Business Photo">
       </div>
     </div>

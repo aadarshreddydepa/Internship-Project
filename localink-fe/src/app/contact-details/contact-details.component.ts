@@ -47,39 +47,24 @@ export class ContactDetailsComponent implements OnInit {
       phoneCode: ['+91', Validators.required],
  
       phone: [
-
         '',
-
         [
-
           Validators.required,
-
           Validators.pattern(/^[3-9][0-9]{9}$/)
-
         ]
-
       ],
  
       email: [
-
         '',
-
         [
-
           Validators.required,
-
           Validators.pattern(/^[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
-
         ]
-
       ],
- 
+
       website: [
-
         '',
-
         Validators.pattern(/^(https?:\/\/)?(www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$/)
-
       ],
  
       address: ['', Validators.required],
@@ -152,7 +137,7 @@ export class ContactDetailsComponent implements OnInit {
       }));
 
       if (this.initialData) {
-        // ✅ Split phone into code and number
+        //  Split phone into code and number
         if (this.initialData.phone) {
           const [code, number] = this.initialData.phone.split(' ');
           this.contactForm.patchValue({
@@ -267,14 +252,10 @@ export class ContactDetailsComponent implements OnInit {
       this.contactForm.markAllAsTouched();
  
     }
- 
   }
 
   previousStep() {
-
     this.previous.emit();
-
   }
- 
 }
  
