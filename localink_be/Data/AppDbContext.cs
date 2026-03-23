@@ -11,6 +11,7 @@ public class AppDbContext : DbContext
     public DbSet<Business> Businesses { get; set; }
     public DbSet<BusinessContact> BusinessContacts { get; set; }
     public DbSet<BusinessPhoto> BusinessPhotos { get; set; }
+    public DbSet<AdminDashboard> AdminDashboards { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // CATEGORY

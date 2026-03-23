@@ -20,23 +20,17 @@ public class BusinessService : IBusinessService
                 .Where(b => b.UserId == userId)
                 .Select(b => new BusinessDto
                 {
-                    BusinessId = b.BusinessId,
-                    BusinessName = b.BusinessName,
+                    Id = b.BusinessId,
+                    Name = b.BusinessName,
                     Description = b.Description,
 
-                    Category = b.Category.CategoryName,
-                    Subcategory = b.Subcategory.SubcategoryName,
+                    CategoryName = b.Category != null ? b.Category.CategoryName : "",
+                    SubcategoryName = b.Subcategory != null ? b.Subcategory.SubcategoryName : "",
+                    SubcategoryId = b.SubcategoryId,
 
-                    // Admin Status
-                    Status = _context.AdminDashboards
-                        .Where(a => a.BusinessId == b.BusinessId)
-                        .Select(a => a.Status)
-                        .FirstOrDefault(),
-
-                    // Contact Details
-                    Phone = _context.BusinessContacts
+                    PhoneNumber = _context.BusinessContacts
                         .Where(c => c.BusinessId == b.BusinessId)
-                        .Select(c => c.PhoneCode + " " + c.PhoneNumber)
+                        .Select(c => (c.PhoneCode ?? "") + " " + (c.PhoneNumber ?? ""))
                         .FirstOrDefault(),
 
                     Email = _context.BusinessContacts
@@ -47,6 +41,11 @@ public class BusinessService : IBusinessService
                     City = _context.BusinessContacts
                         .Where(c => c.BusinessId == b.BusinessId)
                         .Select(c => c.City)
+                        .FirstOrDefault(),
+
+                    Status = _context.AdminDashboards
+                        .Where(a => a.BusinessId == b.BusinessId)
+                        .Select(a => a.Status)
                         .FirstOrDefault()
                 })
                 .ToListAsync();
@@ -111,31 +110,6 @@ public class BusinessService : IBusinessService
         }
     }
 
-    public async Task<List<BusinessDto>> GetBusinessesByUserAsync(long userId)
-    {
-        if (userId <= 0)
-            throw new ArgumentException("UserId must be greater than 0");
-
-        try
-        {
-            return await _context.Businesses
-                .Where(b => b.UserId == userId)
-                .Select(b => new BusinessDto
-                {
-                    Id = b.BusinessId,
-                    Name = b.BusinessName,
-                    Description = b.Description,
-                    CategoryName = b.Category.CategoryName,
-                    SubcategoryId = b.SubcategoryId,
-                    SubcategoryName = b.Subcategory.SubcategoryName
-                })
-                .ToListAsync();
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"Error fetching businesses for userId {userId}", ex);
-        }
-    }
 
     public async Task<BusinessDto?> GetByIdAsync(long id)
     {
