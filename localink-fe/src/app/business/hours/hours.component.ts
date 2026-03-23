@@ -161,7 +161,7 @@ export class HoursComponent {
       }
       this.errorMessage = '';
       const result = this.days.map(d => ({
-        day: d.name,
+        dayOfWeek: d.name,
         mode: d.mode,
         slots: d.slots
       }));
