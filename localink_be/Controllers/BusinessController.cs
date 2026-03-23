@@ -11,6 +11,13 @@ public class BusinessController : ControllerBase
         _service = service;
     }
 
+    [HttpGet("user/{userId}")]
+    public async Task<IActionResult> GetBusinessesByUser(long userId)
+    {
+        var data = await _service.GetBusinessesByUserAsync(userId);
+        return Ok(data);
+    }
+
     [HttpGet("subcategories/{subcategoryId}/businesses")]
     public async Task<IActionResult> GetBySubcategory(int subcategoryId)
     {
