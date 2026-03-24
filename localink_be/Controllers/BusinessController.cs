@@ -61,9 +61,13 @@ public class BusinessController : ControllerBase
 
     // PUT: api/business/{id}
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateBusiness(long id, [FromBody] Business updated)
+    public async Task<IActionResult> UpdateBusiness(long id, [FromBody] UpdateBusinessDto dto)
     {
-        var result = await _service.UpdateBusinessAsync(id, updated);
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var result = await _service.UpdateBusinessAsync(id, dto);
+
         if (result == null)
             return NotFound();
 

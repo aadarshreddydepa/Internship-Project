@@ -35,7 +35,7 @@ export class ClientDashboardComponent implements OnInit {
   isLoading = true;
   fullName: string = '';
 
-  // ✅ CATEGORY DATA (YOUR JSON)
+  //  CATEGORY DATA (YOUR JSON)
   categoriesMap: any = {
     medical: ["Clinic","Pharmacy","Diagnostic Center","Dental Clinic","Eye Care","Physiotherapy"],
     food: ["Restaurant","Cafe","Fast Food","Catering","Bakery","Food Truck"],
