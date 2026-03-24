@@ -118,12 +118,8 @@
 
                 <option value="">Select category</option>
 
-                <option
-                  *ngFor="let cat of categories"
-                  [value]="cat.name">
-
-                  {{cat.name}}
-
+                <option *ngFor="let cat of categories" [value]="cat.id">
+                  {{cat.name | titlecase}}
                 </option>
 
               </select>
@@ -142,12 +138,8 @@
 
                 <option value="">Select subcategory</option>
 
-                <option
-                  *ngFor="let sub of subcategories"
-                  [value]="sub">
-
-                  {{sub}}
-
+                <option *ngFor="let sub of subcategories" [value]="sub.id">
+                  {{sub.name | titlecase}}
                 </option>
 
               </select>

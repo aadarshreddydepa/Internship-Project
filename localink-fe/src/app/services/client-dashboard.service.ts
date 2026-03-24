@@ -19,7 +19,7 @@ export interface BusinessDto {
 })
 export class ClientDashboardService {
 
-  private baseUrl = 'http://localhost:5138/api/v1';
+  private baseUrl = 'http://localhost:5138/api/v1/business';
 
   constructor(private http: HttpClient) {}
 
