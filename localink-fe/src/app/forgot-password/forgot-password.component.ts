@@ -86,7 +86,7 @@ export class ForgotPasswordComponent implements AfterViewInit {
           this.step = 2;
           this.isLoading = false;
         },
-        error: (err) => {
+        error: (err:any) => {
           this.message = err?.error?.message || "Email not found";
           this.isLoading = false;
         }
@@ -120,7 +120,7 @@ export class ForgotPasswordComponent implements AfterViewInit {
 
           this.startCountdown();
         },
-        error: (err) => {
+        error: (err:any) => {
           this.message = err?.error?.message || "Something went wrong";
           this.isLoading = false;
         }
