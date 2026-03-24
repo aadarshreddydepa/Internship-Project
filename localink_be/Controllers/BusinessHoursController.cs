@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[Route("api/business/{businessId}/hours")]
+[Route("api/v1/business/{businessId}/hours")]
 public class BusinessHoursController : ControllerBase
 {
     private readonly IHoursService _hoursService;

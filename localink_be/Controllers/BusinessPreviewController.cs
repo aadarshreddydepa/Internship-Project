@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 [ApiController]
-[Route("api/business/{businessId}/preview")]
+[Route("api/v1/business/{businessId}/preview")]
 public class BusinessPreviewController : ControllerBase
 {
     private readonly AppDbContext _db;

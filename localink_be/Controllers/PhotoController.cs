@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[Route("api/business/{businessId}/photos")]
+[Route("api/v1/business/{businessId}/photos")]
 public class PhotoController : ControllerBase
 {
     private readonly IPhotoService _photoService;
@@ -28,7 +28,7 @@ public class PhotoController : ControllerBase
     }
 
     // DELETE: api/photos/{photoId}
-    [HttpDelete("~/api/photos/{photoId}")]
+    [HttpDelete("~/api/v1/photos/{photoId}")]
     public async Task<IActionResult> DeletePhoto(long photoId)
     {
         var deleted = await _photoService.DeletePhotoAsync(photoId);
