@@ -1,0 +1,33 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+[Table("admin_dashboard")]
+public class AdminDashboard
+{
+    [Key]
+    [Column("id")]
+    public long Id { get; set; }
+
+    [Column("business_id")]
+    public long BusinessId { get; set; }
+
+    [Required]
+    [MaxLength(50)]
+    [Column("status")]
+    public string Status { get; set; } = null!;
+
+    [Column("rejection_reason")]
+    public string? RejectionReason { get; set; }
+
+    [Column("action_by")]
+    public string? ActionBy { get; set; }
+
+    [Column("created_at")]
+    public DateTime CreatedAt { get; set; }
+
+    [Column("updated_at")]
+    public DateTime? UpdatedAt { get; set; }
+
+    [ForeignKey("BusinessId")]
+    public Business Business { get; set; } = null!;
+}

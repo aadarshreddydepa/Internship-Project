@@ -6,28 +6,39 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-#region 🔹 Logging
+// Add services to the container.
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
-#endregion
 
-#region 🔹 Database
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection"),
         sql => sql.EnableRetryOnFailure()
     )
 );
-#endregion
 
-#region 🔹 Dependency Injection
+
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ISubcategoryService, SubcategoryService>();
 builder.Services.AddScoped<IBusinessService, BusinessService>();
-#endregion
+builder.Services.AddScoped<IContactService, ContactService>();
+builder.Services.AddScoped<IHoursService, HoursService>();
+builder.Services.AddScoped<IPhotoService, PhotoService>();
 
-#region 🔹 JWT Authentication
+builder.Services.AddControllers();
+
+
+
+
 var key = builder.Configuration["Jwt:Key"];
 
 if (string.IsNullOrEmpty(key))
@@ -40,7 +51,7 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    // ✅ FIX: Disable HTTPS metadata in development
+    // FIX: Disable HTTPS metadata in development
     options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
     options.SaveToken = true;
 
@@ -59,17 +70,13 @@ builder.Services.AddAuthentication(options =>
         )
     };
 });
-#endregion
 
-#region 🔹 Controllers & JSON
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.PropertyNamingPolicy = null;
     });
-#endregion
 
-#region 🔹 Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -103,9 +110,7 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
-#endregion
 
-#region 🔹 CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -116,13 +121,13 @@ builder.Services.AddCors(options =>
               .AllowAnyOrigin();
     });
 });
-#endregion
+
 
 var app = builder.Build();
 
-#region 🔹 Middleware Pipeline
 
-// ✅ Global Exception Middleware FIRST
+
+// Global Exception Middleware FIRST
 app.UseMiddleware<ExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
@@ -137,6 +142,7 @@ else
 
 // Keep this only if using HTTPS in frontend
 app.UseHttpsRedirection();
+app.MapGet("/", () => "Localink API is running");
 
 // IMPORTANT ORDER
 app.UseRouting();               
@@ -147,10 +153,9 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-#endregion
 
-#region 🔹 Health Check
+
 app.MapGet("/health", () => Results.Ok("API is running"));
-#endregion
+
 
 app.Run();

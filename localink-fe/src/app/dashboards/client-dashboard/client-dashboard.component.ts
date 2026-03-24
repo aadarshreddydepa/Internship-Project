@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
+
+import { ClientDashboardService, BusinessDto } from '../../services/client-dashboard.service';
 
 interface Business {
   id: number;
@@ -31,7 +32,7 @@ export class ClientDashboardComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private http: HttpClient
+    private dashboardService: ClientDashboardService
   ) {}
 
   ngOnInit(): void {
@@ -39,25 +40,22 @@ export class ClientDashboardComponent implements OnInit {
   }
 
   fetchBusinesses() {
-    const userId = 2;
+    const userId = 1;
 
-    this.http.get<any[]>(`http://localhost:5173/api/business/user/${userId}`)
+    this.dashboardService.getBusinessesByUser(userId)
       .subscribe({
         next: (res) => {
-          console.log("API RESPONSE:", res);
 
-          
           this.setUserName(userId);
-
           this.businesses = res.map(b => ({
-            id: b.businessId,
-            businessName: b.businessName,
-            category: b.category,
-            subcategory: b.subcategory,
-            status: b.status,
+            id: b.id,
+            businessName: b.name,
+            category: b.categoryName,
+            subcategory: b.subcategoryName,
+            status: b.status ?? 'Pending',
             description: b.description,
             contact: {
-              phone: b.phone,
+              phone: b.phoneNumber,
               email: b.email,
               city: b.city
             }
@@ -72,7 +70,6 @@ export class ClientDashboardComponent implements OnInit {
       });
   }
 
-  // SAFE TEMP SOLUTION (NO API NEEDED)
   setUserName(userId: number) {
     if (userId === 1) {
       this.fullName = 'Sai Chandrasekhar';

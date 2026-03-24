@@ -11,7 +11,7 @@ public class BusinessDto
 
     public string? City { get; set; }
     public string? State { get; set; }
-
+    public string? Status {get; set;}
     public string? PrimaryImage { get; set; }
     public int SubcategoryId { get; set; }
 }
