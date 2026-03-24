@@ -13,7 +13,7 @@
   </a>
 
     <p class="category">
-    {{ business.categoryName | titlecase }} › {{ business.subcategoryName | titlecase }}
+    {{ categoryName | titlecase }} › {{ subcategoryName | titlecase }}
   </p>
 
   <!-- MAIN CARD -->
@@ -40,14 +40,13 @@
     <div class="info-section">
 
       <div class="title-row">
-        <h1>Business Name : {{ business.name }}</h1>
+        <h1>Business Name : {{ business.businessName }}</h1>
       </div>
 
       
 
       <p class="description">
         <span>Description: </span> {{ business.description || 'No description available' }}
-        reyifgeurohfljwioefhowugfohwiefjluiowehfuiwegfteshrdyfukgiygf jyf ytfyu giu y tftg ihu yfvb hiuf tvusydhofwehfoiwejhfiowehfuwgeofheifhweoifh wewhehweofoiwehfiwh fhwrhfowirhfowrhfwrhfhwrf hwr hfoiwehfoiwejpiwehfoiwehfoiwhfwehofwhehwwoih
       </p>
 
       <!-- CONTACT DETAILS (TEXT STYLE) -->
@@ -55,18 +54,18 @@
 
         <div class="row">
           <span class="label">Phone</span>
-          <span class="value">{{ business.phoneNumber || '—' }}</span>
+          <span class="value">{{ business.contact?.phoneNumber || '—' }}</span>
         </div>
 
         <div class="row">
           <span class="label">Email</span>
-          <span class="value">{{ business.email || '—' }}</span>
+          <span class="value">{{ business.contact?.email || '—' }}</span>
         </div>
 
         <div class="row">
           <span class="label">Location</span>
           <span class="value">
-            {{ business.city || 'N/A' }}, {{ business.state || '' }}
+             {{ business.contact?.city || 'N/A' }}, {{ business.contact?.state || '' }}
           </span>
         </div>
 

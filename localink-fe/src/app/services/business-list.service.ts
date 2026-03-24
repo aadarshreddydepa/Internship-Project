@@ -13,14 +13,14 @@ export class BusinessListService {
   //  GET /api/v1/subcategories/{subcategoryId}/businesses
   getBusinessesBySubcategory(subcategoryId: number) {
     return this.http.get<any[]>(
-      `${this.baseUrl}/subcategories/${subcategoryId}/businesses`
+      `${this.baseUrl}/business/subcategories/${subcategoryId}/businesses`
     );
   }
 
-  //  GET /api/v1/businesses/{id}
+  //  GET /api/v1/business/{id}
   getBusinessById(id: number) {
     return this.http.get<any>(
-      `${this.baseUrl}/businesses/${id}`
+      `${this.baseUrl}/business/${id}`
     );
   }
 }
