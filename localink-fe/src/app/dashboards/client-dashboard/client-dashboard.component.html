@@ -27,9 +27,9 @@
 
         <h3>{{ b.businessName }}</h3>
 
-        <p>{{ b.category }} - {{ b.subcategory }}</p>
+        <p>{{ b.category | titlecase}} - {{ b.subcategory | titlecase}}</p>
 
-        <span class="status">{{ b.status }}</span>
+        <span class="status">{{ b.status | titlecase}}</span>
 
         <div class="actions">
           <button class="btn-outline" (click)="viewBusiness(b.id)">
