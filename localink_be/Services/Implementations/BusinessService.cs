@@ -83,21 +83,48 @@ public class BusinessService : IBusinessService
         return business;
     }
 
-    public async Task<Business?> UpdateBusinessAsync(long id, Business updated)
-    {
-        var existing = await _db.Businesses.FindAsync(id);
-        if (existing == null) return null;
+    public async Task<object?> UpdateBusinessAsync(long id, UpdateBusinessDto dto)
+{
+    using var transaction = await _db.Database.BeginTransactionAsync();
 
-        existing.BusinessName = updated.BusinessName;
-        existing.Description = updated.Description;
-        existing.CategoryId = updated.CategoryId;
-        existing.SubcategoryId = updated.SubcategoryId;
-        existing.UpdatedAt = DateTime.UtcNow;
+    try
+    {
+        var business = await _db.Businesses.FindAsync(id);
+        if (business == null) return null;
+
+        // 🔹 Update Business Table
+        business.BusinessName = dto.BusinessName;
+        business.Description = dto.Description;
+        business.CategoryId = dto.CategoryId;
+        business.SubcategoryId = dto.SubcategoryId;
+        business.UpdatedAt = DateTime.UtcNow;
+
+        // 🔹 Update Contact Table
+        var contact = await _db.BusinessContacts
+            .FirstOrDefaultAsync(c => c.BusinessId == id);
+
+        if (contact != null)
+        {
+            contact.PhoneNumber = dto.PhoneNumber;
+            contact.Email = dto.Email;
+            contact.City = dto.City;
+        }
 
         await _db.SaveChangesAsync();
-        return existing;
-    }
+        await transaction.CommitAsync();
 
+        return new
+        {
+            success = true,
+            message = "Business updated successfully"
+        };
+    }
+    catch (Exception ex)
+    {
+        await transaction.RollbackAsync();
+        throw new Exception("Update failed", ex);
+    }
+}
     public async Task<bool> DeleteBusinessAsync(long id)
     {
         var business = await _db.Businesses.FindAsync(id);
