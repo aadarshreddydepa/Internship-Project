@@ -91,7 +91,7 @@ public class BusinessController : ControllerBase
     }
 
     // GET: api/business/v1/subcategories/{subcategoryId}/businesses
-    [HttpGet("v1/subcategories/{subcategoryId}/businesses")]
+    [HttpGet("subcategories/{subcategoryId}/businesses")]
     public async Task<IActionResult> GetBySubcategory(int subcategoryId)
     {
         var result = await _service.GetBySubcategoryAsync(subcategoryId);
