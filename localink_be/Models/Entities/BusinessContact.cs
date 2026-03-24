@@ -6,8 +6,8 @@ public class BusinessContact
     public long ContactId { get; set; }
 
     public long BusinessId { get; set; }
-
-    public string PhoneCode { get; set; } = null!;
+     [Column("phone_code")]
+    public string? PhoneCode { get; set; }
     public string PhoneNumber { get; set; } = null!;
     public string Email { get; set; } = null!;
     public string? Website { get; set; }

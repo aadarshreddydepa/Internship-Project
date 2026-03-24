@@ -6,6 +6,7 @@ public class Business
     [Key]
     public long BusinessId { get; set; }
     public long UserId { get; set; } 
+    public AdminDashboard? AdminDashboard { get; set; }
 
     public User User { get; set; } = null!; 
     public string BusinessName { get; set; } = null!;

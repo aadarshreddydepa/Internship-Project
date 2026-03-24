@@ -17,19 +17,18 @@
     <h3>Loading businesses...</h3>
   </div>
 
-  <!-- MAIN CONTENT (only after loading) -->
+  <!-- MAIN CONTENT -->
   <div *ngIf="!isLoading">
 
-    <!-- BUSINESS LIST -->
     <div *ngIf="businesses.length > 0; else emptyState" class="business-list">
 
       <div class="card" *ngFor="let b of businesses; trackBy: trackById">
 
         <h3>{{ b.businessName }}</h3>
 
-        <p>{{ b.category }} - {{ b.subcategory }}</p>
+        <p>{{ b.category | titlecase}} - {{ b.subcategory | titlecase}}</p>
 
-        <span class="status">{{ b.status }}</span>
+        <span class="status">{{ b.status | titlecase}}</span>
 
         <div class="actions">
           <button class="btn-outline" (click)="viewBusiness(b.id)">
@@ -59,7 +58,7 @@
 
   </div>
 
-  <!-- VIEW PANEL -->
+  <!-- ================= VIEW MODAL ================= -->
   <div class="view-overlay" *ngIf="selectedBusiness">
 
     <div class="view-card">
@@ -70,7 +69,6 @@
       </div>
 
       <div class="view-content">
-
         <p><strong>Category:</strong> {{ selectedBusiness.category }}</p>
         <p><strong>Subcategory:</strong> {{ selectedBusiness.subcategory }}</p>
         <p><strong>Status:</strong> {{ selectedBusiness.status }}</p>
@@ -81,14 +79,161 @@
 
         <hr>
 
-        <p><strong>Phone:</strong> {{ selectedBusiness.contact?.phone }}</p>
-        <p><strong>Email:</strong> {{ selectedBusiness.contact?.email }}</p>
-        <p><strong>City:</strong> {{ selectedBusiness.contact?.city }}</p>
-
+        <!-- FIXED: removed ?. -->
+        <p><strong>Phone:</strong> {{ selectedBusiness.contact.phone }}</p>
+        <p><strong>Email:</strong> {{ selectedBusiness.contact.email }}</p>
+        <p><strong>City:</strong> {{ selectedBusiness.contact.city }}</p>
       </div>
 
     </div>
 
   </div>
 
-</div>
+  <!-- ================= EDIT MODAL ================= -->
+ <!-- ================= EDIT MODAL ================= -->
+<div class="view-overlay" *ngIf="editingBusiness">
+
+  <div class="view-card">
+
+    <div class="view-header">
+      <h3>Edit Business</h3>
+      <button class="close-btn" (click)="cancelEdit()">✕</button>
+    </div>
+
+    <form #editForm="ngForm" class="view-content edit-form">
+
+  <!-- BUSINESS NAME -->
+  <div class="form-group">
+    <label>Business Name</label>
+    <input 
+      name="businessName"
+      [(ngModel)]="editingBusiness.businessName"
+      required
+      minlength="3"
+      maxlength="50"
+      pattern="^[a-zA-Z0-9 ]+$"
+      #bn="ngModel"
+    />
+    <small *ngIf="bn.invalid && bn.touched" class="error">
+      3-50 chars, no special characters
+    </small>
+  </div>
+
+  <!-- CATEGORY -->
+  <div class="form-group">
+    <label>Category</label>
+    <select 
+      name="category"
+      [(ngModel)]="editingBusiness.category"
+      (change)="onCategoryChange(editingBusiness.category)"
+      required
+      #cat="ngModel"
+    >
+      <option value="">Select</option>
+      <option *ngFor="let c of categoryKeys" [value]="c">
+        {{ c | titlecase }}
+      </option>
+    </select>
+    <small *ngIf="cat.invalid && cat.touched">Required</small>
+  </div>
+
+  <!-- SUBCATEGORY -->
+  <div class="form-group">
+    <label>Subcategory</label>
+    <select 
+      name="subcategory"
+      [(ngModel)]="editingBusiness.subcategory"
+      required
+      #sub="ngModel"
+    >
+      <option value="">Select</option>
+      <option *ngFor="let s of filteredSubcategories" [value]="s">
+        {{ s }}
+      </option>
+    </select>
+    <small *ngIf="sub.invalid && sub.touched">Required</small>
+  </div>
+
+  <!-- DESCRIPTION -->
+  <div class="form-group">
+    <label>Description</label>
+    <textarea 
+      name="description"
+      [(ngModel)]="editingBusiness.description"
+      required
+      minlength="10"
+      maxlength="200"
+      #desc="ngModel"
+    ></textarea>
+    <small *ngIf="desc.invalid && desc.touched">
+      10-200 characters required
+    </small>
+  </div>
+
+  <!-- PHONE -->
+  <div class="form-group">
+    <label>Phone (+Country Code)</label>
+    <input 
+      name="phone"
+      [(ngModel)]="editingBusiness.contact.phone"
+      required
+      pattern="^\\+[1-9][0-9]{10,13}$"
+      #phone="ngModel"
+    />
+    <small *ngIf="phone.invalid && phone.touched">
+      Format: +919876543210
+    </small>
+  </div>
+
+  <!-- EMAIL -->
+  <div class="form-group">
+    <label>Email</label>
+    <input 
+      name="email"
+      [(ngModel)]="editingBusiness.contact.email"
+      required
+      email
+      #email="ngModel"
+    />
+    <small *ngIf="email.invalid && email.touched">
+      Enter valid email
+    </small>
+  </div>
+
+  <!-- CITY -->
+  <div class="form-group">
+    <label>City</label>
+    <input 
+      name="city"
+      [(ngModel)]="editingBusiness.contact.city"
+      required
+      minlength="3"
+      pattern="^[a-zA-Z ]+$"
+      #city="ngModel"
+    />
+    <small *ngIf="city.invalid && city.touched">
+      Only letters, min 3 chars
+    </small>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="actions edit-actions">
+    <button 
+      type="button"
+      class="btn-primary"
+      (click)="saveEdits()"
+      [disabled]="editForm.invalid"
+    >
+      Save Edits
+    </button>
+
+    <button 
+      type="button"
+      class="btn-outline"
+      (click)="cancelEdit()"
+    >
+      Cancel
+    </button>
+  </div>
+
+</form>
