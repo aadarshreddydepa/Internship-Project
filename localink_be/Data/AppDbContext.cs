@@ -11,6 +11,9 @@ public class AppDbContext : DbContext
     public DbSet<Business> Businesses { get; set; }
     public DbSet<BusinessContact> BusinessContacts { get; set; }
     public DbSet<BusinessPhoto> BusinessPhotos { get; set; }
+
+    public DbSet<Address> Addresses { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // CATEGORY
@@ -72,7 +75,20 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<BusinessPhoto>()
             .Property(p => p.IsPrimary).HasColumnName("is_primary");
 
-        // USER
-        modelBuilder.Entity<User>().ToTable("users");
+        modelBuilder.Entity<User>(entity =>
+{
+    entity.ToTable("users");
+
+    entity.HasKey(u => u.UserId);
+
+    entity.Property(u => u.UserId).HasColumnName("user_id");
+    entity.Property(u => u.AccountType).HasColumnName("account_type");
+    entity.Property(u => u.FullName).HasColumnName("full_name");
+    entity.Property(u => u.Email).HasColumnName("email");
+    entity.Property(u => u.PhoneNumber).HasColumnName("phone_number");
+    entity.HasIndex(u => u.PhoneNumber).IsUnique();
+    entity.Property(u => u.PasswordHash).HasColumnName("password_hash");
+    entity.Property(u => u.CountryCode).HasColumnName("country_code");
+});
     }
 }
