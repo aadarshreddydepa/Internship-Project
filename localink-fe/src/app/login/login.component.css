@@ -35,17 +35,6 @@ html, body {
   transform: translateY(-20px); /* slight upward shift */
 }
 
-/* LOGO */
-.logo-container {
-  margin-bottom: 20px;
-}
-
-.logo-container img {
-  width: 200px;
-  max-width: 240px;
-  opacity: 0.95;
-  filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.4));
-}
 /* PLASMA BACKGROUND */
 .plasma-bg {
   position: absolute;
@@ -226,6 +215,33 @@ html, body {
   margin-bottom: 6px;
   font-size: 13px;
   color: #C8A97E;
+}
+/* REMOVE DEFAULT PASSWORD ICONS */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
+/* ===================================== */
+/* FIX: REMOVE DUPLICATE PASSWORD ICON */
+/* ===================================== */
+
+input[type="password"] {
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
+input[type="password"]::-webkit-credentials-auto-fill-button,
+input[type="password"]::-webkit-textfield-decoration-container,
+input[type="password"]::-webkit-caps-lock-indicator {
+  display: none !important;
+  visibility: hidden;
+  pointer-events: none;
 }
 /* WRAPPER FOR ICON */
 .input-wrapper {

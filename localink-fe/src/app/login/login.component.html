@@ -1,13 +1,10 @@
 <div class="login-wrapper">
-  <!-- LEFT -->
+
   <div class="login-left">
     <div class="plasma-bg"></div>
     <div class="particles"></div>
     <canvas class="lines-canvas"></canvas>
     <div class="cursor-glow"></div>
-    <div class="logo-container">
-    <img src="assets/remove_bg.png" alt="LocaLink Logo" />
-  </div>
 
     <div class="left-content">
       <h1>Welcome Back</h1>
@@ -15,11 +12,9 @@
     </div>
   </div>
 
-  <!-- RIGHT -->
   <div class="login-right">
     <div class="login-card" id="loginCard">
 
-      <!-- LOGIN -->
       <ng-container *ngIf="currentView === 'login'">
 
         <h1 class="logo">LocaLink</h1>
@@ -27,7 +22,6 @@
 
         <form [formGroup]="loginForm" (ngSubmit)="login()">
 
-          <!-- EMAIL -->
           <div class="input-group">
             <label>Email</label>
             <input type="email"
@@ -39,7 +33,6 @@
             </div>
           </div>
 
-          <!-- PASSWORD -->
           <div class="input-group">
             <label>Password</label>
 
@@ -59,19 +52,16 @@
             </div>
           </div>
 
-          <!-- SERVER ERROR -->
           <div class="server-error" *ngIf="errorMessage">
             {{ errorMessage }}
           </div>
 
-          <!-- BUTTON -->
           <button type="submit"
             [disabled]="isLoading || loginForm.invalid"
             class="btn-login">
             Sign In
           </button>
 
-          <!-- FOOTER -->
           <div class="form-footer">
             <a (click)="goToForgotPassword()" class="link highlight">
               Forgot Password
@@ -87,7 +77,6 @@
         </form>
       </ng-container>
 
-      <!-- FORGOT PASSWORD -->
       <ng-container *ngIf="currentView === 'forgot'">
         <app-forgot-password (backToLogin)="backToLogin()"></app-forgot-password>
       </ng-container>

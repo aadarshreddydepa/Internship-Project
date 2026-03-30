@@ -1,4 +1,6 @@
 import { Component, AfterViewInit } from '@angular/core';
+import { Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import {
   FormBuilder,
   Validators,
@@ -28,14 +30,14 @@ export class LoginComponent implements AfterViewInit {
   isLoading = false;
   errorMessage = "";
 
-  // 🔥 VIEW STATE
   currentView: 'login' | 'forgot' = 'login';
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private tokenService: TokenService,
-    private router: Router
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.initializeForm();
 
@@ -66,9 +68,9 @@ export class LoginComponent implements AfterViewInit {
     return this.loginForm.controls;
   }
 
-togglePassword() {
-  this.showPassword = !this.showPassword;
-}
+  togglePassword() {
+    this.showPassword = !this.showPassword;
+  }
 
   isInvalid(field: string): boolean {
     const control = this.f[field];
@@ -89,67 +91,72 @@ togglePassword() {
   }
 
   login() {
-  try {
-    this.submitted = true;
-    this.errorMessage = '';
+    try {
+      this.submitted = true;
+      this.errorMessage = '';
 
-    if (this.loginForm.invalid) {
-      const firstInvalid = document.querySelector('.invalid') as HTMLElement;
-      firstInvalid?.focus();
-      return;
+      if (isPlatformBrowser(this.platformId)) {
+        const firstInvalid = document.querySelector('.invalid') as HTMLElement;
+        firstInvalid?.focus();
+      }
+
+      // ✅ critical guard
+      if (this.loginForm.invalid || this.isLoading) return;
+
+      this.isLoading = true;
+
+      const payload = {
+        usernameOrEmail: this.loginForm.value.usernameOrEmail.trim().toLowerCase(),
+        password: this.loginForm.value.password
+      };
+
+      this.authService.login(payload).subscribe({
+        next: (res: any) => {
+          try {
+            this.tokenService.setToken(res.token);
+            this.tokenService.setUser(res.name);
+
+            const role = (res?.userType || '').toLowerCase();
+
+            if (role === 'client') {
+              this.router.navigate(['/client-dashboard']);
+            } else {
+              this.router.navigate(['/user-dashboard']);
+            }
+          } catch {
+            this.errorMessage = 'Something went wrong after login';
+          }
+        },
+        error: (err: any) => {
+          this.handleError(err);
+        },
+        complete: () => {
+          this.isLoading = false;
+        }
+      });
+
+    } catch {
+      this.errorMessage = "Unexpected error occurred";
+      this.isLoading = false;
+    }
+  }
+
+  handleError(err: any) {
+    if (err.status === 401) {
+      this.errorMessage = 'Invalid email or password';
+    } else if (err.status === 0) {
+      this.errorMessage = 'Network error. Try again';
+    } else {
+      this.errorMessage = 'Login failed. Try again';
     }
 
-    this.isLoading = true;
-
-    const payload = {
-      usernameOrEmail: this.loginForm.value.usernameOrEmail.trim().toLowerCase(),
-      password: this.loginForm.value.password
-    };
-
-    this.authService.login(payload).subscribe({
-      next: (res) => {
-        try {
-          this.tokenService.setToken(res.token);
-
-          const role = (res?.userType || '').toLowerCase();
-
-          if (role === 'client') {
-            this.router.navigate(['/client-dashboard']);
-          } else {
-            this.router.navigate(['/user-dashboard']);
-          }
-        } catch (err) {
-          this.errorMessage = 'Something went wrong after login';
-        }
-      },
-      error: (err) => {
-        this.handleError(err);
-      },
-      complete: () => {
-        this.isLoading = false;
-      }
-    });
-
-  } catch (error) {
-    this.errorMessage = "Unexpected error occurred";
     this.isLoading = false;
+    this.triggerErrorAnimation();
   }
-}
-
-handleError(err: any) {
-  if (err.status === 401) {
-    this.errorMessage = 'Invalid email or password';
-  } else if (err.status === 0) {
-    this.errorMessage = 'Network error. Try again';
-  } else {
-    this.errorMessage = 'Login failed. Try again';
-  }
-
-  this.isLoading = false;
-  this.triggerErrorAnimation();
-}
 
   triggerErrorAnimation() {
+    if (!isPlatformBrowser(this.platformId)) return;
+
     const card = document.getElementById('loginCard');
     if (!card) return;
 
@@ -157,7 +164,6 @@ handleError(err: any) {
     setTimeout(() => card.classList.remove('shake'), 400);
   }
 
-  // 🔥 VIEW SWITCH
   goToForgotPassword() {
     this.currentView = 'forgot';
   }
@@ -167,67 +173,64 @@ handleError(err: any) {
   }
 
   ngAfterViewInit() {
+    if (!isPlatformBrowser(this.platformId)) return;
 
-  /* CURSOR GLOW */
-  const glow = document.querySelector('.cursor-glow') as HTMLElement;
+    const glow = document.querySelector('.cursor-glow') as HTMLElement;
 
-  document.addEventListener('mousemove', (e) => {
-    if (glow) {
-      glow.style.left = e.clientX + 'px';
-      glow.style.top = e.clientY + 'px';
-    }
-  });
-
-  /* CANVAS LINES */
-  const canvas = document.querySelector('.lines-canvas') as HTMLCanvasElement;
-  if (!canvas) return;
-
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
-
-  const resize = () => {
-    canvas.width = window.innerWidth / 2;
-    canvas.height = window.innerHeight;
-  };
-
-  resize();
-  window.addEventListener('resize', resize);
-
-  const points = Array.from({ length: 40 }, () => ({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height,
-    vx: (Math.random() - 0.5) * 0.4,
-    vy: (Math.random() - 0.5) * 0.4
-  }));
-
-  const draw = () => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    points.forEach(p => {
-      p.x += p.vx;
-      p.y += p.vy;
-
-      if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-      if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-
-      points.forEach(p2 => {
-        const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
-
-        if (dist < 130) {
-          ctx.strokeStyle = `rgba(200,169,126,${1 - dist / 130})`;
-          ctx.lineWidth = 1;
-
-          ctx.beginPath();
-          ctx.moveTo(p.x, p.y);
-          ctx.lineTo(p2.x, p2.y);
-          ctx.stroke();
-        }
-      });
+    document.addEventListener('mousemove', (e) => {
+      if (glow) {
+        glow.style.left = e.clientX + 'px';
+        glow.style.top = e.clientY + 'px';
+      }
     });
 
-    requestAnimationFrame(draw);
-  };
+    const canvas = document.querySelector('.lines-canvas') as HTMLCanvasElement;
+    if (!canvas) return;
 
-  draw();
-}
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const resize = () => {
+      canvas.width = window.innerWidth / 2;
+      canvas.height = window.innerHeight;
+    };
+
+    resize();
+    window.addEventListener('resize', resize);
+
+    const points = Array.from({ length: 40 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4
+    }));
+
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      points.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+        points.forEach(p2 => {
+          const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+
+          if (dist < 130) {
+            ctx.strokeStyle = `rgba(200,169,126,${1 - dist / 130})`;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+          }
+        });
+      });
+
+      requestAnimationFrame(draw);
+    };
+
+    draw();
+  }
 }

@@ -11,8 +11,6 @@ public class BusinessController : ControllerBase
         _service = service;
     }
 
-    // 1 (Core CRUD)
-    // GET: api/business
     [HttpGet]
     public async Task<IActionResult> GetAllBusinesses()
     {
@@ -20,7 +18,6 @@ public class BusinessController : ControllerBase
         return Ok(businesses);
     }
 
-    // GET: api/business/{id}
     [HttpGet("{id}")]
     public async Task<IActionResult> GetBusinessById(long id)
     {
@@ -31,7 +28,6 @@ public class BusinessController : ControllerBase
         return Ok(business);
     }
 
-    // POST: api/business/register
     [HttpPost("register")]
     public async Task<IActionResult> RegisterBusiness([FromBody] RegisterBusinessDto dto)
     {
@@ -59,7 +55,6 @@ public class BusinessController : ControllerBase
         }
     }
 
-    // PUT: api/business/{id}
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateBusiness(long id, [FromBody] Business updated)
     {
@@ -70,7 +65,6 @@ public class BusinessController : ControllerBase
         return Ok(result);
     }
 
-    // DELETE: api/business/{id}
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteBusiness(long id)
     {
@@ -81,8 +75,6 @@ public class BusinessController : ControllerBase
         return NoContent();
     }
 
-    // FROM FILE 2 (Additional APIs)
-    // GET: api/business/v1/user/{userId}
     [HttpGet("user/{userId}")]
     public async Task<IActionResult> GetBusinessesByUser(long userId)
     {
@@ -90,7 +82,6 @@ public class BusinessController : ControllerBase
         return Ok(data);
     }
 
-    // GET: api/business/v1/subcategories/{subcategoryId}/businesses
     [HttpGet("subcategories/{subcategoryId}/businesses")]
     public async Task<IActionResult> GetBySubcategory(int subcategoryId)
     {
@@ -98,11 +89,18 @@ public class BusinessController : ControllerBase
         return Ok(result);
     }
 
-    // GET: api/business/v1/businesses/{id}
     [HttpGet("v1/businesses/{id}")]
     public async Task<IActionResult> GetById(long id)
     {
         var result = await _service.GetByIdAsync(id);
         return Ok(result);
+    }
+
+    [HttpGet("search")]
+    public async Task<IActionResult> SearchBusinesses([FromQuery] string query)
+    {
+          var results = await _service.SearchBusinessesAsync(query);
+            return Ok(results);
+       
     }
 }

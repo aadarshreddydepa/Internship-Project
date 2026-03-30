@@ -41,8 +41,17 @@ subcategoryId!: number;
       this.route.snapshot.queryParamMap.get('categoryId')
     );
     this.businessService.getBusinessById(id).subscribe({
-      next: (data) => {
-        this.business = data;
+      next: (data: any) => {
+
+        const primaryPhoto = data.photos?.find((p: any) => p.isPrimary);
+
+        this.business = {
+          ...data,
+          primaryImage: primaryPhoto
+            ? 'http://localhost:5138' + primaryPhoto.imageUrl
+            : null
+        };
+
       }
     });
   }

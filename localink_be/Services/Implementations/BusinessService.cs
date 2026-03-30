@@ -18,9 +18,7 @@ public class BusinessService : IBusinessService
         _photoService = photoService;
     }
 
-    // =========================
-    // CRUD
-    // =========================
+ 
     public async Task<List<object>> GetAllBusinessesAsync()
     {
         return await _db.Businesses
@@ -31,6 +29,12 @@ public class BusinessService : IBusinessService
                 b.Description,
                 b.CategoryId,
                 b.SubcategoryId,
+                CategoryName = b.Category.CategoryName,
+                SubcategoryName = b.Subcategory.SubcategoryName,
+                PrimaryImage = _db.BusinessPhotos
+                    .Where(p => p.BusinessId == b.BusinessId && p.IsPrimary)
+                    .Select(p => p.ImageUrl)
+                    .FirstOrDefault(),
                 b.CreatedAt
             })
             .ToListAsync<object>();
@@ -108,71 +112,75 @@ public class BusinessService : IBusinessService
         return true;
     }
 
-    // =========================
-    // Registration
-    // =========================
     public async Task<long> RegisterBusinessAsync(RegisterBusinessDto dto)
-{
-    using var transaction = await _db.Database.BeginTransactionAsync();
-
-    try
     {
-        // Validate Category
-        var category = await _db.Categories.FindAsync(dto.CategoryId);
-        if (category == null)
-            throw new Exception("Invalid category");
+        using var transaction = await _db.Database.BeginTransactionAsync();
 
-        // Validate Subcategory
-        var subcategory = await _db.Subcategories
-            .FirstOrDefaultAsync(s => s.SubcategoryId == dto.SubcategoryId &&
-                                      s.CategoryId == dto.CategoryId);
-
-        if (subcategory == null)
-            throw new Exception("Invalid subcategory");
-
-        // Create Business
-        var business = new Business
+        try
         {
-            BusinessName = dto.BusinessName,
-            Description = dto.Description,
-            CategoryId = dto.CategoryId,
-            SubcategoryId = dto.SubcategoryId,
-            UserId = dto.UserId, // FIXED
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
+            // Validate Category
+            var category = await _db.Categories.FindAsync(dto.CategoryId);
+            if (category == null)
+                throw new Exception("Invalid category");
 
-        _db.Businesses.Add(business);
-        await _db.SaveChangesAsync();
+            // Validate Subcategory
+            var subcategory = await _db.Subcategories
+                .FirstOrDefaultAsync(s => s.SubcategoryId == dto.SubcategoryId &&
+                                        s.CategoryId == dto.CategoryId);
 
-        // CONTACT
-        await _contactService.AddContactAsync(dto, business.BusinessId);
+            if (subcategory == null)
+                throw new Exception("Invalid subcategory");
 
-        // HOURS
-        await _hoursService.AddHoursAsync(dto.Hours, business.BusinessId);
+            // Create Business
+            var business = new Business
+            {
+                BusinessName = dto.BusinessName,
+                Description = dto.Description,
+                CategoryId = dto.CategoryId,
+                SubcategoryId = dto.SubcategoryId,
+                UserId = dto.UserId, // FIXED
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
 
-        //  PHOTO
-        if (!string.IsNullOrWhiteSpace(dto.Photo))
-        {
-            if (dto.Photo.Length > 5_000_000) // ~5MB limit
-                throw new Exception("Image too large");
+            _db.Businesses.Add(business);
+            await _db.SaveChangesAsync();
 
-            await _photoService.SavePhotoAsync(dto.Photo, business.BusinessId);
+            // CONTACT
+            await _contactService.AddContactAsync(dto, business.BusinessId);
+
+            // HOURS
+            await _hoursService.AddHoursAsync(dto.Hours, business.BusinessId);
+
+            //  PHOTO
+            if (!string.IsNullOrWhiteSpace(dto.Photo))
+            {
+                if (dto.Photo.Length > 5_000_000) // ~5MB limit
+                    throw new Exception("Image too large");
+
+                await _photoService.SavePhotoAsync(dto.Photo, business.BusinessId);
+            }
+
+            await _db.AdminDashboards.AddAsync(new AdminDashboard
+            {
+                BusinessId = business.BusinessId,
+                Status = BusinessStatus.Pending,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            });
+
+await _db.SaveChangesAsync();
+
+            await transaction.CommitAsync();
+            return business.BusinessId;
         }
-
-        await transaction.CommitAsync();
-        return business.BusinessId;
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
-    catch
-    {
-        await transaction.RollbackAsync();
-        throw;
-    }
-}
 
-    // =========================
-    // Preview
-    // =========================
     public async Task<object?> GetBusinessPreviewAsync(long businessId)
     {
         var business = await _db.Businesses.FirstOrDefaultAsync(b => b.BusinessId == businessId);
@@ -236,9 +244,6 @@ public class BusinessService : IBusinessService
         };
     }
 
-    // =========================
-    // ADDITIONAL (FROM FILE 2)
-    // =========================
 
     public async Task<List<BusinessDto>> GetBusinessesByUserAsync(long userId)
     {
@@ -275,7 +280,7 @@ public class BusinessService : IBusinessService
 
                     Status = _db.AdminDashboards
                         .Where(a => a.BusinessId == b.BusinessId)
-                        .Select(a => a.Status)
+                        .Select(a => a.Status.ToString())
                         .FirstOrDefault()
                 })
                 .ToListAsync();
@@ -391,5 +396,67 @@ public class BusinessService : IBusinessService
         {
             throw new Exception($"Error fetching business with Id {id}", ex);
         }
+    }
+    
+    public async Task<List<BusinessDto>> SearchBusinessesAsync(string query)
+    {
+        if (string.IsNullOrWhiteSpace(query))
+            return new List<BusinessDto>();
+
+        query = query.Trim();
+
+        var businesses = await _db.Businesses
+            .AsNoTracking()
+            .Where(b =>
+                (
+                     EF.Functions.Like(b.BusinessName, $"%{query}%") ||
+                    (b.Description != null && EF.Functions.Like(b.Description, $"%{query}%")) ||
+                    (b.Category != null && EF.Functions.Like(b.Category.CategoryName, $"%{query}%")) ||
+                    (b.Subcategory != null && EF.Functions.Like(b.Subcategory.SubcategoryName, $"%{query}%"))
+                )
+            )
+
+            .Select(b => new BusinessDto
+            {
+                Id = b.BusinessId,
+                Name = b.BusinessName,
+                Description = b.Description,
+
+                CategoryName = b.Category != null ? b.Category.CategoryName : "",
+                SubcategoryName = b.Subcategory != null ? b.Subcategory.SubcategoryName : "",
+
+                SubcategoryId = b.SubcategoryId,
+                PhoneNumber = _db.BusinessContacts
+                    .Where(c => c.BusinessId == b.BusinessId)
+                    .Select(c => c.PhoneNumber)
+                    .FirstOrDefault(),
+
+                Email = _db.BusinessContacts
+                    .Where(c => c.BusinessId == b.BusinessId)
+                    .Select(c => c.Email)
+                    .FirstOrDefault(),
+
+                City = _db.BusinessContacts
+                    .Where(c => c.BusinessId == b.BusinessId)
+                    .Select(c => c.City)
+                    .FirstOrDefault(),
+
+                State = _db.BusinessContacts
+                    .Where(c => c.BusinessId == b.BusinessId)
+                    .Select(c => c.State)
+                    .FirstOrDefault(),
+                Status = _db.AdminDashboards
+                    .Where(a => a.BusinessId == b.BusinessId)
+                    .Select(a => a.Status.ToString())
+                    .FirstOrDefault(),
+                PrimaryImage = _db.BusinessPhotos
+                    .Where(p => p.BusinessId == b.BusinessId && p.IsPrimary)
+                    .Select(p => p.ImageUrl)
+                    .FirstOrDefault()
+            })
+            .Take(10)
+            .ToListAsync();
+
+        return businesses;
     }
 }

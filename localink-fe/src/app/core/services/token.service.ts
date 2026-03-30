@@ -12,8 +12,26 @@ export class TokenService {
   getToken() {
     return localStorage.getItem('token');
   }
+  setUser(name: string) {
+  localStorage.setItem('username', name);
+}
+
+getUser() {
+  return localStorage.getItem('username');
+}
 
   logout() {
     localStorage.removeItem('token');
   }
+  setRefreshToken(token: string) {
+  localStorage.setItem('refreshToken', token);
+}
+
+getRefreshToken(): string | null {
+  return localStorage.getItem('refreshToken');
+}
+
+clear() {
+  localStorage.clear();
+}
 }

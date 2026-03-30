@@ -1,213 +1,48 @@
-<div class="profile-wrapper">
+<div *ngIf="user" class="profile-container">
 
-<div class="profile-card">
+  <h2 class="title">Account Details</h2>
 
-<h2>Account Details</h2>
+  <div class="info-block">
 
-<!-- USERNAME -->
+    <!-- USERNAME -->
+    <div class="info-row">
+      <span>Username</span>
+      <p>{{ user.fullName }}</p>
+    </div>
 
-<div class="info-row">
-<span>Username</span>
+    <!-- EMAIL -->
+    <div class="info-row">
+      <span>Email</span>
+      <p>{{ user.email }}</p>
+    </div>
 
-<p *ngIf="!editMode">{{user.username}}</p>
+    <!-- ADDRESS -->
+    <div class="info-row">
+      <span>Address</span>
+      <div class="address">
+        <p>{{ user.address.street }}, {{ user.address.city }}</p>
+        <p>{{ user.address.state }}  - {{ user.address.pincode }}</p>
+        <p>{{ user.address.country }}</p>
+      </div>
+    </div>
 
-<input
-*ngIf="editMode"
-[(ngModel)]="user.username"
-/>
+    <!-- PHONE -->
+    <div class="info-row">
+      <span>Phone</span>
+      <p>{{ user.phone }}</p>
+    </div>
 
-</div>
-
-
-<!-- EMAIL -->
-
-<div class="info-row">
-<span>Email</span>
-
-<p *ngIf="!editMode">{{user.email}}</p>
-
-<input
-*ngIf="editMode"
-type="email"
-[(ngModel)]="user.email"
-(input)="validateEmail()"
-[class.invalid]="emailInvalid"
-/>
-
-<p class="error" *ngIf="emailInvalid">
-Email must start with a letter or number and follow the format example&#64;domain.com
-</p>
-
-</div>
-
-
-<!-- ADDRESS -->
-
-<div class="info-row">
-
-<span>Address</span>
-
-<!-- VIEW MODE -->
-
-<div *ngIf="!editMode">
-
-<p>{{user.address.street}}</p>
-<p>{{user.address.city}}, {{user.address.state}}</p>
-<p>{{user.address.country}} - {{user.address.pincode}}</p>
-
-</div>
-
-
-<!-- EDIT MODE -->
-
-<div class="address-grid" *ngIf="editMode">
-
-  <!-- Country -->
-  <div>
-    <label>Country</label>
-    <select [(ngModel)]="user.address.country" (change)="onCountryChange()">
-      <option *ngFor="let country of countries" [value]="country">
-        {{country}}
-      </option>
-    </select>
   </div>
 
-  <!-- State -->
-  <div>
-    <label>State</label>
-    <select [(ngModel)]="user.address.state">
-      <option *ngFor="let state of states" [value]="state">
-        {{state}}
-      </option>
-    </select>
-  </div>
-
-  <!-- Street Address (FULL WIDTH) -->
-  <div class="full-width">
-    <label>Street Address</label>
-    <input [(ngModel)]="user.address.street">
-  </div>
-
-  <!-- City -->
-  <div>
-    <label>City</label>
-    <input [(ngModel)]="user.address.city">
-  </div>
-
-  <!-- Pincode -->
-  <div>
-    <label>Pincode</label>
-    <input 
-      [(ngModel)]="user.address.pincode"
-      [maxlength]="pincodeConfig[user.address.country]?.length"
-      (input)="validatePincode()"
-      (keypress)="allowOnlyNumbers($event)"
-      class="phone-input"
-      [class.invalid]="pincodeInvalid"
-    >
+  <div class="actions">
+    <button class="primary-btn">
+      Edit Profile
+    </button>
   </div>
 
 </div>
 
-<!-- PINCODE ERROR -->
-<p class="error" *ngIf="pincodeInvalid">
-  Pincode must be {{pincodeConfig[user.address.country]?.length}} digits
-</p>
-
-</div>
-
-
-<!-- PHONE -->
-
-<div class="info-row">
-
-<span>Phone</span>
-
-<!-- VIEW MODE -->
-
-<p *ngIf="!editMode">
-{{phoneCode}} {{user.phone}}
-</p>
-
-<!-- EDIT MODE -->
-
-<div class="phone-field" *ngIf="editMode">
-
-<select
-[(ngModel)]="user.address.country"
-(change)="onCountryChange()"
-class="country-code">
-
-<option *ngFor="let country of countries" [value]="country">
-{{country}} ({{countryPhoneConfig[country].code}})
-</option>
-
-</select>
-
-<input
-type="tel"
-[(ngModel)]="user.phone"
-inputmode="numeric"
-placeholder="Enter phone number"
-[maxlength]="phoneMaxLength"
-(input)="validatePhone()"
-(keypress)="allowOnlyNumbers($event)"
-class="phone-input"
-[class.invalid]="phoneInvalid"
-/>
-
-</div>
-
-<p class="error" *ngIf="phoneInvalid">
-Phone number must be {{phoneMaxLength}} digits
-</p>
-
-</div>
-
-
-<!-- BUTTONS -->
-
-<div class="profile-buttons">
-
-<!-- VIEW MODE -->
-
-<button
-class="edit-btn"
-*ngIf="!editMode"
-(click)="enableEdit()">
-Edit Profile
-</button>
-
-<!-- EDIT MODE -->
-
-<button
-class="save-btn"
-*ngIf="editMode"
-(click)="saveProfile()"
-[disabled]="
-  phoneInvalid ||
-  emailInvalid ||
-  pincodeInvalid ||
-  !user.username ||
-  !user.email ||
-  !user.phone ||
-  !user.address.country ||
-  !user.address.state ||
-  !user.address.street ||
-  !user.address.city ||
-  !user.address.pincode
-">
-Save
-</button>
-
-<button
-class="change-password-btn"
-*ngIf="editMode"
-(click)="openPasswordForm()">
-Change Password
-</button>
-
-</div>
-
-</div>
+<!-- LOADING -->
+<div *ngIf="!user" class="loading">
+  Loading profile...
 </div>

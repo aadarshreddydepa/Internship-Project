@@ -1,0 +1,251 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+
+public class AuthService : IAuthService
+{
+    private readonly AppDbContext _context;
+    private readonly IConfiguration _config;
+    private readonly IEmailService _emailService;
+
+    public AuthService(
+        AppDbContext context,
+        IConfiguration config,
+        IEmailService emailService)
+    {
+        _context = context;
+        _config = config;
+        _emailService = emailService;
+    }
+
+    // REGISTER
+    public async Task<string> RegisterAsync(RegisterRequest request)
+    {
+        var email = request.Email?.Trim().ToLower();
+
+        if (string.IsNullOrWhiteSpace(email))
+            throw new ArgumentException("Invalid request");
+
+        if (string.IsNullOrWhiteSpace(request.Password) || request.Password.Length < 8)
+            throw new ArgumentException("Invalid request");
+
+        using var transaction = await _context.Database.BeginTransactionAsync();
+
+        User user;
+
+        try
+        {
+            var emailExists = await _context.Users.AnyAsync(u => u.Email == email);
+            if (emailExists)
+                throw new InvalidOperationException("Invalid request");
+
+            var phoneExists = await _context.Users.AnyAsync(u => u.PhoneNumber == request.Phone);
+            if (phoneExists)
+                throw new InvalidOperationException("Invalid request");
+
+            user = new User
+            {
+                AccountType = request.UserType?.Trim().ToLower() ?? "user",
+                FullName = request.Name,
+                Email = email,
+                PhoneNumber = request.Phone,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password, 12),
+                CountryCode = request.CountryCode
+            };
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            var address = new Address
+            {
+                UserId = user.UserId,
+                Country = request.Country,
+                State = request.State,
+                City = request.City,
+                StreetAddress = request.Street,
+                Pincode = request.Pincode
+            };
+
+            _context.Addresses.Add(address);
+            await _context.SaveChangesAsync();
+
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+
+        try
+        {
+            await _emailService.SendWelcomeEmailAsync(user.Email, user.FullName);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Email failed: {ex.Message}");
+        }
+
+        return "User registered successfully";
+    }
+    public async Task<string> VerifyEmailAsync(string email)
+{
+    if (string.IsNullOrWhiteSpace(email))
+        throw new ArgumentException("Invalid request");
+
+    var exists = await _context.Users
+        .AnyAsync(u => u.Email == email.Trim().ToLower());
+
+    return exists ? "Email exists" : "Invalid request";
+}
+public async Task<string> ResetPasswordAsync(ForgotPasswordRequest request)
+{
+    var email = request.Email.Trim().ToLower();
+
+    var user = await _context.Users
+        .FirstOrDefaultAsync(u => u.Email == email);
+
+    if (user == null)
+        throw new UnauthorizedAccessException("Invalid request");
+
+    user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword, 12);
+
+    await _context.SaveChangesAsync();
+
+    return "Password updated successfully";
+}
+
+    // LOGIN (WITH CAPTCHA)
+    public async Task<object> LoginAsync(LoginRequest request)
+    {
+
+        if (string.IsNullOrWhiteSpace(request.UsernameOrEmail) ||
+            string.IsNullOrWhiteSpace(request.Password))
+            throw new UnauthorizedAccessException("Invalid credentials");
+
+        var email = request.UsernameOrEmail.Trim().ToLower();
+
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Email == email);
+
+        if (user == null ||
+            !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+            throw new UnauthorizedAccessException("Invalid credentials");
+
+        var token = GenerateJwtToken(user);
+
+        return new
+        {
+            token,
+            userType = user.AccountType,
+            name = user.FullName
+        };
+    }
+
+    // SEND OTP
+    public async Task<string> SendResetOtpAsync(string email)
+    {
+        var normalizedEmail = email.Trim().ToLower();
+
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Email == normalizedEmail);
+
+        if (user == null)
+            return "If the email exists, an OTP has been sent";
+
+        if (user.OtpExpiry != null && user.OtpExpiry > DateTime.UtcNow.AddMinutes(-1))
+            throw new InvalidOperationException("Please wait before requesting another OTP");
+
+        var otp = GenerateOtp();
+
+        user.PasswordResetOtp = otp;
+        user.OtpExpiry = DateTime.UtcNow.AddMinutes(10);
+        user.OtpAttempts = 0;
+
+        await _context.SaveChangesAsync();
+
+        try
+        {
+            await _emailService.SendOtpEmailAsync(user.Email, otp);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Email failed: " + ex.Message);
+        }
+
+        return "If the email exists, an OTP has been sent";
+    }
+
+    // VERIFY OTP + RESET PASSWORD
+    public async Task<string> VerifyOtpAndResetPasswordAsync(string email, string otp, string newPassword)
+    {
+        var normalizedEmail = email.Trim().ToLower();
+
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Email == normalizedEmail);
+
+        if (user == null)
+            throw new UnauthorizedAccessException("Invalid request");
+
+        if (user.OtpAttempts >= 5)
+            throw new UnauthorizedAccessException("Too many attempts. Request new OTP");
+
+        if (user.PasswordResetOtp != otp)
+        {
+            user.OtpAttempts += 1;
+            await _context.SaveChangesAsync();
+            throw new UnauthorizedAccessException("Invalid OTP");
+        }
+
+        if (user.OtpExpiry < DateTime.UtcNow)
+            throw new UnauthorizedAccessException("OTP expired");
+
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword, 12);
+
+        user.OtpAttempts = 0;
+        user.PasswordResetOtp = null;
+        user.OtpExpiry = null;
+
+        await _context.SaveChangesAsync();
+
+        return "Password reset successful";
+    }
+
+
+    private string GenerateOtp()
+    {
+        var bytes = new byte[4];
+        using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
+        rng.GetBytes(bytes);
+
+        int number = BitConverter.ToInt32(bytes, 0) & 0x7fffffff;
+
+        return (number % 900000 + 100000).ToString();
+    }
+
+    private string GenerateJwtToken(User user)
+    {
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        var claims = new[]
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.Role, user.AccountType ?? "user"),
+            new Claim(ClaimTypes.Name, user.FullName ?? "")
+        };
+
+        var token = new JwtSecurityToken(
+            issuer: _config["Jwt:Issuer"],
+            audience: _config["Jwt:Audience"],
+            claims: claims,
+            expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(_config["Jwt:ExpiryMinutes"])),
+            signingCredentials: creds
+        );
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+}

@@ -11,7 +11,6 @@ public class BusinessHoursController : ControllerBase
         _hoursService = hoursService;
     }
 
-    // POST: api/business/{businessId}/hours
     [HttpPost]
     public async Task<IActionResult> CreateOrReplaceBusinessHours(long businessId, [FromBody] BusinessHoursDto dto)
     {
@@ -19,7 +18,6 @@ public class BusinessHoursController : ControllerBase
         return Ok(result);
     }
 
-    // GET: api/business/{businessId}/hours
     [HttpGet]
     public async Task<IActionResult> GetBusinessHours(long businessId)
     {

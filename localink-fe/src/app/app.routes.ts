@@ -13,6 +13,7 @@ import { RegisterBusinessComponent } from './register-business/register-business
 import { UserDashboardComponent } from './dashboards/user-dashboard/user-dashboard.component';
 import { EditBusinessBusinessComponent } from './edit-business/edit-business.component';
 import { BusinessDetailComponent } from './pages/business-detail/business-detail.component';
+import { AdminDashboardComponent } from './dashboards/admin-dashboard/admin-dashboard.component';
 
 
 export const routes: Routes = [
@@ -72,6 +73,10 @@ export const routes: Routes = [
   { 
     path: 'business/:id', 
     component: BusinessDetailComponent 
+  },
+  {
+    path: 'admin-dashboard',
+    component : AdminDashboardComponent
   },
   {
     path: '**',

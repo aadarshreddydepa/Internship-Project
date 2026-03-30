@@ -38,28 +38,29 @@ export class ForgotPasswordComponent implements AfterViewInit {
     });
 
     this.resetForm = this.fb.group({
-  password: ['', [
-    Validators.required,
-    Validators.minLength(8),
-    Validators.maxLength(50),
-    Validators.pattern('^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$'),
-    Validators.pattern('^\\S(.*\\S)?$')
-  ]],
-  confirmPassword: ['', Validators.required]
-}, { validators: this.passwordMatchValidator });
+      otp: ['', [Validators.required]],
+      password: ['', [
+        Validators.required,
+        Validators.minLength(8),
+        Validators.maxLength(50),
+        Validators.pattern('^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$'),
+        Validators.pattern('^\\S(.*\\S)?$')
+      ]],
+      confirmPassword: ['', Validators.required]
+    }, { validators: this.passwordMatchValidator });
 
     this.emailForm.valueChanges.subscribe(() => this.message = '');
     this.resetForm.valueChanges.subscribe(() => this.message = '');
   }
 
   passwordMatchValidator(form: FormGroup) {
-  const password = form.get('password')?.value;
-  const confirmPassword = form.get('confirmPassword')?.value;
+    const password = form.get('password')?.value;
+    const confirmPassword = form.get('confirmPassword')?.value;
 
-  if (!confirmPassword) return null;
+    if (!confirmPassword) return null;
 
-  return password === confirmPassword ? null : { mismatch: true };
-}
+    return password === confirmPassword ? null : { mismatch: true };
+  }
 
   togglePassword() {
     this.showPassword = !this.showPassword;
@@ -69,8 +70,8 @@ export class ForgotPasswordComponent implements AfterViewInit {
     this.showConfirmPassword = !this.showConfirmPassword;
   }
 
-  // STEP 1
-  async verifyEmail() {
+  // STEP 1 → SEND OTP
+  verifyEmail() {
     try {
       this.submitted = true;
 
@@ -81,13 +82,15 @@ export class ForgotPasswordComponent implements AfterViewInit {
 
       this.email = this.emailForm.value.email.trim().toLowerCase();
 
-      this.authService.verifyEmail(this.email).subscribe({
+      this.authService.sendOtp({
+        email: this.email
+      }).subscribe({
         next: () => {
           this.step = 2;
           this.isLoading = false;
         },
-        error: (err) => {
-          this.message = err?.error?.message || "Email not found";
+        error: (err: any) => {
+          this.message = err?.error?.message || "Something went wrong";
           this.isLoading = false;
         }
       });
@@ -98,8 +101,8 @@ export class ForgotPasswordComponent implements AfterViewInit {
     }
   }
 
-  // STEP 2
-  async resetPassword() {
+  // STEP 2 → VERIFY OTP + RESET
+  resetPassword() {
     try {
       this.submitted = true;
 
@@ -110,6 +113,7 @@ export class ForgotPasswordComponent implements AfterViewInit {
 
       const payload = {
         email: this.email,
+        otp: this.resetForm.value.otp,
         newPassword: this.resetForm.value.password.trim()
       };
 
@@ -117,10 +121,9 @@ export class ForgotPasswordComponent implements AfterViewInit {
         next: () => {
           this.step = 3;
           this.message = "Password updated successfully";
-
           this.startCountdown();
         },
-        error: (err) => {
+        error: (err: any) => {
           this.message = err?.error?.message || "Something went wrong";
           this.isLoading = false;
         }
@@ -154,66 +157,64 @@ export class ForgotPasswordComponent implements AfterViewInit {
 
   ngAfterViewInit() {
 
-  /* CURSOR GLOW */
-  const glow = document.querySelector('.cursor-glow') as HTMLElement;
+    const glow = document.querySelector('.cursor-glow') as HTMLElement;
 
-  document.addEventListener('mousemove', (e) => {
-    if (glow) {
-      glow.style.left = e.clientX + 'px';
-      glow.style.top = e.clientY + 'px';
-    }
-  });
-
-  /* CANVAS LINES */
-  const canvas = document.querySelector('.lines-canvas') as HTMLCanvasElement;
-  if (!canvas) return;
-
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
-
-  const resize = () => {
-    canvas.width = window.innerWidth / 2;
-    canvas.height = window.innerHeight;
-  };
-
-  resize();
-  window.addEventListener('resize', resize);
-
-  const points = Array.from({ length: 40 }, () => ({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height,
-    vx: (Math.random() - 0.5) * 0.4,
-    vy: (Math.random() - 0.5) * 0.4
-  }));
-
-  const draw = () => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    points.forEach(p => {
-      p.x += p.vx;
-      p.y += p.vy;
-
-      if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-      if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-
-      points.forEach(p2 => {
-        const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
-
-        if (dist < 130) {
-          ctx.strokeStyle = `rgba(200,169,126,${1 - dist / 130})`;
-          ctx.lineWidth = 1;
-
-          ctx.beginPath();
-          ctx.moveTo(p.x, p.y);
-          ctx.lineTo(p2.x, p2.y);
-          ctx.stroke();
-        }
-      });
+    document.addEventListener('mousemove', (e) => {
+      if (glow) {
+        glow.style.left = e.clientX + 'px';
+        glow.style.top = e.clientY + 'px';
+      }
     });
 
-    requestAnimationFrame(draw);
-  };
+    const canvas = document.querySelector('.lines-canvas') as HTMLCanvasElement;
+    if (!canvas) return;
 
-  draw();
-}
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const resize = () => {
+      canvas.width = window.innerWidth / 2;
+      canvas.height = window.innerHeight;
+    };
+
+    resize();
+    window.addEventListener('resize', resize);
+
+    const points = Array.from({ length: 40 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4
+    }));
+
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      points.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+        points.forEach(p2 => {
+          const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+
+          if (dist < 130) {
+            ctx.strokeStyle = `rgba(200,169,126,${1 - dist / 130})`;
+            ctx.lineWidth = 1;
+
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+          }
+        });
+      });
+
+      requestAnimationFrame(draw);
+    };
+
+    draw();
+  }
 }
