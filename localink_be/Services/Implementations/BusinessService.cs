@@ -249,6 +249,8 @@ public class BusinessService : IBusinessService
         {
             return await _db.Businesses
                 .Where(b => b.UserId == userId)
+                .Include(b => b.Category)
+                .Include(b => b.Subcategory)
                 .Select(b => new BusinessDto
                 {
                     Id = b.BusinessId,

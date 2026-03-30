@@ -59,7 +59,7 @@
     <div class="section">
       <h3>Business Hours</h3>
       <div class="hours-row" *ngFor="let day of hoursData">
-        <span class="day">{{day.day}}</span>
+        <span class="day">{{day.dayOfWeek}}</span>
 
         <span class="time" *ngIf="day.mode === 'closed'">
           Closed
@@ -82,7 +82,8 @@
     <div class="section" *ngIf="photoData">
       <h3>Business Photo</h3>
       <div class="photo-box">
-        <img [src]="photoData" alt="Business Photo">
+        <img [src]="photoData ? 'data:image/png;base64,' + photoData : ''" alt="Business Photo">
+
       </div>
     </div>
   </div>

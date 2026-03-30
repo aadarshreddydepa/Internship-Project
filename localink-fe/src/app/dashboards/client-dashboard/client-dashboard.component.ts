@@ -40,7 +40,7 @@ export class ClientDashboardComponent implements OnInit {
   }
 
   fetchBusinesses() {
-    const userId = 1;
+    const userId = 2;
 
     this.dashboardService.getBusinessesByUser(userId)
       .subscribe({

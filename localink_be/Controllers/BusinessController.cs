@@ -54,7 +54,8 @@ public class BusinessController : ControllerBase
             return StatusCode(500, new
             {
                 success = false,
-                message = ex.Message
+                message = ex.Message,
+                inner = ex.InnerException?.Message
             });
         }
     }

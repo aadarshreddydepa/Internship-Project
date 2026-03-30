@@ -26,14 +26,14 @@ interface DaySchedule {
 })
 export class HoursComponent {
 
-  @Output() hoursSaved = new EventEmitter<any>();
-  @Input() initialHours: any;
-
+  
+  @Input() initialHours: any[] = [];                     // ✅ parent passes saved hours
+  @Output() hoursSaved = new EventEmitter<any[]>();
   ngOnInit() {
 
       if (this.initialHours && this.initialHours.length) {
         this.days.forEach(day => {
-          const saved = this.initialHours.find((d: { day: string; }) => d.day === day.name);
+          const saved = this.initialHours.find((d: { dayOfWeek: string; }) => d.dayOfWeek === day.name);
           if (saved) {
             day.mode = saved.mode;
             day.slots = saved.slots || [];

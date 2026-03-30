@@ -125,7 +125,12 @@
     <input type="text" formControlName="city" placeholder="City">
 
     <div class="error" *ngIf="contactForm.get('city')?.touched && contactForm.get('city')?.invalid">
-    City is required
+      <span *ngIf="contactForm.get('city')?.errors?.['required']">
+        City is required
+      </span>
+      <span *ngIf="contactForm.get('city')?.errors?.['pattern']">
+        City must contain only letters
+      </span>
     </div>
 
     </div>  
@@ -148,9 +153,13 @@
 
     <label>Street Address *</label>
     <input type="text" formControlName="address" placeholder="Enter business address">
-
     <div class="error" *ngIf="contactForm.get('address')?.touched && contactForm.get('address')?.invalid">
-    Address is required
+      <span *ngIf="contactForm.get('address')?.errors?.['required']">
+        Address is required
+      </span>
+      <span *ngIf="contactForm.get('address')?.errors?.['pattern']">
+        Address must include letters or symbols, not just numbers
+      </span>
     </div>
 
     <!-- BUTTONS -->

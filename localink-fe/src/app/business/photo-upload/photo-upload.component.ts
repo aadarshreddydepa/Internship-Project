@@ -12,7 +12,7 @@ import { EventEmitter, Output, Input} from '@angular/core';
 export class PhotoUploadComponent {
 
   @Input() initialPhoto: string | null = null;
-  @Output() photoSelected = new EventEmitter<string>();
+  @Output() photoSelected = new EventEmitter<string | null>();
   selectedImage: string | null = null;
   errorMessage = '';
 
@@ -22,7 +22,9 @@ export class PhotoUploadComponent {
   
   ngOnInit() {
     if(this.initialPhoto){
-      this.selectedImage = this.initialPhoto;
+      this.selectedImage = this.initialPhoto.startsWith('data:')
+      ? this.initialPhoto
+      : 'data:image/png;base64,' + this.initialPhoto;;
     }
   }
   onFileSelected(event: Event) {
@@ -60,17 +62,20 @@ export class PhotoUploadComponent {
 
     this.errorMessage = '';
     const reader = new FileReader();
-    reader.onload = () => {
-      this.selectedImage = reader.result as string;
-      this.photoSelected.emit(this.selectedImage);
-    };
+      reader.onload = () => {
+      const result = reader.result as string;
+      this.selectedImage = result; // full Data URL for preview
 
+      const base64Data = result.split(',')[1]; // raw base64 for backend
+      this.photoSelected.emit(base64Data);
+    };
     reader.readAsDataURL(file);
   }
 
   removeImage(event: Event) {
     event.stopPropagation();
     this.selectedImage = null;
+    this.photoSelected.emit(null);
     localStorage.removeItem('businessPhoto');
   }
 

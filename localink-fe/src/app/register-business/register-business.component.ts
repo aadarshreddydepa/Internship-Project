@@ -62,11 +62,12 @@ export class RegisterBusinessComponent {
   }
 
   ngOnInit(): void {
-  this.http.get<any>('http://localhost:5138/api/v1/categories')
-    .subscribe(data => {
-      this.categories = data;
-    });
-}
+    this.http.get<any>('http://localhost:5138/api/v1/categories')
+      .subscribe(data => {
+        console.log("Data::: ", data);
+        this.categories = data;
+      });
+  }
 
   onCategoryChange() {
     const categoryId = this.businessForm.get('category')?.value;
@@ -113,7 +114,7 @@ export class RegisterBusinessComponent {
     this.hoursErrorMessage = '';
   }
 
-  savePhoto(photo: string) {
+  savePhoto(photo: string | null) {
     this.photoData = photo;
   }
 
@@ -190,7 +191,7 @@ export class RegisterBusinessComponent {
       categoryId: this.businessData.category,
       subcategoryId: this.businessData.subcategory,
 
-      userId: 1, // ⚠️ TEMP (replace with logged-in user)
+      userId: 2, // ⚠️ TEMP (replace with logged-in user)
 
       phoneCode: this.contactData.phoneCode,
       phoneNumber: this.contactData.phone.replace(this.contactData.phoneCode, ''),

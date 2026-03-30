@@ -67,9 +67,19 @@ export class ContactDetailsComponent implements OnInit {
         Validators.pattern(/^(https?:\/\/)?(www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$/)
       ],
  
-      address: ['', Validators.required],
+      address: ['',
+        [ 
+          Validators.required,
+          Validators.pattern(/^(?!\d+$)[A-Za-z0-9\s\-\:\/\,\.]+$/)
+        ]
+      ],
  
-      city: ['', Validators.required],
+      city: ['',
+        [
+           Validators.required,  
+           Validators.pattern(/^[A-Za-z\s]+$/) 
+        ]
+      ],
  
       state: ['', Validators.required],
  
