@@ -122,6 +122,7 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddHttpClient();
 
 var app = builder.Build();
 

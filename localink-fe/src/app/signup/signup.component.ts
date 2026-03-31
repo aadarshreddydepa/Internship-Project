@@ -1,11 +1,12 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, NgZone, Inject, PLATFORM_ID } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { Router } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
 import { HttpClient } from '@angular/common/http';
 
+declare var grecaptcha: any; 
 @Component({
   selector: 'app-signup',
   standalone: true,
@@ -16,7 +17,7 @@ import { HttpClient } from '@angular/common/http';
 export class SignupComponent implements OnInit, AfterViewInit {
 
   signupForm: FormGroup;
-
+  captchaToken: string = '';
   showPassword = false;
   showConfirmPassword = false;
   showSuccessPopup = false;
@@ -39,7 +40,9 @@ export class SignupComponent implements OnInit, AfterViewInit {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private http: HttpClient
+    private http: HttpClient,
+    private ngZone: NgZone,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.signupForm = this.fb.group({
       userType: ['', Validators.required],
@@ -88,9 +91,9 @@ export class SignupComponent implements OnInit, AfterViewInit {
     this.signupForm.patchValue({ userType: 'user' });
 
     this.http.get<any[]>('assets/countries.json').subscribe(data => {
-  this.locationData = data;
-  this.countries = data.map(c => c.name); // full objects for ng-select
-});
+    this.locationData = data;
+    this.countries = data.map(c => c.name); // full objects for ng-select
+    });
   }
 
   // COUNTRY CHANGE
@@ -154,6 +157,10 @@ export class SignupComponent implements OnInit, AfterViewInit {
   // SUBMIT
   isSubmitting = false;
   onSubmit() {
+  if (!this.captchaToken) {
+    alert("Please complete CAPTCHA");
+    return;
+  }
   if (this.signupForm.valid && !this.isSubmitting) {
 
     this.isSubmitting = true;
@@ -162,7 +169,8 @@ export class SignupComponent implements OnInit, AfterViewInit {
 
     const formData = {
       ...payload,
-      userType: this.selectedType
+      userType: this.selectedType,
+      captchaToken: this.captchaToken
     };
 
     this.authService.register(formData).subscribe({
@@ -201,9 +209,25 @@ allowOnlyNumbers(event: KeyboardEvent) {
     event.preventDefault();
   }
 }
+  renderCaptcha() {
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    grecaptcha.ready(() => {
+      grecaptcha.render('recaptcha-container', {
+        sitekey: '6LeAuJwsAAAAAF0BaOuNYhhyq_1dWaCpY4G3-yFX',
+        callback: (token: string) => {
+          this.ngZone.run(() => {
+            this.captchaToken = token;
+            console.log('CAPTCHA TOKEN:', token);
+          });
+        }
+      });
+    });
+  }
 
   // CANVAS ANIMATION (UNCHANGED)
   ngAfterViewInit() {
+    if (!isPlatformBrowser(this.platformId)) return;
     const glow = document.querySelector('.cursor-glow') as HTMLElement;
 
     document.addEventListener('mousemove', (e) => {
@@ -263,5 +287,6 @@ allowOnlyNumbers(event: KeyboardEvent) {
     };
 
     draw();
+    this.renderCaptcha();
   }
 }

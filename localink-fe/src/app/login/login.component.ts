@@ -1,4 +1,4 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, Inject, PLATFORM_ID } from '@angular/core';
 import {
   FormBuilder,
   Validators,
@@ -7,7 +7,7 @@ import {
   AbstractControl
 } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 
 import { AuthService } from '../core/services/auth.service';
 import { TokenService } from '../core/services/token.service';
@@ -35,7 +35,8 @@ export class LoginComponent implements AfterViewInit {
     private fb: FormBuilder,
     private authService: AuthService,
     private tokenService: TokenService,
-    private router: Router
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.initializeForm();
 
@@ -94,8 +95,10 @@ togglePassword() {
     this.errorMessage = '';
 
     if (this.loginForm.invalid) {
-      const firstInvalid = document.querySelector('.invalid') as HTMLElement;
-      firstInvalid?.focus();
+      if (isPlatformBrowser(this.platformId)) {
+        const firstInvalid = document.querySelector('.invalid') as HTMLElement;
+        firstInvalid?.focus();
+      }
       return;
     }
 
@@ -150,6 +153,7 @@ handleError(err: any) {
 }
 
   triggerErrorAnimation() {
+    if (!isPlatformBrowser(this.platformId)) return;
     const card = document.getElementById('loginCard');
     if (!card) return;
 
@@ -167,7 +171,7 @@ handleError(err: any) {
   }
 
   ngAfterViewInit() {
-
+  if (!isPlatformBrowser(this.platformId)) return;
   /* CURSOR GLOW */
   const glow = document.querySelector('.cursor-glow') as HTMLElement;
 
