@@ -45,131 +45,92 @@
 
       <!-- STEP 1 : BASIC INFO -->
 
+      <!-- STEP 1 : BASIC INFO -->
       <div *ngIf="currentStep === 1">
-
         <h3>Basic Information</h3>
 
         <form [formGroup]="businessForm">
 
-          <!-- BUSINESS NAME -->
-
-          <div class="form-group">
-
-            <label>Business Name *</label>
-
-            <input
-              type="text"
-              placeholder="Enter business name"
-              formControlName="businessName">
-
-            <div class="error" *ngIf="businessForm.get('businessName')?.touched && businessForm.get('businessName')?.invalid">
-                <span *ngIf="businessForm.get('businessName')?.errors?.['required']">
-                Business name is required
-                </span>
-                <span *ngIf="businessForm.get('businessName')?.errors?.['pattern']">
-                Business name must contain only letters, spaces, &, ', or -
-                </span>
-            </div>
+        <!-- CATEGORY + SUBCATEGORY FIRST -->
+      <div class="two-column">
+        <!-- CATEGORY -->
+        <div class="form-group">
+          <label>Category *</label>
+          <select
+            formControlName="category"
+            (change)="onCategoryChange()">
+            <option value="">Select category</option>
+            <option *ngFor="let cat of categories" [value]="cat.id">
+              {{cat.name | titlecase}}
+            </option>
+          </select>
+          <div class="error" *ngIf="businessForm.get('category')?.touched && businessForm.get('category')?.invalid">
+            Category is required
           </div>
+        </div>
 
-
-          <!-- BUSINESS DESCRIPTION -->
-
-          <div class="form-group">
-
-            <label>Business Description *</label>
-
-            <textarea
-              rows="4"
-              placeholder="Describe your business, services, and what makes you unique"
-              formControlName="description">
-            </textarea>
-
-            <div class="error" *ngIf="businessForm.get('description')?.touched">
-
-            <span *ngIf="businessForm.get('description')?.errors?.['required']">
-              Description is required
-            </span>
-
-            <span *ngIf="businessForm.get('description')?.errors?.['minlength']">
-              Description must be at least 10 characters
-            </span>
-
-            <span *ngIf="businessForm.get('description')?.errors?.['pattern']">
-                Start of Description must contain only letters
-            </span>
-
+        <!-- SUBCATEGORY (only shown if category selected) -->
+        <div class="form-group" *ngIf="businessForm.get('category')?.value">
+          <label>Subcategory *</label>
+          <select formControlName="subcategory">
+            <option value="">Select subcategory</option>
+            <option *ngFor="let sub of subcategories" [value]="sub.id">
+              {{sub.name | titlecase}}
+            </option>
+          </select>
+          <div class="error" *ngIf="businessForm.get('subcategory')?.touched && businessForm.get('subcategory')?.invalid">
+            Subcategory is required
           </div>
+        </div>
+      </div> <!-- END two-column -->
 
-          </div>
-
-
-          <!-- CATEGORY + SUBCATEGORY -->
-
-          <div class="two-column">
-
-            <div class="form-group">
-
-              <label>Category *</label>
-
-              <select
-                formControlName="category"
-                (change)="onCategoryChange()">
-
-                <option value="">Select category</option>
-
-                <option *ngFor="let cat of categories" [value]="cat.id">
-                  {{cat.name | titlecase}}
-                </option>
-
-              </select>
-              <div class="error" *ngIf="businessForm.get('category')?.touched && businessForm.get('category')?.invalid">
-              Category is required
-              </div>
-
-            </div>
-
-
-            <div class="form-group">
-
-              <label>Subcategory *</label>
-
-              <select formControlName="subcategory">
-
-                <option value="">Select subcategory</option>
-
-                <option *ngFor="let sub of subcategories" [value]="sub.id">
-                  {{sub.name | titlecase}}
-                </option>
-
-              </select>
-
-               <div class="error" *ngIf="businessForm.get('subcategory')?.touched && businessForm.get('subcategory')?.invalid">
-                Subcategory is required
-                </div>
-
-            </div>
-
-          </div>
-
-
-          <!-- BUTTON -->
-
-          <div class="button-container">
-
-            <button
-              type="button"
-              (click)="goToNext()">
-
-              Next Step
-
-            </button>
-
-          </div>
-
-        </form>
-
+      <!-- BUSINESS NAME BELOW -->
+      <div class="form-group" *ngIf="businessForm.get('subcategory')?.value">
+        <label>Business Name *</label>
+        <input
+          type="text"
+          placeholder="Enter business name"
+          formControlName="businessName">
+        <div class="error" *ngIf="businessForm.get('businessName')?.touched && businessForm.get('businessName')?.invalid">
+          <span *ngIf="businessForm.get('businessName')?.errors?.['required']">
+            Business name is required
+          </span>
+          <span *ngIf="businessForm.get('businessName')?.errors?.['pattern']">
+            Business name must contain only letters, spaces, &, ', or -
+          </span>
+        </div>
       </div>
+
+      <!-- BUSINESS DESCRIPTION BELOW -->
+      <div class="form-group" *ngIf="businessForm.get('subcategory')?.value">
+        <label>Business Description *</label>
+        <textarea
+          rows="4"
+          placeholder="Describe your business, services, and what makes you unique"
+          formControlName="description">
+        </textarea>
+        <div class="error" *ngIf="businessForm.get('description')?.touched">
+          <span *ngIf="businessForm.get('description')?.errors?.['required']">
+            Description is required
+          </span>
+          <span *ngIf="businessForm.get('description')?.errors?.['minlength']">
+            Description must be at least 10 characters
+          </span>
+          <span *ngIf="businessForm.get('description')?.errors?.['pattern']">
+            Start of Description must contain only letters
+          </span>
+        </div>
+      </div>
+
+    <!-- BUTTON -->
+    <div class="button-container">
+      <button type="button" (click)="goToNext()">
+        Next Step
+      </button>
+    </div>
+
+  </form>
+</div>
 
 
       <!-- STEP 2 : CONTACT DETAILS -->

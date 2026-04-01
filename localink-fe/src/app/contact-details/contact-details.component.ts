@@ -32,8 +32,10 @@ export class ContactDetailsComponent implements OnInit {
  
   countries: any[] = [];
  
-  states: string[] = [];
- 
+  states: any[] = [];
+
+  cities: any[] = [];
+
   constructor(
  
     private fb: FormBuilder,
@@ -74,12 +76,7 @@ export class ContactDetailsComponent implements OnInit {
         ]
       ],
  
-      city: ['',
-        [
-           Validators.required,  
-           Validators.pattern(/^[A-Za-z\s]+$/) 
-        ]
-      ],
+      city: ['', Validators.required,  ],
  
       state: ['', Validators.required],
  
@@ -166,105 +163,74 @@ export class ContactDetailsComponent implements OnInit {
       }
     });
 }
- 
- 
+
   onCountryChange() {
- 
-    const selectedCountry = this.contactForm.get('country')?.value;
- 
-    const countryObj = this.countries.find(
- 
-      c => c.name === selectedCountry
- 
-    );
- 
-    this.states = countryObj ? countryObj.states : [];
- 
-    this.contactForm.get('state')?.setValue('');
- 
-    this.contactForm.updateValueAndValidity();
- 
-  }
- 
- 
-  countryPhoneValidator(group: FormGroup) {
- 
-    const country = group.get('country')?.value;
- 
-    const phoneCode = group.get('phoneCode')?.value;
- 
-    const phoneControl = group.get('phone');
- 
-    const countryObj = this.countries.find(c => c.name === country);
- 
-    if (countryObj && countryObj.code !== phoneCode) {
- 
-      phoneControl?.setErrors({
- 
-        ...(phoneControl.errors || {}),
- 
-        countryMismatch: true
- 
-      });
- 
-    } else {
- 
-      if (phoneControl?.errors) {
- 
-        const { countryMismatch, ...otherErrors } = phoneControl.errors;
- 
-        phoneControl.setErrors(
- 
-          Object.keys(otherErrors).length ? otherErrors : null
- 
-        );
- 
-      }
- 
-    }
- 
-    return null;
- 
-  }
- 
-  allowOnlyNumbers(event: any) {
- 
-    let value = event.target.value.replace(/[^0-9]/g, '');
- 
-    if (/^0+$/.test(value)) {
- 
-      value = '';
- 
-    }
- 
-    this.contactForm.get('phone')?.setValue(value);
- 
-  }
- 
-  submit() {
- 
-    if (this.contactForm.valid) {
- 
-      const form = this.contactForm.value;
- 
-      const fullPhone = form.phoneCode + ' ' + form.phone;
- 
-      this.next.emit({
- 
-        ...form,
- 
-        phone: fullPhone
- 
-      });
- 
-    } else {
- 
-      this.contactForm.markAllAsTouched();
- 
+  const selectedCountry = this.contactForm.get('country')?.value;
+  const countryObj = this.countries.find(c => c.name === selectedCountry);
+
+  this.states = countryObj ? countryObj.states : [];
+  this.cities = []; // reset cities when country changes
+  this.contactForm.get('state')?.setValue('');
+  this.contactForm.get('city')?.setValue('');
+
+
+  this.contactForm.updateValueAndValidity();
+}
+
+onStateChange(event: any) {
+  const selectedState = this.contactForm.get('state')?.value;
+  const stateObj = this.states.find(s => s.name === selectedState);
+
+  this.cities = stateObj ? stateObj.cities : [];
+  this.contactForm.get('city')?.setValue('');
+  this.contactForm.updateValueAndValidity();
+}
+
+countryPhoneValidator(group: FormGroup) {
+  const country = group.get('country')?.value;
+  const phoneCode = group.get('phoneCode')?.value;
+  const phoneControl = group.get('phone');
+
+  const countryObj = this.countries.find(c => c.name === country);
+
+  if (countryObj && countryObj.code !== phoneCode) {
+    phoneControl?.setErrors({
+      ...(phoneControl.errors || {}),
+      countryMismatch: true
+    });
+  } else {
+    if (phoneControl?.errors) {
+      const { countryMismatch, ...otherErrors } = phoneControl.errors;
+      phoneControl.setErrors(
+        Object.keys(otherErrors).length ? otherErrors : null
+      );
     }
   }
- 
-  previousStep() {
-    this.previous.emit();
+  return null;
+}
+
+allowOnlyNumbers(event: any) {
+  let value = event.target.value.replace(/[^0-9]/g, '');
+  if (/^0+$/.test(value)) {
+    value = '';
   }
+  this.contactForm.get('phone')?.setValue(value);
+}
+
+submit() {
+  if (this.contactForm.valid) {
+    const form = this.contactForm.value;
+    const fullPhone = form.phoneCode + ' ' + form.phone;
+    this.next.emit({
+      ...form,
+      phone: fullPhone
+    });
+  } else {
+    this.contactForm.markAllAsTouched();
+  }
+}
+
+previousStep() {
+  this.previous.emit();
+}
 }

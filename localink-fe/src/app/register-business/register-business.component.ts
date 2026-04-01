@@ -54,7 +54,7 @@ export class RegisterBusinessComponent {
       description: ['', [
         Validators.required,
         Validators.minLength(10),
-        Validators.pattern(/^[A-Za-z][A-Za-z\s.,'()%!]*$/)
+        Validators.pattern(/^(?=.*[A-Za-z])[A-Za-z0-9\s.,'()%!#\$%\*-]*$/)
       ]],
       category: ['', Validators.required],
       subcategory: ['', Validators.required]

@@ -71,69 +71,70 @@
     <!-- LOCATION ROW -->
     <div class="location-row">
 
-
     <!-- COUNTRY -->
     <div class="location-field">
+      <label>Country *</label>
+      <ng-select
+        [items]="countries"
+        bindLabel="name"
+        bindValue="name"
+        placeholder="Select Country"
+        formControlName="country"
+        [searchable]="true"
+        [clearable]="true"
+        [virtualScroll]="true"
+        (change)="onCountryChange()">
+      </ng-select>
 
-    <label>Country *</label>
-    
-    <ng-select
-      [items]="countries"
-      bindLabel="name"
-      bindValue="name"
-      placeholder="Select Country"
-      formControlName="country"
-      [searchable]="true"
-      [clearable]="false"
-      [virtualScroll]="true"
-      (change)="onCountryChange()">
-    </ng-select>
-
-    <div class="error" *ngIf="contactForm.get('country')?.touched && contactForm.get('country')?.invalid">
-    Country is required
+      <div class="error" *ngIf="contactForm.get('country')?.touched && contactForm.get('country')?.invalid">
+        Country is required
+      </div>
     </div>
-
-    </div>
-
 
     <!-- STATE -->
     <div class="location-field">
+      <label>State *</label>
+      <ng-select
+        [items]="states"
+        bindLabel="name"
+        bindValue="name"
+        placeholder="Select State"
+        formControlName="state"
+        [searchable]="true"
+        [clearable]="true"
+        [virtualScroll]="true"
+        [disabled]="!contactForm.get('country')?.value"
+        (change)="onStateChange($event)">
+      </ng-select>
 
-    <label>State *</label>
-
-    <ng-select
-      [items]="states"
-      placeholder="Select State"
-      formControlName="state"
-      [searchable]="true"
-      [clearable]="false"
-      [disabled]="!contactForm.get('country')?.value">
-    </ng-select>
-
-    <div class="error" *ngIf="contactForm.get('state')?.touched && contactForm.get('state')?.invalid">
-    State is required
+      <div class="error" *ngIf="contactForm.get('state')?.touched && contactForm.get('state')?.invalid">
+        State is required
+      </div>
     </div>
-
-    </div>
-
 
     <!-- CITY -->
     <div class="location-field">
+      <label>City *</label>
+      <ng-select
+        [items]="cities"
+        bindLabel="name"
+        bindValue="name"
+        placeholder="Select City"
+        formControlName="city"
+        [searchable]="true"
+        [clearable]="true"
+        [virtualScroll]="true"
+        [disabled]="!contactForm.get('state')?.value">
+      </ng-select>
 
-    <label>City *</label>
-
-    <input type="text" formControlName="city" placeholder="City">
-
-    <div class="error" *ngIf="contactForm.get('city')?.touched && contactForm.get('city')?.invalid">
-      <span *ngIf="contactForm.get('city')?.errors?.['required']">
-        City is required
-      </span>
-      <span *ngIf="contactForm.get('city')?.errors?.['pattern']">
-        City must contain only letters
-      </span>
+      <div class="error" *ngIf="contactForm.get('city')?.touched && contactForm.get('city')?.invalid">
+        <span *ngIf="contactForm.get('city')?.errors?.['required']">
+          City is required
+        </span>
+      </div>
     </div>
 
-    </div>  
+
 
 
     <!-- PINCODE -->
