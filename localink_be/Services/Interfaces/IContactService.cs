@@ -1,7 +1,14 @@
-public interface IContactService
+using System.Threading.Tasks;
+using localink_be.Models.Entities;
+using localink_be.Models.DTOs;
+
+namespace localink_be.Services.Interfaces
 {
-    Task AddContactAsync(RegisterBusinessDto dto, long businessId);
-    Task<BusinessContact?> UpdateContactAsync(long businessId, BusinessContact updated);
-    Task<bool> DeleteContactAsync(int contactId);
-    Task<object?> GetContactByBusinessIdAsync(long businessId);
+    public interface IContactService
+    {
+        Task AddContactAsync(RegisterBusinessDto dto, long businessId);
+        Task<BusinessContact?> UpdateContactAsync(long businessId, BusinessContact updated);
+        Task<bool> DeleteContactAsync(int contactId);
+        Task<object?> GetContactByBusinessIdAsync(long businessId);
+    }
 }

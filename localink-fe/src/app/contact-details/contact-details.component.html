@@ -58,7 +58,8 @@
     <input type="email" formControlName="email" placeholder="Enter email">
 
     <div class="error" *ngIf="contactForm.get('email')?.touched && contactForm.get('email')?.invalid">
-    Enter a valid email
+      <div *ngIf="contactForm.get('email')?.errors?.['required']">Email is required</div>
+      <div *ngIf="contactForm.get('email')?.errors?.['pattern']">Enter a valid email address</div>
     </div>
 
 
@@ -68,6 +69,7 @@
     <div class="error" *ngIf="contactForm.get('website')?.touched && contactForm.get('website')?.invalid">
     Enter a valid website URL
     </div>
+
     <!-- LOCATION ROW -->
     <div class="location-row">
 
@@ -125,7 +127,10 @@
     <input type="text" formControlName="city" placeholder="City">
 
     <div class="error" *ngIf="contactForm.get('city')?.touched && contactForm.get('city')?.invalid">
-    City is required
+      <div *ngIf="contactForm.get('city')?.errors?.['required']">City is required</div>
+      <div *ngIf="contactForm.get('city')?.errors?.['minlength']">City must be at least 2 characters</div>
+      <div *ngIf="contactForm.get('city')?.errors?.['maxlength']">City cannot exceed 50 characters</div>
+      <div *ngIf="contactForm.get('city')?.errors?.['pattern']">City can only contain letters, spaces, dots, and hyphens</div>
     </div>
 
     </div>  
@@ -139,7 +144,8 @@
     <input type="text" formControlName="pincode" placeholder="Pincode">
 
     <div class="error" *ngIf="contactForm.get('pincode')?.touched && contactForm.get('pincode')?.invalid">
-    Enter a valid 6 digit pincode
+      <div *ngIf="contactForm.get('pincode')?.errors?.['required']">Pincode is required</div>
+      <div *ngIf="contactForm.get('pincode')?.errors?.['pattern']">Enter a valid 6-digit pincode starting with 1-9</div>
     </div>
 
     </div>
@@ -150,7 +156,93 @@
     <input type="text" formControlName="address" placeholder="Enter business address">
 
     <div class="error" *ngIf="contactForm.get('address')?.touched && contactForm.get('address')?.invalid">
-    Address is required
+      <div *ngIf="contactForm.get('address')?.errors?.['required']">Address is required</div>
+      <div *ngIf="contactForm.get('address')?.errors?.['minlength']">Address must be at least 5 characters</div>
+      <div *ngIf="contactForm.get('address')?.errors?.['maxlength']">Address cannot exceed 200 characters</div>
+    </div>
+
+    <!-- ======== MAP SECTION ======== -->
+
+    <div class="map-section">
+
+      <!-- SEARCH BAR -->
+      <label><i class="fa fa-map-marker" aria-hidden="true" style="margin-right: 5px;"></i>Search Location</label>
+      <div class="search-bar-container">
+        <div class="search-bar">
+          <input
+            type="text"
+            class="search-input"
+            [(ngModel)]="searchQuery"
+            (ngModelChange)="onSearchQueryChange($event)"
+            [ngModelOptions]="{standalone: true}"
+            placeholder="Search for a place, city or address..."
+            (keydown)="onSearchKeydown($event)"
+            (blur)="closeDropdown()">
+          <button type="button" class="search-btn" (click)="searchLocation()">
+            <i class="fa fa-search"></i>
+            Search
+          </button>
+        </div>
+
+        <!-- AUTOCOMPLETE DROPDOWN -->
+        <div class="autocomplete-dropdown" *ngIf="showDropdown && searchResults.length > 0">
+          <div class="autocomplete-item" 
+               *ngFor="let result of searchResults" 
+               (mousedown)="selectSearchResult(result)">
+            <i class="fa fa-map-marker"></i>
+            <span class="ac-text">{{ result.display_name }}</span>
+          </div>
+        </div>
+        <div class="autocomplete-dropdown" *ngIf="isSearching">
+          <div class="autocomplete-loading">
+            <span class="spinner" style="width: 12px; height: 12px; margin-right: 8px;"></span> Searching...
+          </div>
+        </div>
+      </div>
+
+      <!-- CURRENT LOCATION BUTTON -->
+      <label><i class="fa fa-map" aria-hidden="true" style="margin-right: 5px;"></i>Select Business Location *</label>
+      <button
+        type="button"
+        class="location-btn"
+        [disabled]="isLoadingLocation"
+        (click)="useCurrentLocation()">
+        <span *ngIf="!isLoadingLocation">
+          <i class="fa fa-crosshairs"></i>
+          Use My Current Location
+        </span>
+        <span *ngIf="isLoadingLocation" class="btn-loading">
+          <span class="spinner"></span>
+          Detecting location...
+        </span>
+      </button>
+
+      <!-- LOCATION ERROR -->
+      <div class="location-error" *ngIf="locationError">
+        <i class="fa fa-exclamation-circle"></i>
+        {{ locationError }}
+      </div>
+
+      <!-- MAP CONTAINER -->
+      <div class="map-wrapper">
+        <div *ngIf="isGeocodingAddress" class="geocoding-overlay">
+          <span class="spinner"></span>
+          <span>Fetching address...</span>
+        </div>
+        <div id="leaflet-map"></div>
+      </div>
+
+      <!-- COORDINATES HINT -->
+      <div class="coords-hint" *ngIf="selectedLat && selectedLng">
+        <i class="fa fa-map-pin"></i>
+        Selected: {{ selectedLat | number:'1.6-6' }}, {{ selectedLng | number:'1.6-6' }}
+      </div>
+
+      <div class="map-tip" *ngIf="!selectedLat">
+        <i class="fa fa-info-circle"></i>
+        Click on the map, drag the marker, or use "Use My Current Location" to pin your business location.
+      </div>
+
     </div>
 
     <!-- BUTTONS -->

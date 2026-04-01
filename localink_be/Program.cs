@@ -3,20 +3,38 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using localink_be.Services.Interfaces;
+using localink_be.Services.Implementations;
+using localink_be.Data;
+using localink_be.Models.Entities;
+using localink_be.Models.DTOs;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Localink API", Version = "v1" });
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Description = "Enter: Bearer {your JWT token}",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer"
+    });
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
@@ -25,6 +43,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     )
 );
 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
@@ -34,15 +54,13 @@ builder.Services.AddScoped<IContactService, ContactService>();
 builder.Services.AddScoped<IHoursService, HoursService>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
 
-builder.Services.AddControllers();
+builder.Services.AddHttpClient<ICaptchaService, CaptchaService>();
 
-
-
-
-var key = builder.Configuration["Jwt:Key"];
-
-if (string.IsNullOrEmpty(key))
-    throw new Exception("JWT Key is missing in configuration!");
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = null;
+    });
 
 builder.Services.AddAuthentication(options =>
 {
@@ -51,10 +69,11 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    // FIX: Disable HTTPS metadata in development
+    var key = builder.Configuration["Jwt:Key"];
+    if (string.IsNullOrEmpty(key)) throw new Exception("JWT Key is missing!");
+    
     options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
     options.SaveToken = true;
-
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
@@ -62,72 +81,22 @@ builder.Services.AddAuthentication(options =>
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
         ClockSkew = TimeSpan.Zero,
-
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(key)
-        )
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
     };
-});
-
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.PropertyNamingPolicy = null;
-    });
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-    options.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "Localink API",
-        Version = "v1"
-    });
-
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Name = "Authorization",
-        Description = "Enter: Bearer {your JWT token}",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.Http,
-        Scheme = "bearer"
-    });
-
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
-        }
-    });
 });
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowAnyOrigin();
+        policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
     });
 });
 
-
 var app = builder.Build();
 
-
-
-// Global Exception Middleware FIRST
 app.UseMiddleware<ExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
@@ -140,22 +109,18 @@ else
     app.UseHsts();
 }
 
-// Keep this only if using HTTPS in frontend
-app.UseHttpsRedirection();
-app.MapGet("/", () => "Localink API is running");
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
-// IMPORTANT ORDER
 app.UseRouting();               
 app.UseCors("AllowAll"); 
-
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
-
-
+app.MapGet("/", () => "Localink API is running");
 app.MapGet("/health", () => Results.Ok("API is running"));
-
 
 app.Run();

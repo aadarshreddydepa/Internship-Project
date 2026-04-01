@@ -1,4 +1,11 @@
-public interface ICategoryService
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using localink_be.Models.DTOs;
+
+namespace localink_be.Services.Interfaces
 {
-    Task<List<CategoryDto>> GetCategoriesAsync();
+    public interface ICategoryService
+    {
+        Task<List<CategoryDto>> GetCategoriesAsync();
+    }
 }

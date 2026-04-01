@@ -64,6 +64,11 @@
             {{ errorMessage }}
           </div>
 
+          <!-- RECAPTCHA -->
+          <div class="captcha-wrapper">
+            <div id="login-captcha"></div>
+          </div>
+
           <!-- BUTTON -->
           <button type="submit"
             [disabled]="isLoading || loginForm.invalid"

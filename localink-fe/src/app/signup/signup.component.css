@@ -417,3 +417,12 @@ margin-top: 3px;
 border-color: #ff4d4f;
 }
 
+/* RECAPTCHA */
+.captcha-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 18px;
+  transform: scale(0.95);
+  transform-origin: center;
+}
+

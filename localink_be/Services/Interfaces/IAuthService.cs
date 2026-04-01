@@ -1,8 +1,14 @@
-public interface IAuthService
+using System.Threading.Tasks;
+using localink_be.Models.DTOs;
+
+namespace localink_be.Services.Interfaces
 {
-    Task<string> RegisterAsync(RegisterRequest request);
-    Task<object> LoginAsync(LoginRequest request);
-    Task<string> VerifyEmailAsync(string email);
-   Task<string> ResetPasswordAsync(ForgotPasswordRequest request);
+    public interface IAuthService
+    {
+        Task<string> RegisterAsync(RegisterRequest request);
+        Task<object> LoginAsync(LoginRequest request);
+        Task<string> VerifyEmailAsync(string email);
+        Task<string> ResetPasswordAsync(ForgotPasswordRequest request);
+    }
 }
     

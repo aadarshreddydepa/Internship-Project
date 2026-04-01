@@ -13,6 +13,9 @@ import { AuthService } from '../core/services/auth.service';
 import { TokenService } from '../core/services/token.service';
 import { ForgotPasswordComponent } from '../forgot-password/forgot-password.component';
 
+// Declare global grecaptcha so TypeScript doesn't complain
+declare const grecaptcha: any;
+
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -27,6 +30,7 @@ export class LoginComponent implements AfterViewInit {
   submitted = false;
   isLoading = false;
   errorMessage = "";
+  captchaToken: string | null = null;
 
   // 🔥 VIEW STATE
   currentView: 'login' | 'forgot' = 'login';
@@ -99,11 +103,18 @@ togglePassword() {
       return;
     }
 
+    // Block submission if reCAPTCHA not completed
+    if (!this.captchaToken) {
+      this.errorMessage = 'Please complete the reCAPTCHA verification.';
+      return;
+    }
+
     this.isLoading = true;
 
     const payload = {
       usernameOrEmail: this.loginForm.value.usernameOrEmail.trim().toLowerCase(),
-      password: this.loginForm.value.password
+      password: this.loginForm.value.password,
+      captchaToken: this.captchaToken
     };
 
     this.authService.login(payload).subscribe({
@@ -164,9 +175,38 @@ handleError(err: any) {
 
   backToLogin() {
     this.currentView = 'login';
+    this.captchaToken = null;
+    this.renderCaptcha();
+  }
+
+  renderCaptcha() {
+    setTimeout(() => {
+      const captchaEl = document.getElementById('login-captcha');
+      if (captchaEl && typeof grecaptcha !== 'undefined') {
+        try {
+          grecaptcha.render(captchaEl, {
+            sitekey: '6LeWsJ0sAAAAAKwBUTRqFvX9qufIJVUrrId14onY',
+            theme: 'dark',
+            callback: (token: string) => {
+              this.captchaToken = token;
+              this.errorMessage = '';
+            },
+            'expired-callback': () => {
+              this.captchaToken = null;
+            },
+            'error-callback': () => {
+              this.captchaToken = null;
+            }
+          });
+        } catch (e) {
+          console.warn('Login reCAPTCHA render failed or already rendered', e);
+        }
+      }
+    }, 300);
   }
 
   ngAfterViewInit() {
+    this.renderCaptcha();
 
   /* CURSOR GLOW */
   const glow = document.querySelector('.cursor-glow') as HTMLElement;

@@ -1,35 +1,42 @@
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using localink_be.Data;
+using localink_be.Models.DTOs;
+using localink_be.Services.Interfaces;
 
-public class CategoryService : ICategoryService
+namespace localink_be.Services.Implementations
 {
-    private readonly AppDbContext _context;
-
-    public CategoryService(AppDbContext context)
+    public class CategoryService : ICategoryService
     {
-        _context = context ?? throw new ArgumentNullException(nameof(context));
-    }
+        private readonly AppDbContext _context;
 
-    public async Task<List<CategoryDto>> GetCategoriesAsync()
-    {
-        try
+        public CategoryService(AppDbContext context)
         {
-            var categories = await _context.Categories
-                .Select(c => new CategoryDto
-                {
-                    Id = c.CategoryId,
-                    Name = c.CategoryName,
-                    IconUrl = c.IconUrl
-                })
-                .ToListAsync();
-
-            if (categories == null || categories.Count == 0)
-                throw new KeyNotFoundException("No categories found");
-
-            return categories;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
-        catch (Exception ex)
+
+        public async Task<List<CategoryDto>> GetCategoriesAsync()
         {
-            throw new Exception("Error fetching categories", ex);
+            try
+            {
+                var categories = await _context.Categories
+                    .Select(c => new CategoryDto
+                    {
+                        Id = c.CategoryId,
+                        Name = c.CategoryName,
+                        IconUrl = c.IconUrl
+                    })
+                    .ToListAsync();
+
+                return categories; // Return empty list if none found
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error fetching categories from database", ex);
+            }
         }
     }
 }

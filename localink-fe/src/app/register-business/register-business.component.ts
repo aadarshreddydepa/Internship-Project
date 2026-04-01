@@ -50,11 +50,17 @@ export class RegisterBusinessComponent {
     private router: Router
   ) {
     this.businessForm = this.fb.group({
-      businessName: ['', [Validators.required, Validators.pattern(/^[A-Za-z\s&'-]+$/)]],
+      businessName: ['', [
+        Validators.required, 
+        Validators.minLength(3),
+        Validators.maxLength(100),
+        Validators.pattern(/^[A-Za-z\s&'-]+$/)
+      ]],
       description: ['', [
         Validators.required,
         Validators.minLength(10),
-        Validators.pattern(/^[A-Za-z][A-Za-z\s.,'()%!]*$/)
+        Validators.maxLength(500),
+        Validators.pattern(/^[A-Za-z][A-Za-z0-9\s.,'()%!-]*$/)
       ]],
       category: ['', Validators.required],
       subcategory: ['', Validators.required]

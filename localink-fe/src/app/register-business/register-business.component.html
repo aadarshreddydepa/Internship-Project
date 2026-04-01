@@ -51,59 +51,6 @@
 
         <form [formGroup]="businessForm">
 
-          <!-- BUSINESS NAME -->
-
-          <div class="form-group">
-
-            <label>Business Name *</label>
-
-            <input
-              type="text"
-              placeholder="Enter business name"
-              formControlName="businessName">
-
-            <div class="error" *ngIf="businessForm.get('businessName')?.touched && businessForm.get('businessName')?.invalid">
-                <span *ngIf="businessForm.get('businessName')?.errors?.['required']">
-                Business name is required
-                </span>
-                <span *ngIf="businessForm.get('businessName')?.errors?.['pattern']">
-                Business name must contain only letters, spaces, &, ', or -
-                </span>
-            </div>
-          </div>
-
-
-          <!-- BUSINESS DESCRIPTION -->
-
-          <div class="form-group">
-
-            <label>Business Description *</label>
-
-            <textarea
-              rows="4"
-              placeholder="Describe your business, services, and what makes you unique"
-              formControlName="description">
-            </textarea>
-
-            <div class="error" *ngIf="businessForm.get('description')?.touched">
-
-            <span *ngIf="businessForm.get('description')?.errors?.['required']">
-              Description is required
-            </span>
-
-            <span *ngIf="businessForm.get('description')?.errors?.['minlength']">
-              Description must be at least 10 characters
-            </span>
-
-            <span *ngIf="businessForm.get('description')?.errors?.['pattern']">
-                Start of Description must contain only letters
-            </span>
-
-          </div>
-
-          </div>
-
-
           <!-- CATEGORY + SUBCATEGORY -->
 
           <div class="two-column">
@@ -118,8 +65,8 @@
 
                 <option value="">Select category</option>
 
-                <option *ngFor="let cat of categories" [value]="cat.id">
-                  {{cat.name | titlecase}}
+                <option *ngFor="let cat of categories" [value]="cat.Id">
+                  {{cat.Name | titlecase}}
                 </option>
 
               </select>
@@ -138,8 +85,8 @@
 
                 <option value="">Select subcategory</option>
 
-                <option *ngFor="let sub of subcategories" [value]="sub.id">
-                  {{sub.name | titlecase}}
+                <option *ngFor="let sub of subcategories" [value]="sub.Id">
+                  {{sub.Name | titlecase}}
                 </option>
 
               </select>
@@ -149,6 +96,69 @@
                 </div>
 
             </div>
+
+          </div>
+
+
+          <!-- BUSINESS NAME -->
+
+          <div class="form-group">
+
+            <label>Business Name *</label>
+
+            <input
+              type="text"
+              placeholder="Enter business name"
+              formControlName="businessName">
+
+            <div class="error" *ngIf="businessForm.get('businessName')?.touched && businessForm.get('businessName')?.invalid">
+                <div *ngIf="businessForm.get('businessName')?.errors?.['required']">
+                Business name is required
+                </div>
+                <div *ngIf="businessForm.get('businessName')?.errors?.['minlength']">
+                Business name must be at least 3 characters
+                </div>
+                <div *ngIf="businessForm.get('businessName')?.errors?.['maxlength']">
+                Business name cannot exceed 100 characters
+                </div>
+                <div *ngIf="businessForm.get('businessName')?.errors?.['pattern']">
+                Business name must contain only letters, spaces, &, ', or -
+                </div>
+            </div>
+          </div>
+
+
+          <!-- BUSINESS DESCRIPTION -->
+
+          <div class="form-group">
+
+            <label>Business Description *</label>
+
+            <textarea
+              rows="4"
+              placeholder="Describe your business, services, and what makes you unique"
+              formControlName="description">
+            </textarea>
+
+            <div class="error" *ngIf="businessForm.get('description')?.touched && businessForm.get('description')?.invalid">
+
+            <div *ngIf="businessForm.get('description')?.errors?.['required']">
+              Description is required
+            </div>
+
+            <div *ngIf="businessForm.get('description')?.errors?.['minlength']">
+              Description must be at least 10 characters
+            </div>
+
+            <div *ngIf="businessForm.get('description')?.errors?.['maxlength']">
+              Description cannot exceed 500 characters
+            </div>
+
+            <div *ngIf="businessForm.get('description')?.errors?.['pattern']">
+                Description must start with a letter and contain valid characters
+            </div>
+
+          </div>
 
           </div>
 

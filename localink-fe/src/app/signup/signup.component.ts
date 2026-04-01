@@ -6,6 +6,9 @@ import { Router } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
 import { HttpClient } from '@angular/common/http';
 
+// Declare global grecaptcha so TypeScript doesn't complain
+declare const grecaptcha: any;
+
 @Component({
   selector: 'app-signup',
   standalone: true,
@@ -28,6 +31,7 @@ export class SignupComponent implements OnInit, AfterViewInit {
 
   selectedType: 'user' | 'client' = 'user';
   currentStep = 1;
+  captchaToken: string | null = null;
 
   stepFields: any = {
     1: ['name', 'phone', 'email'],
@@ -156,13 +160,20 @@ export class SignupComponent implements OnInit, AfterViewInit {
   onSubmit() {
   if (this.signupForm.valid && !this.isSubmitting) {
 
+    // Block submission if reCAPTCHA not completed
+    if (!this.captchaToken) {
+      alert('Please complete the reCAPTCHA verification.');
+      return;
+    }
+
     this.isSubmitting = true;
 
     const { confirmPassword, ...payload } = this.signupForm.value;
 
     const formData = {
       ...payload,
-      userType: this.selectedType
+      userType: this.selectedType,
+      captchaToken: this.captchaToken
     };
 
     this.authService.register(formData).subscribe({
@@ -204,6 +215,27 @@ allowOnlyNumbers(event: KeyboardEvent) {
 
   // CANVAS ANIMATION (UNCHANGED)
   ngAfterViewInit() {
+
+    /* RECAPTCHA */
+    setTimeout(() => {
+      const captchaEl = document.getElementById('signup-captcha');
+      if (captchaEl && typeof grecaptcha !== 'undefined') {
+        grecaptcha.render(captchaEl, {
+          sitekey: '6LeWsJ0sAAAAAKwBUTRqFvX9qufIJVUrrId14onY',
+          theme: 'dark',
+          callback: (token: string) => {
+            this.captchaToken = token;
+          },
+          'expired-callback': () => {
+            this.captchaToken = null;
+          },
+          'error-callback': () => {
+            this.captchaToken = null;
+          }
+        });
+      }
+    }, 300);
+
     const glow = document.querySelector('.cursor-glow') as HTMLElement;
 
     document.addEventListener('mousemove', (e) => {

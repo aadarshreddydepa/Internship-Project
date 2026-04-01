@@ -1,32 +1,36 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
+using localink_be.Services.Interfaces;
+using localink_be.Models.DTOs;
 
-[ApiController]
-[Route("api/v1/business/{businessId}/hours")]
-public class BusinessHoursController : ControllerBase
+namespace localink_be.Controllers
 {
-    private readonly IHoursService _hoursService;
-
-    public BusinessHoursController(IHoursService hoursService)
+    [ApiController]
+    [Route("api/v1/business/{businessId}/hours")]
+    public class BusinessHoursController : ControllerBase
     {
-        _hoursService = hoursService;
-    }
+        private readonly IHoursService _hoursService;
 
-    // POST: api/business/{businessId}/hours
-    [HttpPost]
-    public async Task<IActionResult> CreateOrReplaceBusinessHours(long businessId, [FromBody] BusinessHoursDto dto)
-    {
-        var result = await _hoursService.CreateOrReplaceBusinessHoursAsync(businessId, dto);
-        return Ok(result);
-    }
+        public BusinessHoursController(IHoursService hoursService)
+        {
+            _hoursService = hoursService;
+        }
 
-    // GET: api/business/{businessId}/hours
-    [HttpGet]
-    public async Task<IActionResult> GetBusinessHours(long businessId)
-    {
-        var hours = await _hoursService.GetBusinessHoursAsync(businessId);
-        if (hours == null)
-            return NotFound();
+        [HttpPost]
+        public async Task<IActionResult> CreateOrReplaceBusinessHours(long businessId, [FromBody] BusinessHoursDto dto)
+        {
+            var result = await _hoursService.CreateOrReplaceBusinessHoursAsync(businessId, dto);
+            return Ok(result);
+        }
 
-        return Ok(hours);
+        [HttpGet]
+        public async Task<IActionResult> GetBusinessHours(long businessId)
+        {
+            var hours = await _hoursService.GetBusinessHoursAsync(businessId);
+            if (hours == null)
+                return NotFound();
+
+            return Ok(hours);
+        }
     }
 }

@@ -1,108 +1,117 @@
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using localink_be.Models.Entities;
+using localink_be.Models.DTOs;
+using localink_be.Services.Interfaces;
 
-[ApiController]
-[Route("api/v1/business")]
-public class BusinessController : ControllerBase
+namespace localink_be.Controllers
 {
-    private readonly IBusinessService _service;
-
-    public BusinessController(IBusinessService service)
+    [ApiController]
+    [Route("api/v1/business")]
+    public class BusinessController : ControllerBase
     {
-        _service = service;
-    }
+        private readonly IBusinessService _service;
 
-    // 1 (Core CRUD)
-    // GET: api/business
-    [HttpGet]
-    public async Task<IActionResult> GetAllBusinesses()
-    {
-        var businesses = await _service.GetAllBusinessesAsync();
-        return Ok(businesses);
-    }
-
-    // GET: api/business/{id}
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetBusinessById(long id)
-    {
-        var business = await _service.GetBusinessByIdAsync(id);
-        if (business == null)
-            return NotFound();
-
-        return Ok(business);
-    }
-
-    // POST: api/business/register
-    [HttpPost("register")]
-    public async Task<IActionResult> RegisterBusiness([FromBody] RegisterBusinessDto dto)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-        try
+        public BusinessController(IBusinessService service)
         {
-            var businessId = await _service.RegisterBusinessAsync(dto);
-
-            return Ok(new
-            {
-                success = true,
-                message = "Business registered successfully",
-                businessId
-            });
+            _service = service;
         }
-        catch (Exception ex)
+
+        // 1 (Core CRUD)
+        // GET: api/business
+        [HttpGet]
+        public async Task<IActionResult> GetAllBusinesses()
         {
-            return StatusCode(500, new
+            var businesses = await _service.GetAllBusinessesAsync();
+            return Ok(businesses);
+        }
+
+        // GET: api/business/{id}
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetBusinessById(long id)
+        {
+            var business = await _service.GetBusinessByIdAsync(id);
+            if (business == null)
+                return NotFound();
+
+            return Ok(business);
+        }
+
+        // POST: api/business/register
+        [HttpPost("register")]
+        public async Task<IActionResult> RegisterBusiness([FromBody] RegisterBusinessDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
             {
-                success = false,
-                message = ex.Message
-            });
+                var businessId = await _service.RegisterBusinessAsync(dto);
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Business registered successfully",
+                    businessId
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
+        }
+
+        // PUT: api/business/{id}
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateBusiness(long id, [FromBody] Business updated)
+        {
+            var result = await _service.UpdateBusinessAsync(id, updated);
+            if (result == null)
+                return NotFound();
+
+            return Ok(result);
+        }
+
+        // DELETE: api/business/{id}
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteBusiness(long id)
+        {
+            var deleted = await _service.DeleteBusinessAsync(id);
+            if (!deleted)
+                return NotFound();
+
+            return NoContent();
+        }
+
+        // FROM FILE 2 (Additional APIs)
+        // GET: api/business/v1/user/{userId}
+        [HttpGet("user/{userId}")]
+        public async Task<IActionResult> GetBusinessesByUser(long userId)
+        {
+            var data = await _service.GetBusinessesByUserAsync(userId);
+            return Ok(data);
+        }
+
+        // GET: api/business/v1/subcategories/{subcategoryId}/businesses
+        [HttpGet("v1/subcategories/{subcategoryId}/businesses")]
+        public async Task<IActionResult> GetBySubcategory(int subcategoryId)
+        {
+            var result = await _service.GetBySubcategoryAsync(subcategoryId);
+            return Ok(result);
+        }
+
+        // GET: api/business/v1/businesses/{id}
+        [HttpGet("v1/businesses/{id}")]
+        public async Task<IActionResult> GetById(long id)
+        {
+            var result = await _service.GetByIdAsync(id);
+            return Ok(result);
         }
     }
-
-    // PUT: api/business/{id}
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateBusiness(long id, [FromBody] Business updated)
-    {
-        var result = await _service.UpdateBusinessAsync(id, updated);
-        if (result == null)
-            return NotFound();
-
-        return Ok(result);
-    }
-
-    // DELETE: api/business/{id}
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteBusiness(long id)
-    {
-        var deleted = await _service.DeleteBusinessAsync(id);
-        if (!deleted)
-            return NotFound();
-
-        return NoContent();
-    }
-
-    // FROM FILE 2 (Additional APIs)
-    // GET: api/business/v1/user/{userId}
-    [HttpGet("user/{userId}")]
-    public async Task<IActionResult> GetBusinessesByUser(long userId)
-    {
-        var data = await _service.GetBusinessesByUserAsync(userId);
-        return Ok(data);
-    }
-
-    // GET: api/business/v1/subcategories/{subcategoryId}/businesses
-    [HttpGet("v1/subcategories/{subcategoryId}/businesses")]
-    public async Task<IActionResult> GetBySubcategory(int subcategoryId)
-    {
-        var result = await _service.GetBySubcategoryAsync(subcategoryId);
-        return Ok(result);
-    }
-
-    // GET: api/business/v1/businesses/{id}
-    [HttpGet("v1/businesses/{id}")]
-    public async Task<IActionResult> GetById(long id)
-    {
-        var result = await _service.GetByIdAsync(id);
-        return Ok(result);
-    }
-}
+}

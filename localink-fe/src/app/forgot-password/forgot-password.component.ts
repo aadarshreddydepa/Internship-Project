@@ -3,6 +3,9 @@ import { FormBuilder, Validators, FormGroup, ReactiveFormsModule } from '@angula
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../core/services/auth.service';
 
+// Declare global grecaptcha so TypeScript doesn't complain
+declare const grecaptcha: any;
+
 @Component({
   selector: 'app-forgot-password',
   standalone: true,
@@ -26,6 +29,7 @@ export class ForgotPasswordComponent implements AfterViewInit {
   emailForm!: FormGroup;
   resetForm!: FormGroup;
   submitted = false;
+  captchaToken: string | null = null;
 
   constructor(private fb: FormBuilder, private authService: AuthService) {
 
@@ -76,6 +80,12 @@ export class ForgotPasswordComponent implements AfterViewInit {
 
       if (this.emailForm.invalid || this.isLoading) return;
 
+      // Block if reCAPTCHA not completed
+      if (!this.captchaToken) {
+        this.message = 'Please complete the reCAPTCHA verification.';
+        return;
+      }
+
       this.isLoading = true;
       this.message = "";
 
@@ -110,8 +120,11 @@ export class ForgotPasswordComponent implements AfterViewInit {
 
       const payload = {
         email: this.email,
-        newPassword: this.resetForm.value.password.trim()
+        newPassword: this.resetForm.value.password.trim(),
+        captchaToken: this.captchaToken
       };
+      
+      console.log('Sending reset payload:', payload);
 
       this.authService.resetPassword(payload).subscribe({
         next: () => {
@@ -149,10 +162,40 @@ export class ForgotPasswordComponent implements AfterViewInit {
     } else {
       this.step = 1;
       this.message = "";
+      this.captchaToken = null;
+      this.renderCaptcha();
     }
   }
 
+  renderCaptcha() {
+    setTimeout(() => {
+      const captchaEl = document.getElementById('forgot-captcha');
+      if (captchaEl && typeof grecaptcha !== 'undefined') {
+        try {
+          grecaptcha.render(captchaEl, {
+            sitekey: '6LeWsJ0sAAAAAKwBUTRqFvX9qufIJVUrrId14onY',
+            theme: 'dark',
+            callback: (token: string) => {
+              this.captchaToken = token;
+              this.message = '';
+            },
+            'expired-callback': () => {
+              this.captchaToken = null;
+            },
+            'error-callback': () => {
+              this.captchaToken = null;
+            }
+          });
+        } catch (e) {
+          // If already rendered, this might throw, which we can safely ignore
+          console.warn('Captcha render failed or already rendered', e);
+        }
+      }
+    }, 100);
+  }
+
   ngAfterViewInit() {
+    this.renderCaptcha();
 
   /* CURSOR GLOW */
   const glow = document.querySelector('.cursor-glow') as HTMLElement;
