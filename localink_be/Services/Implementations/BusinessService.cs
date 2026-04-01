@@ -82,21 +82,31 @@ public class BusinessService : IBusinessService
 
         return business;
     }
+public async Task<Business?> UpdateBusinessAsync(long id, Business updated)
+{
+    var existing = await _db.Businesses.FindAsync(id);
+    if (existing == null) return null;
 
-    public async Task<Business?> UpdateBusinessAsync(long id, Business updated)
-    {
-        var existing = await _db.Businesses.FindAsync(id);
-        if (existing == null) return null;
-
+    // Update only non-null / non-default fields
+    if (!string.IsNullOrWhiteSpace(updated.BusinessName))
         existing.BusinessName = updated.BusinessName;
-        existing.Description = updated.Description;
-        existing.CategoryId = updated.CategoryId;
-        existing.SubcategoryId = updated.SubcategoryId;
-        existing.UpdatedAt = DateTime.UtcNow;
 
-        await _db.SaveChangesAsync();
-        return existing;
-    }
+    if (!string.IsNullOrWhiteSpace(updated.Description))
+        existing.Description = updated.Description;
+
+    if (updated.CategoryId > 0)
+        existing.CategoryId = updated.CategoryId;
+
+    if (updated.SubcategoryId > 0)
+        existing.SubcategoryId = updated.SubcategoryId;
+
+    // Always update timestamp
+    existing.UpdatedAt = DateTime.UtcNow;
+
+    await _db.SaveChangesAsync();
+    return existing;
+}
+
 
     public async Task<bool> DeleteBusinessAsync(long id)
     {
