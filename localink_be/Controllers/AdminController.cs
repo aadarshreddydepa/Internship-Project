@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
+[Authorize(Roles = "admin")]
 [ApiController]
 [Route("api/v1/admin")]
 public class AdminController : ControllerBase
@@ -21,7 +23,8 @@ public class AdminController : ControllerBase
     [HttpPut("business/{id}/status")]
     public async Task<IActionResult> UpdateStatus(long id, UpdateStatusDto dto)
     {
-        await _service.UpdateStatusAsync(id, dto, 1); // temp admin id
+        var adminId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        await _service.UpdateStatusAsync(id, dto, long.Parse(adminId));
         return Ok(new { message = "Status updated" });
     }
 

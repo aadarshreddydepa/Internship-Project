@@ -1,10 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-
-import { UserService } from '../../services/user.service';
-import { TokenService } from '../../core/services/token.service';
+import { UserService, UserProfile } from '../../services/user.service';
 
 @Component({
   selector: 'app-profile',
@@ -18,21 +15,15 @@ export class ProfileComponent implements OnInit {
   user: any | null = null;
   isLoading = false;
   errorMessage = '';
-  isLoggedIn = false;
 
-  constructor(
-    private userService: UserService,
-    private tokenService: TokenService,
-    private router: Router
-  ) {}
+  constructor(private userService: UserService) {}
 
   ngOnInit(): void {
 
-    const token = this.tokenService.getToken();
+    const token = localStorage.getItem('token');
 
-    this.isLoggedIn = !!token;
-
-    if (!this.isLoggedIn) {
+    if (!token) {
+      this.errorMessage = 'User not authenticated';
       return;
     }
 
@@ -45,14 +36,13 @@ export class ProfileComponent implements OnInit {
 
     this.userService.getUserProfile().subscribe({
       next: (data) => {
-        this.user = data?.data || data;
+        this.user = data;
         this.isLoading = false;
       },
       error: (err) => {
 
         if (err.status === 401) {
           this.errorMessage = 'Session expired. Please login again.';
-          this.logout();
         } else {
           this.errorMessage = 'Failed to load profile';
         }
@@ -60,16 +50,5 @@ export class ProfileComponent implements OnInit {
         this.isLoading = false;
       }
     });
-  }
-
-  logout() {
-    this.tokenService.logout();
-    this.user = null;
-    this.isLoggedIn = false;
-    this.router.navigate(['/']);
-  }
-
-  goToLogin() {
-    this.router.navigate(['/']);
   }
 }

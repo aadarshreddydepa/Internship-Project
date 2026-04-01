@@ -222,9 +222,6 @@ input[type="password"]::-ms-clear {
   display: none;
 }
 
-/* ===================================== */
-/* FIX: REMOVE DUPLICATE PASSWORD ICON */
-/* ===================================== */
 
 input[type="password"] {
   appearance: none;

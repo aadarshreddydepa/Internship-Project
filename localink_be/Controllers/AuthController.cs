@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
+[AllowAnonymous]
 [ApiController]
 [Route("api/v1/auth")]
 public class AuthController : ControllerBase
@@ -9,6 +11,28 @@ public class AuthController : ControllerBase
     public AuthController(IAuthService authService)
     {
         _authService = authService;
+    }
+    private IActionResult ValidateRequest()
+    {
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState
+                .Where(x => x.Value?.Errors.Count > 0)
+                .Select(x => new
+                {
+                    field = x.Key,
+                    errors = x.Value!.Errors.Select(e => e.ErrorMessage)
+                });
+
+            return BadRequest(new
+            {
+                success = false,
+                message = "Validation failed",
+                errors
+            });
+        }
+
+        return null!;
     }
 
     // LOGIN
@@ -50,7 +74,7 @@ public async Task<IActionResult> SendOtp([FromBody] SendOtpRequest request)
     if (!ModelState.IsValid)
         return BadRequest(new { success = false, errors = ModelState });
 
-    var result = await _authService.SendResetOtpAsync(request.Email);
+    var result = await _authService.SendResetOtpAsync(request.Email,request.CaptchaToken);
 
     return Ok(new
     {

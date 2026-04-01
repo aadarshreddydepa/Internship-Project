@@ -17,6 +17,7 @@ public class AppDbContext : DbContext
 
     public DbSet<Address> Addresses { get; set; }
     public DbSet<AdminDashboard> AdminDashboards { get; set; }
+    public DbSet<BusinessReview> BusinessReviews { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -28,6 +29,7 @@ public class AppDbContext : DbContext
         ConfigureBusinessPhoto(modelBuilder);
         ConfigureBusinessHours(modelBuilder);
         ConfigureUser(modelBuilder);
+        ConfigureBusinessReview(modelBuilder);
     }
 
 
@@ -133,6 +135,26 @@ public class AppDbContext : DbContext
             entity.Property(u => u.OtpAttempts).HasColumnName("otp_attempts");
 
             entity.HasIndex(u => u.PhoneNumber).IsUnique();
+        });
+    }
+
+    private void ConfigureBusinessReview(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<BusinessReview>(entity =>
+        {
+            entity.ToTable("business_reviews");
+            entity.HasKey(r => r.ReviewId);
+            entity.Property(r => r.ReviewId).HasColumnName("review_id");
+            entity.Property(r => r.BusinessId).HasColumnName("business_id");
+            entity.Property(r => r.UserId).HasColumnName("user_id");
+            entity.Property(r => r.Rating).HasColumnName("rating");
+            entity.Property(r => r.Comment).HasColumnName("comment");
+            entity.Property(r => r.CreatedAt).HasColumnName("created_at");
+            entity.Property(r => r.UpdatedAt).HasColumnName("updated_at");
+            entity.HasOne(r => r.User)
+                .WithMany()
+                .HasForeignKey(r => r.UserId)
+                .OnDelete(DeleteBehavior.NoAction); // Avoid cascade conflict
         });
     }
 }

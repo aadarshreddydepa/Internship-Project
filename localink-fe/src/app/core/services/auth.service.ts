@@ -21,7 +21,7 @@ export class AuthService {
   }
 
   // SEND OTP
-  sendOtp(data: { email: string}) {
+  sendOtp(data: { email: string; captchaToken: string }) {
   return this.http.post(`${this.baseUrl}/auth/forgot-password`, data);
 }
 

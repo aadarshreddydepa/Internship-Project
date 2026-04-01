@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 [ApiController]
 [Route("api/v1/business/{businessId}/hours")]
@@ -10,7 +11,8 @@ public class BusinessHoursController : ControllerBase
     {
         _hoursService = hoursService;
     }
-
+    
+    [Authorize(Roles = "client")]
     [HttpPost]
     public async Task<IActionResult> CreateOrReplaceBusinessHours(long businessId, [FromBody] BusinessHoursDto dto)
     {

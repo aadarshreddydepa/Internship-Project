@@ -6,16 +6,18 @@ public class BusinessService : IBusinessService
     private readonly IContactService _contactService;
     private readonly IHoursService _hoursService;
     private readonly IPhotoService _photoService;
-
+    private readonly IEmailService _emailService;
     public BusinessService(AppDbContext db,
                            IContactService contactService,
                            IHoursService hoursService,
-                           IPhotoService photoService)
+                           IPhotoService photoService,
+                           IEmailService emailService)
     {
         _db = db ?? throw new ArgumentNullException(nameof(db));
         _contactService = contactService;
         _hoursService = hoursService;
         _photoService = photoService;
+        _emailService = emailService;
     }
 
  
@@ -87,19 +89,33 @@ public class BusinessService : IBusinessService
         return business;
     }
 
-    public async Task<Business?> UpdateBusinessAsync(long id, Business updated)
+    public async Task<bool> UpdateBusinessFullAsync(long id, UpdateBusinessDto dto)
     {
-        var existing = await _db.Businesses.FindAsync(id);
-        if (existing == null) return null;
+        var business = await _db.Businesses.FindAsync(id);
+        if (business == null) return false;
 
-        existing.BusinessName = updated.BusinessName;
-        existing.Description = updated.Description;
-        existing.CategoryId = updated.CategoryId;
-        existing.SubcategoryId = updated.SubcategoryId;
-        existing.UpdatedAt = DateTime.UtcNow;
+        business.BusinessName = dto.BusinessName;
+        business.Description = dto.Description;
+        business.CategoryId = dto.CategoryId;
+        business.SubcategoryId = dto.SubcategoryId;
+
+        var contact = await _db.BusinessContacts
+            .FirstOrDefaultAsync(c => c.BusinessId == id);
+
+        if (contact != null)
+        {
+            contact.PhoneCode = dto.PhoneCode;
+            contact.PhoneNumber = dto.PhoneNumber;
+            contact.Email = dto.Email;
+            contact.City = dto.City;
+            contact.State = dto.State;
+            contact.Country = dto.Country;
+            contact.Pincode = dto.Pincode;
+            contact.StreetAddress = dto.StreetAddress;
+        }
 
         await _db.SaveChangesAsync();
-        return existing;
+        return true;
     }
 
     public async Task<bool> DeleteBusinessAsync(long id)
@@ -112,33 +128,29 @@ public class BusinessService : IBusinessService
         return true;
     }
 
-    public async Task<long> RegisterBusinessAsync(RegisterBusinessDto dto)
+    public async Task<long> RegisterBusinessAsync(RegisterBusinessDto dto, long userId)
     {
         using var transaction = await _db.Database.BeginTransactionAsync();
 
         try
         {
-            // Validate Category
             var category = await _db.Categories.FindAsync(dto.CategoryId);
             if (category == null)
                 throw new Exception("Invalid category");
 
-            // Validate Subcategory
             var subcategory = await _db.Subcategories
                 .FirstOrDefaultAsync(s => s.SubcategoryId == dto.SubcategoryId &&
                                         s.CategoryId == dto.CategoryId);
 
             if (subcategory == null)
                 throw new Exception("Invalid subcategory");
-
-            // Create Business
             var business = new Business
             {
                 BusinessName = dto.BusinessName,
                 Description = dto.Description,
                 CategoryId = dto.CategoryId,
                 SubcategoryId = dto.SubcategoryId,
-                UserId = dto.UserId, // FIXED
+                UserId = userId, 
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -152,15 +164,16 @@ public class BusinessService : IBusinessService
             // HOURS
             await _hoursService.AddHoursAsync(dto.Hours, business.BusinessId);
 
-            //  PHOTO
+            // PHOTO
             if (!string.IsNullOrWhiteSpace(dto.Photo))
             {
-                if (dto.Photo.Length > 5_000_000) // ~5MB limit
+                if (dto.Photo.Length > 5_000_000)
                     throw new Exception("Image too large");
 
                 await _photoService.SavePhotoAsync(dto.Photo, business.BusinessId);
             }
 
+            // ADMIN DASHBOARD ENTRY
             await _db.AdminDashboards.AddAsync(new AdminDashboard
             {
                 BusinessId = business.BusinessId,
@@ -169,9 +182,32 @@ public class BusinessService : IBusinessService
                 UpdatedAt = DateTime.UtcNow
             });
 
-await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync();
 
             await transaction.CommitAsync();
+            // GET BUSINESS DETAILS FOR EMAIL
+            var contact = await _db.BusinessContacts
+                .Where(c => c.BusinessId == business.BusinessId)
+                .FirstOrDefaultAsync();
+
+            var categoryName = await _db.Categories
+                .Where(c => c.CategoryId == business.CategoryId)
+                .Select(c => c.CategoryName)
+                .FirstOrDefaultAsync();
+
+            // ADMIN EMAIL FROM CONFIG
+            var adminEmail = "aadarshreddydepa@gmail.com"; // move to config later
+
+            await _emailService.SendNewBusinessNotificationToAdminAsync(
+                adminEmail,
+                business.BusinessName,
+                categoryName ?? "",
+                business.Description ?? "",
+                contact?.City + ", " + contact?.State,
+                contact?.PhoneCode + contact?.PhoneNumber,
+                contact?.Email
+            );
+
             return business.BusinessId;
         }
         catch
@@ -180,7 +216,6 @@ await _db.SaveChangesAsync();
             throw;
         }
     }
-
     public async Task<object?> GetBusinessPreviewAsync(long businessId)
     {
         var business = await _db.Businesses.FirstOrDefaultAsync(b => b.BusinessId == businessId);
@@ -281,7 +316,26 @@ await _db.SaveChangesAsync();
                     Status = _db.AdminDashboards
                         .Where(a => a.BusinessId == b.BusinessId)
                         .Select(a => a.Status.ToString())
-                        .FirstOrDefault()
+                        .FirstOrDefault(),
+                    State = _db.BusinessContacts
+                        .Where(c => c.BusinessId == b.BusinessId)
+                        .Select(c => c.State)
+                        .FirstOrDefault(),
+
+                    Country = _db.BusinessContacts
+                        .Where(c => c.BusinessId == b.BusinessId)
+                        .Select(c => c.Country)
+                        .FirstOrDefault(),
+
+                    Pincode = _db.BusinessContacts
+                        .Where(c => c.BusinessId == b.BusinessId)
+                        .Select(c => c.Pincode)
+                        .FirstOrDefault(),
+
+                    StreetAddress = _db.BusinessContacts
+                        .Where(c => c.BusinessId == b.BusinessId)
+                        .Select(c => c.StreetAddress)
+                        .FirstOrDefault(),
                 })
                 .ToListAsync();
         }

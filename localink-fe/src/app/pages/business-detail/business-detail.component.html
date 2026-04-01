@@ -41,6 +41,9 @@
 
       <div class="title-row">
         <h1>Business Name : {{ business.businessName }}</h1>
+        <span class="rating-badge" *ngIf="totalReviews > 0">
+          ⭐ {{ averageRating }} / 5
+        </span>
       </div>
 
       
@@ -78,6 +81,64 @@
       </div>
 
     </div>
+
+  </div>
+    <!-- REVIEW LIST -->
+    <div class="review-grid">
+    <div *ngFor="let r of visibleReviews" class="review-card">
+      <strong>{{ r.userName }}</strong>
+      <p>⭐ {{ r.rating }}</p>
+      <p>{{ r.comment }}</p>
+    </div>
+  </div>
+  
+  <div class="review-section">
+
+    <!-- NO REVIEWS STATE -->
+    <div *ngIf="totalReviews === 0" class="no-review-container">
+
+      <p class="no-review-text">
+        Be the first person to review this business
+      </p>
+
+      <button class="add-review-btn-inline" (click)="toggleReviewForm()">
+        Add Review
+      </button>
+
+    </div>
+
+    <!-- HAS REVIEWS STATE -->
+    <div *ngIf="totalReviews > 0" class="add-review-container">
+      <button class="add-review-btn" (click)="toggleReviewForm()">
+        Add Review
+      </button>
+    </div>
+
+    <div *ngIf="showReviewForm" class="add-review">
+
+      <div class="star-rating">
+        <span
+          *ngFor="let star of [1,2,3,4,5]"
+          (click)="setRating(star)"
+          (mouseenter)="setHover(star)"
+          (mouseleave)="clearHover()"
+          [class.active]="star <= (hoverRating || rating)"
+        >
+          ★
+        </span>
+      </div>
+
+      <textarea [(ngModel)]="comment" placeholder="Write your review"></textarea>
+
+      <button class="submit" (click)="submitReview()">Submit</button>
+
+    </div>
+
+  <div *ngIf="reviews.length > 6" class="view-more">
+    <button (click)="toggleViewMore()">
+      {{ showAllReviews ? 'View Less ▲' : 'View More ▼' }}
+    </button>
+  </div>
 
   </div>
 

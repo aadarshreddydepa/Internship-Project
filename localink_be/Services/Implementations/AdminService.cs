@@ -3,10 +3,12 @@ using OfficeOpenXml;
 public class AdminService : IAdminService
 {
     private readonly AppDbContext _db;
+    private readonly IEmailService _emailService;
 
-    public AdminService(AppDbContext db)
+    public AdminService(AppDbContext db, IEmailService emailService)
     {
         _db = db;
+        _emailService = emailService;
     }
 
     public async Task<List<AdminBusinessDto>> GetAllAsync()
@@ -55,6 +57,25 @@ public class AdminService : IAdminService
         record.UpdatedAt = DateTime.UtcNow;
 
         await _db.SaveChangesAsync();
+        var business = await _db.Businesses
+            .FirstOrDefaultAsync(b => b.BusinessId == businessId);
+
+        var user = await _db.Users
+            .FirstOrDefaultAsync(u => u.UserId == business.UserId);
+
+        var categoryName = await _db.Categories
+            .Where(c => c.CategoryId == business.CategoryId)
+            .Select(c => c.CategoryName)
+            .FirstOrDefaultAsync();
+
+        await _emailService.SendBusinessStatusUpdateToUserAsync(
+            user.Email,
+            user.FullName,
+            business.BusinessName,
+            categoryName ?? "",
+            record.Status.ToString(),
+            record.RejectionReason
+        );
     }
 
     public async Task<byte[]> ExportAsync(string status)
