@@ -31,4 +31,8 @@ export class ReviewService {
   getSummary(businessId: number) {
     return this.http.get(`${this.baseUrl}/summary/${businessId}`);
   }
+
+  getAiSuggestions(keywords: string) {
+    return this.http.get<string[]>(`http://localhost:5138/api/ai/suggestions?keywords=${encodeURIComponent(keywords)}`);
+  }
 }

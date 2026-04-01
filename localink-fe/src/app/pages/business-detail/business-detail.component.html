@@ -128,9 +128,27 @@
         </span>
       </div>
 
-      <textarea [(ngModel)]="comment" placeholder="Write your review"></textarea>
+      <div class="ai-toggle-container" style="margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+        <input type="checkbox" id="aiToggle" [(ngModel)]="enableAiSuggestions" />
+        <label for="aiToggle">Enable AI-Generated Suggestions (Based on keywords)</label>
+      </div>
 
-      <button class="submit" (click)="submitReview()">Submit</button>
+      <textarea [(ngModel)]="comment" (ngModelChange)="onCommentChange()" placeholder="Write your review or enter keywords..."></textarea>
+
+      <!-- AI Suggestions Section -->
+      <div *ngIf="enableAiSuggestions && aiSuggestions.length > 0" class="suggestions-container" style="margin-top: 10px;">
+        <p style="font-size: 0.9em; font-weight: bold; margin-bottom: 5px;">AI Suggestions (Click to append):</p>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <button *ngFor="let suggestion of aiSuggestions" 
+                  (click)="appendSuggestion(suggestion)" 
+                  class="suggestion-chip" 
+                  style="text-align: left; padding: 8px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; cursor: pointer; color: #333;">
+            {{ suggestion }}
+          </button>
+        </div>
+      </div>
+
+      <button class="submit" (click)="submitReview()" style="margin-top: 15px;">Submit</button>
 
     </div>
 
