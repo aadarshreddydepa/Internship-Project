@@ -55,4 +55,24 @@ public class UserController : ControllerBase
 
         return Ok(result);
     }
+    
+    [Authorize]
+    [HttpPut("profile")]
+    public async Task<IActionResult> UpdateProfile([FromBody] UpdateUserProfileDto request)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(new { success = false, errors = ModelState });
+
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        if (userId == null)
+            return Unauthorized();
+
+        var result = await _service.UpdateUserProfileAsync(long.Parse(userId), request);
+
+        if (!result)
+            return NotFound(new { success = false, message = "User not found" });
+
+        return Ok(new { success = true, message = "Profile updated successfully" });
+    }
 }

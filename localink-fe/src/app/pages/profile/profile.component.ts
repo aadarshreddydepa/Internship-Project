@@ -16,9 +16,13 @@ import { TokenService } from '../../core/services/token.service';
 export class ProfileComponent implements OnInit {
 
   user: any | null = null;
+  editableUser: any = null;
+
   isLoading = false;
-  errorMessage = '';
   isLoggedIn = false;
+  isEditMode = false;
+
+  errorMessage = '';
 
   constructor(
     private userService: UserService,
@@ -27,16 +31,12 @@ export class ProfileComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-
     const token = this.tokenService.getToken();
-
     this.isLoggedIn = !!token;
 
-    if (!this.isLoggedIn) {
-      return;
+    if (this.isLoggedIn) {
+      this.loadUser();
     }
-
-    this.loadUser();
   }
 
   loadUser() {
@@ -49,15 +49,45 @@ export class ProfileComponent implements OnInit {
         this.isLoading = false;
       },
       error: (err) => {
-
         if (err.status === 401) {
           this.errorMessage = 'Session expired. Please login again.';
           this.logout();
         } else {
           this.errorMessage = 'Failed to load profile';
         }
-
         this.isLoading = false;
+      }
+    });
+  }
+
+  enableEdit() {
+    this.isEditMode = true;
+
+    // Deep clone (prevents live mutation)
+    this.editableUser = JSON.parse(JSON.stringify(this.user));
+  }
+
+  cancelEdit() {
+    this.isEditMode = false;
+    this.editableUser = null;
+    this.errorMessage = '';
+  }
+
+  saveProfile() {
+    this.errorMessage = '';
+
+    this.userService.updateUserProfile(this.editableUser).subscribe({
+      next: () => {
+        this.user = { ...this.editableUser };
+        this.isEditMode = false;
+        this.editableUser = null;
+      },
+      error: (err) => {
+        if (err.error?.errors) {
+          this.errorMessage = Object.values(err.error.errors).flat().join(', ');
+        } else {
+          this.errorMessage = 'Failed to update profile';
+        }
       }
     });
   }

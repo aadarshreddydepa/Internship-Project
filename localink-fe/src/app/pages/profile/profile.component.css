@@ -90,12 +90,13 @@
 }
 
 .logout-btn {
-  margin-left: 10px;
+  margin-left: 14px;
   background: #ff4d4f;
   color: white;
   border: none;
   padding: 8px 16px;
   cursor: pointer;
+  border-radius: 3px;
 }
 
 .login-btn {
@@ -110,4 +111,67 @@
 .not-logged-in {
   text-align: center;
   margin-top: 50px;
+}
+
+/* INPUT FIELDS */
+input {
+  width: 100%;
+  padding: 8px;
+  margin-top: 6px;
+  background: #2A2A2A;
+  border: 1px solid #444;
+  color: #fff;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+/* ERROR */
+.error {
+  color: #ff4d4f;
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+/* LOADING */
+.loading {
+  text-align: center;
+  margin-top: 40px;
+  color: #ccc;
+}
+
+.actions {
+  position: sticky;
+  bottom: 0;
+  background: #121212;
+  padding: 15px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #2A2A2A;
+  margin-top: 20px;
+  z-index: 10;
+}
+.left-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.right-actions {
+  margin-left: auto;
+}
+
+.secondary-btn {
+  background: #444;
+  color: #fff;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.secondary-btn:hover {
+  background: #555;
+}
+.profile-container {
+  padding-bottom: 100px; /* prevents overlap */
 }
