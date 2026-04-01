@@ -88,3 +88,26 @@
 .primary-btn:hover {
   background: #d6b48a;
 }
+
+.logout-btn {
+  margin-left: 10px;
+  background: #ff4d4f;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.login-btn {
+  margin-top: 15px;
+  background: #c8a97e;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.not-logged-in {
+  text-align: center;
+  margin-top: 50px;
+}

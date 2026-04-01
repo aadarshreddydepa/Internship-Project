@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 [ApiController]
 [Route("api/v1/business")]
@@ -14,74 +15,57 @@ public class BusinessController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllBusinesses()
     {
-        var businesses = await _service.GetAllBusinessesAsync();
-        return Ok(businesses);
+        return Ok(await _service.GetAllBusinessesAsync());
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetBusinessById(long id)
     {
         var business = await _service.GetBusinessByIdAsync(id);
-        if (business == null)
-            return NotFound();
-
+        if (business == null) return NotFound();
         return Ok(business);
     }
 
+    [Authorize(Roles = "client")]
     [HttpPost("register")]
     public async Task<IActionResult> RegisterBusiness([FromBody] RegisterBusinessDto dto)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
-        try
-        {
-            var businessId = await _service.RegisterBusinessAsync(dto);
+        var businessId = await _service.RegisterBusinessAsync(dto, long.Parse(userId));
 
-            return Ok(new
-            {
-                success = true,
-                message = "Business registered successfully",
-                businessId
-            });
-        }
-        catch (Exception ex)
+        return Ok(new
         {
-            return StatusCode(500, new
-            {
-                success = false,
-                message = ex.Message
-            });
-        }
+            success = true,
+            businessId
+        });
     }
 
+    [Authorize(Roles = "client")]
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateBusiness(long id, [FromBody] Business updated)
+    public async Task<IActionResult> UpdateBusiness(long id, [FromBody] UpdateBusinessDto dto)
     {
-        var result = await _service.UpdateBusinessAsync(id, updated);
-        if (result == null)
-            return NotFound();
-
-        return Ok(result);
+        var result = await _service.UpdateBusinessFullAsync(id, dto);
+        return result == null ? NotFound() : Ok(result);
     }
 
+    [Authorize(Roles = "client")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteBusiness(long id)
     {
         var deleted = await _service.DeleteBusinessAsync(id);
-        if (!deleted)
-            return NotFound();
-
-        return NoContent();
+        return deleted ? NoContent() : NotFound();
     }
 
-    [HttpGet("user/{userId}")]
-    public async Task<IActionResult> GetBusinessesByUser(long userId)
+    [Authorize]
+    [HttpGet("my-businesses")]
+    public async Task<IActionResult> GetMyBusinesses()
     {
-        var data = await _service.GetBusinessesByUserAsync(userId);
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        var data = await _service.GetBusinessesByUserAsync(long.Parse(userId));
         return Ok(data);
     }
-
     [HttpGet("subcategories/{subcategoryId}/businesses")]
     public async Task<IActionResult> GetBySubcategory(int subcategoryId)
     {
@@ -99,8 +83,6 @@ public class BusinessController : ControllerBase
     [HttpGet("search")]
     public async Task<IActionResult> SearchBusinesses([FromQuery] string query)
     {
-          var results = await _service.SearchBusinessesAsync(query);
-            return Ok(results);
-       
+        return Ok(await _service.SearchBusinessesAsync(query));
     }
 }

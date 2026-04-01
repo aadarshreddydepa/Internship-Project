@@ -1,6 +1,6 @@
 
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.AspNetCore.Authorization;
 
 [ApiController]
 [Route("api/v1/user")]
@@ -42,13 +42,16 @@ public class UserController : ControllerBase
         return Ok(new { success = true, message = result });
     }
 
-    [HttpGet("profile/{userId}")]
-    public async Task<IActionResult> GetProfile(long userId)
+    [Authorize]
+    [HttpGet("profile")]
+    public async Task<IActionResult> GetProfile()
     {
-        var result = await _service.GetUserProfileAsync(userId);
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        var result = await _service.GetUserProfileAsync(long.Parse(userId));
 
         if (result == null)
-            return NotFound("User not found");
+            return NotFound();
 
         return Ok(result);
     }

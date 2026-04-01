@@ -12,9 +12,9 @@ public class User
     public string CountryCode { get; set; } = string.Empty;
     public string PasswordHash { get; set; } = null!;
 
+    public int? OtpAttempts { get; set; }
     public string? PasswordResetOtp { get; set; }
     public DateTime? OtpExpiry { get; set; }
-    public int OtpAttempts { get; set; } = 0;
     public ICollection<Business> Businesses { get; set; } = new List<Business>();
 
 }

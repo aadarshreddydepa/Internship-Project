@@ -103,4 +103,106 @@ public class EmailService : IEmailService
             <small>Localink Security Team</small>
         </div>";
     }
+
+    public async Task SendNewBusinessNotificationToAdminAsync(
+        string adminEmail,
+        string businessName,
+        string category,
+        string description,
+        string address,
+        string phone,
+        string email)
+    {
+        var subject = "🚀 New Business Registration - Action Required";
+
+        var body = $@"
+        <div style='font-family: Arial; padding:20px'>
+            <h2>New Business Registration</h2>
+
+            <p>A new business has been registered and is pending approval.</p>
+
+            <hr/>
+
+            <b>Business Name:</b> {businessName} <br/>
+            <b>Category:</b> {category} <br/>
+            <b>Description:</b> {description} <br/><br/>
+
+            <b>Address:</b> {address} <br/>
+            <b>Phone:</b> {phone} <br/>
+            <b>Email:</b> {email} <br/>
+
+            <hr/>
+
+            <p><b>Status:</b> Pending Approval</p>
+
+            <p>Please review it from the admin dashboard.</p>
+
+            <small>Localink System</small>
+        </div>";
+
+        await SendEmailAsync(adminEmail, subject, body);
+    }
+
+    public async Task SendBusinessStatusUpdateToUserAsync(
+        string userEmail,
+        string ownerName,
+        string businessName,
+        string category,
+        string status,
+        string? rejectionReason)
+    {
+        string subject;
+        string body;
+
+        if (status == "Approved")
+        {
+            subject = "🎉 Your Business Has Been Approved!";
+
+            body = $@"
+            <div style='font-family: Arial; padding:20px'>
+                <h2>Congratulations {ownerName}! 🎉</h2>
+
+                <p>Your business has been approved.</p>
+
+                <hr/>
+
+                <b>Business Name:</b> {businessName} <br/>
+                <b>Category:</b> {category} <br/>
+                <b>Status:</b> Approved <br/>
+
+                <hr/>
+
+                <p>You can now start getting customers.</p>
+
+                <small>Localink Team</small>
+            </div>";
+        }
+        else
+        {
+            subject = "❌ Business Registration Update";
+
+            body = $@"
+            <div style='font-family: Arial; padding:20px'>
+                <h2>Hello {ownerName},</h2>
+
+                <p>Your business was reviewed but not approved.</p>
+
+                <hr/>
+
+                <b>Business Name:</b> {businessName} <br/>
+                <b>Category:</b> {category} <br/>
+                <b>Status:</b> Rejected <br/>
+
+                <p><b>Reason:</b> {rejectionReason}</p>
+
+                <hr/>
+
+                <p>Please update and resubmit.</p>
+
+                <small>Localink Team</small>
+            </div>";
+        }
+
+        await SendEmailAsync(userEmail, subject, body);
+    }
 }

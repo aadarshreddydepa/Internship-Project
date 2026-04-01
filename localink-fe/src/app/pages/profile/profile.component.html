@@ -1,32 +1,29 @@
-<div *ngIf="user" class="profile-container">
+
+<div *ngIf="isLoggedIn && user" class="profile-container">
 
   <h2 class="title">Account Details</h2>
 
   <div class="info-block">
 
-    <!-- USERNAME -->
     <div class="info-row">
       <span>Username</span>
       <p>{{ user.fullName }}</p>
     </div>
 
-    <!-- EMAIL -->
     <div class="info-row">
       <span>Email</span>
       <p>{{ user.email }}</p>
     </div>
 
-    <!-- ADDRESS -->
     <div class="info-row">
       <span>Address</span>
       <div class="address">
-        <p>{{ user.address.street }}, {{ user.address.city }}</p>
-        <p>{{ user.address.state }}  - {{ user.address.pincode }}</p>
-        <p>{{ user.address.country }}</p>
+        <p>{{ user.address?.street }}, {{ user.address?.city }}</p>
+        <p>{{ user.address?.state }} - {{ user.address?.pincode }}</p>
+        <p>{{ user.address?.country }}</p>
       </div>
     </div>
 
-    <!-- PHONE -->
     <div class="info-row">
       <span>Phone</span>
       <p>{{ user.phone }}</p>
@@ -35,14 +32,31 @@
   </div>
 
   <div class="actions">
-    <button class="primary-btn">
-      Edit Profile
-    </button>
+    <button class="primary-btn">Edit Profile</button>
+    <button class="logout-btn" (click)="logout()">Logout</button>
   </div>
 
 </div>
 
-<!-- LOADING -->
-<div *ngIf="!user" class="loading">
+<div *ngIf="isLoggedIn && isLoading" class="loading">
   Loading profile...
+</div>
+
+<div *ngIf="!isLoggedIn" class="not-logged-in">
+
+  <h2>You're not logged in</h2>
+
+  <p>
+    Access your personalized profile, manage your account,
+    and explore premium features by logging in.
+  </p>
+
+  <button class="login-btn" (click)="goToLogin()">
+    Login to Continue
+  </button>
+
+</div>
+
+<div *ngIf="errorMessage" class="error">
+  {{ errorMessage }}
 </div>

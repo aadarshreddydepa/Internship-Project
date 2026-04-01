@@ -6,7 +6,7 @@ import { Subject, debounceTime, distinctUntilChanged, switchMap, filter } from '
 import { CategoryService, Category } from '../../services/category.service';
 import { PopularBusinessesComponent } from '../../popular-businesses/popular-businesses.component';
 import { ProfileComponent } from '../../pages/profile/profile.component';
-import { UserService } from '../../services/user.service';
+import { UserProfile, UserService } from '../../services/user.service';
 import { SearchService, BusinessDto } from '../../services/search.service';
 
 @Component({
@@ -64,10 +64,9 @@ export class UserDashboardComponent implements OnInit {
     this.searchSubject.next(trimmed);
   }
 
-  loadUser() {
-    const userId = 1;
-    this.userService.getUserProfile(userId).subscribe({
-      next: (data) => {
+ loadUser() {
+    this.userService.getUserProfile().subscribe({
+      next: (data: UserProfile) => {
         this.username = data.fullName;
       },
       error: (err) => {

@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface UserProfile {
+  data: UserProfile;
   userId: number;
   fullName: string;
   email: string;
@@ -16,16 +17,14 @@ export interface UserProfile {
   };
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class UserService {
 
   private baseUrl = 'http://localhost:5138/api/v1/user';
 
   constructor(private http: HttpClient) {}
 
-  getUserProfile(userId: number): Observable<UserProfile> {
-    return this.http.get<UserProfile>(`${this.baseUrl}/profile/${userId}`);
+  getUserProfile() {
+    return this.http.get<UserProfile>(`${this.baseUrl}/profile`);
   }
 }

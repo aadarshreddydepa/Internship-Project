@@ -2,13 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService, AdminBusiness } from '../../services/admin.service';
+import { UserProfile, UserService } from '../../services/user.service';
+import { ProfileComponent } from '../../pages/profile/profile.component';
 
 type Section = 'pending' | 'approved' | 'rejected' | 'inactive';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ProfileComponent],
   templateUrl: './admin-dashboard.component.html',
   styleUrl: './admin-dashboard.component.css'
 })
@@ -17,9 +19,9 @@ export class AdminDashboardComponent implements OnInit {
   businesses: AdminBusiness[] = [];
   currentSection: Section = 'pending';
   searchTerm = '';
-
+  showProfile = false;
   selectedBusiness: AdminBusiness | null = null;
-
+  username = localStorage.getItem('username') || 'Admin';
   toastMessage = '';
   showToast = false;
 
@@ -27,10 +29,13 @@ export class AdminDashboardComponent implements OnInit {
   rejectComment = '';
   rejectBusinessId: number | null = null;
 
-  constructor(private service: AdminService) {}
+  constructor(private service: AdminService,
+              private userService: UserService
+  ) {}
 
   ngOnInit(): void {
     this.loadBusinesses();
+    this.loadUser();
   }
 
   loadBusinesses(): void {
@@ -55,7 +60,7 @@ export class AdminDashboardComponent implements OnInit {
         b.name.toLowerCase().includes(this.searchTerm.toLowerCase())
       );
   }
-
+  
   approve(id: number): void {
     this.service.updateStatus(id, { status: 'Approved' }).subscribe(() => {
       this.notify('Business Approved');
@@ -125,4 +130,25 @@ export class AdminDashboardComponent implements OnInit {
       window.URL.revokeObjectURL(url);
     });
   }
+  toggleProfile(): void {
+    this.showProfile = true;
+  }
+
+  closeProfile(): void {
+    this.showProfile = false;
+  }
+
+  scrollToTop(): void {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  loadUser() {
+      this.userService.getUserProfile().subscribe({
+        next: (data: UserProfile) => {
+          this.username = data.fullName;
+        },
+        error: (err) => {
+          console.error('Error fetching user', err);
+        }
+      });
+    }
 }

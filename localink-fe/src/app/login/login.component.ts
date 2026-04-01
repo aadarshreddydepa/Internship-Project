@@ -15,10 +15,14 @@ import { AuthService } from '../core/services/auth.service';
 import { TokenService } from '../core/services/token.service';
 import { ForgotPasswordComponent } from '../forgot-password/forgot-password.component';
 
+
+// ✅ IMPORTANT (global grecaptcha)
+declare var grecaptcha: any;
+
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, ForgotPasswordComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule,ForgotPasswordComponent ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
@@ -29,6 +33,10 @@ export class LoginComponent implements AfterViewInit {
   submitted = false;
   isLoading = false;
   errorMessage = "";
+
+  captchaToken: string = '';
+  captchaError = false;
+  captchaRendered = false; 
 
   currentView: 'login' | 'forgot' = 'login';
 
@@ -100,45 +108,71 @@ export class LoginComponent implements AfterViewInit {
         firstInvalid?.focus();
       }
 
-      // ✅ critical guard
       if (this.loginForm.invalid || this.isLoading) return;
+
+     
+      if (!this.captchaToken) {
+        this.captchaError = true;
+        return;
+      }
 
       this.isLoading = true;
 
       const payload = {
         usernameOrEmail: this.loginForm.value.usernameOrEmail.trim().toLowerCase(),
-        password: this.loginForm.value.password
+        password: this.loginForm.value.password,
+        captchaToken: this.captchaToken // 👈 ready for backend
       };
 
       this.authService.login(payload).subscribe({
         next: (res: any) => {
           try {
-            this.tokenService.setToken(res.token);
-            this.tokenService.setUser(res.name);
+            const response = res.data;
 
-            const role = (res?.userType || '').toLowerCase();
+            this.tokenService.setToken(response.token);
+            this.tokenService.setUser(response.name);
+            
+            const role = (response?.userType || '').toLowerCase().trim();
+            localStorage.setItem('userType', role);
 
             if (role === 'client') {
               this.router.navigate(['/client-dashboard']);
-            } else {
+            } else if(role === 'user') {
               this.router.navigate(['/user-dashboard']);
             }
-          } catch {
+            else if(role === 'admin') {
+              this.router.navigate(['/admin-dashboard']);
+            }
+            else{
+              this.errorMessage = 'Unknown user role';
+            }
+          } catch (err) {
             this.errorMessage = 'Something went wrong after login';
           }
         },
         error: (err: any) => {
           this.handleError(err);
+
+          // ✅ RESET CAPTCHA
+          if (typeof grecaptcha !== 'undefined') {
+            grecaptcha.reset();
+            this.captchaToken = '';
+          }
         },
         complete: () => {
           this.isLoading = false;
         }
       });
 
-    } catch {
+    } catch (error) {
       this.errorMessage = "Unexpected error occurred";
       this.isLoading = false;
     }
+  }
+
+  onCaptchaResolved(token: string) {
+    this.captchaToken = token;
+    this.captchaError = false;
   }
 
   handleError(err: any) {
@@ -174,6 +208,23 @@ export class LoginComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     if (!isPlatformBrowser(this.platformId)) return;
+
+    const interval = setInterval(() => {
+      if (!this.captchaRendered && typeof grecaptcha !== 'undefined') {
+        this.captchaRendered = true;
+
+        grecaptcha.render('loginCaptcha', {
+          sitekey: '6LeWsJ0sAAAAAKwBUTRqFvX9qufIJVUrrId14onY',
+          callback: (token: string) => {
+            this.onCaptchaResolved(token);
+          }
+        });
+
+        clearInterval(interval);
+      }
+    }, 500);
+
+    // 🎨 KEEP YOUR EXISTING UI CODE
 
     const glow = document.querySelector('.cursor-glow') as HTMLElement;
 
@@ -220,6 +271,8 @@ export class LoginComponent implements AfterViewInit {
 
           if (dist < 130) {
             ctx.strokeStyle = `rgba(200,169,126,${1 - dist / 130})`;
+            ctx.lineWidth = 1;
+
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(p2.x, p2.y);

@@ -14,6 +14,7 @@ import { UserDashboardComponent } from './dashboards/user-dashboard/user-dashboa
 import { EditBusinessBusinessComponent } from './edit-business/edit-business.component';
 import { BusinessDetailComponent } from './pages/business-detail/business-detail.component';
 import { AdminDashboardComponent } from './dashboards/admin-dashboard/admin-dashboard.component';
+import { AuthGuard } from './guards/auth.guard';
 
 
 export const routes: Routes = [
@@ -56,15 +57,18 @@ export const routes: Routes = [
   },
   { 
     path: 'client-dashboard',
-    component: ClientDashboardComponent 
+    component: ClientDashboardComponent,
+    canActivate: [AuthGuard] 
   },
   { 
     path: 'register-business', 
-    component: RegisterBusinessComponent 
+    component: RegisterBusinessComponent ,
+    canActivate: [AuthGuard]
   },
   {
     path: 'edit-business/:id',
-    component: EditBusinessBusinessComponent
+    component: EditBusinessBusinessComponent,
+    canActivate: [AuthGuard]
   },
   {
     path:'categories',
@@ -76,7 +80,8 @@ export const routes: Routes = [
   },
   {
     path: 'admin-dashboard',
-    component : AdminDashboardComponent
+    component : AdminDashboardComponent,
+    canActivate: [AuthGuard]
   },
   {
     path: '**',

@@ -3,21 +3,24 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-
+using System.Text.RegularExpressions;
 public class AuthService : IAuthService
 {
     private readonly AppDbContext _context;
     private readonly IConfiguration _config;
     private readonly IEmailService _emailService;
+    private readonly ICaptchaService _captchaService;
 
     public AuthService(
         AppDbContext context,
         IConfiguration config,
-        IEmailService emailService)
+        IEmailService emailService,
+        ICaptchaService captchaService)
     {
         _context = context;
         _config = config;
         _emailService = emailService;
+        _captchaService = captchaService;
     }
 
     // REGISTER
@@ -120,6 +123,9 @@ public async Task<string> ResetPasswordAsync(ForgotPasswordRequest request)
     // LOGIN (WITH CAPTCHA)
     public async Task<object> LoginAsync(LoginRequest request)
     {
+        var isCaptchaValid = await _captchaService.VerifyAsync(request.CaptchaToken);
+        if (!isCaptchaValid)
+            throw new UnauthorizedAccessException("Captcha validation failed");
 
         if (string.IsNullOrWhiteSpace(request.UsernameOrEmail) ||
             string.IsNullOrWhiteSpace(request.Password))
@@ -145,8 +151,11 @@ public async Task<string> ResetPasswordAsync(ForgotPasswordRequest request)
     }
 
     // SEND OTP
-    public async Task<string> SendResetOtpAsync(string email)
+    public async Task<string> SendResetOtpAsync(string email, string captchaToken)
     {
+        var isCaptchaValid = await _captchaService.VerifyAsync(captchaToken);
+        if (!isCaptchaValid)
+            throw new UnauthorizedAccessException("Captcha validation failed");
         var normalizedEmail = email.Trim().ToLower();
 
         var user = await _context.Users
@@ -161,7 +170,7 @@ public async Task<string> ResetPasswordAsync(ForgotPasswordRequest request)
         var otp = GenerateOtp();
 
         user.PasswordResetOtp = otp;
-        user.OtpExpiry = DateTime.UtcNow.AddMinutes(10);
+        user.OtpExpiry = DateTime.UtcNow.AddMinutes(1);
         user.OtpAttempts = 0;
 
         await _context.SaveChangesAsync();
