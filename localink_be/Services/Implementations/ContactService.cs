@@ -55,7 +55,7 @@ public class ContactService : IContactService
         await _db.SaveChangesAsync();
         return existing;
     }
-    public async Task<bool> DeleteContactAsync(int contactId)
+    public async Task<bool> DeleteContactAsync(long contactId)
     {
         var contact = await _db.BusinessContacts.FindAsync(contactId);
         if (contact == null) return false;

@@ -1,294 +1,254 @@
 using Xunit;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using FluentAssertions;
 
-public class ReviewServiceTests
+namespace Localink.Tests.Services
 {
-    private AppDbContext GetDbContext()
+    public class ReviewServiceTests
     {
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseInMemoryDatabase(databaseName: $"ReviewDb_{Guid.NewGuid()}")
-            .ConfigureWarnings(w =>
-                w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.InMemoryEventId.TransactionIgnoredWarning))
-            .Options;
-        return new AppDbContext(options);
-    }
-
-    private User ValidUser()
-    {
-        return new User
+        private AppDbContext GetDbContext()
         {
-            UserId = 1,
-            AccountType = "user",
-            FullName = "John Reviewer",
-            Email = "reviewer@example.com",
-            PhoneNumber = "+919876543210",
-            PasswordHash = "hashed",
-            IsEmailVerified = true,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
-    }
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+                .UseInMemoryDatabase(databaseName: $"ReviewDb_{Guid.NewGuid()}")
+                .Options;
+            return new AppDbContext(options);
+        }
 
-    private Category ValidCategory()
-    {
-        return new Category
+        private void SeedBaseData(AppDbContext db)
         {
-            CategoryId = 1,
-            CategoryName = "Restaurants",
-            IconUrl = "https://example.com/icon.png"
-        };
-    }
+            db.Users.Add(new User
+            {
+                UserId = 1, AccountType = "user", FullName = "John",
+                Email = "j@t.com", PasswordHash = "h", CountryCode = "+91"
+            });
+            db.Categories.Add(new Category { CategoryId = 1, CategoryName = "Food", IconUrl = "i.png" });
+            db.Subcategories.Add(new Subcategory { SubcategoryId = 1, CategoryId = 1, SubcategoryName = "Fast" });
+            db.Businesses.Add(new Business
+            {
+                BusinessId = 1, BusinessName = "Biz", Description = "Test business description",
+                CategoryId = 1, SubcategoryId = 1, UserId = 1,
+                CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow
+            });
+            db.SaveChanges();
+        }
 
-    private Subcategory ValidSubcategory()
-    {
-        return new Subcategory
+        // ──── AddOrUpdateReview ────
+
+        [Fact]
+        public async Task AddOrUpdateReview_CreatesNewReview()
         {
-            SubcategoryId = 1,
-            CategoryId = 1,
-            SubcategoryName = "Fast Food",
-            IconUrl = "https://example.com/sub-icon.png"
-        };
-    }
+            // Arrange
+            var db = GetDbContext();
+            SeedBaseData(db);
+            var service = new ReviewService(db);
+            var dto = new ReviewRequestDto { BusinessId = 1, Rating = 4, Comment = "Good!" };
 
-    private Business ValidBusiness()
-    {
-        return new Business
+            // Act
+            await service.AddOrUpdateReview(1, dto);
+
+            // Assert
+            var review = await db.BusinessReviews.FirstOrDefaultAsync(r => r.UserId == 1 && r.BusinessId == 1);
+            review.Should().NotBeNull();
+            review!.Rating.Should().Be(4);
+            review.Comment.Should().Be("Good!");
+        }
+
+        [Fact]
+        public async Task AddOrUpdateReview_UpdatesExistingReview()
         {
-            BusinessId = 1,
-            BusinessName = "Restaurant Name",
-            Description = "A great restaurant serving delicious food",
-            UserId = 1,
-            CategoryId = 1,
-            SubcategoryId = 1,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
-    }
+            // Arrange
+            var db = GetDbContext();
+            SeedBaseData(db);
+            db.BusinessReviews.Add(new BusinessReview
+            {
+                ReviewId = 1, UserId = 1, BusinessId = 1,
+                Rating = 3, Comment = "OK", CreatedAt = DateTime.UtcNow
+            });
+            await db.SaveChangesAsync();
 
-    private BusinessReview ValidReview()
-    {
-        return new BusinessReview
+            var service = new ReviewService(db);
+            var dto = new ReviewRequestDto { BusinessId = 1, Rating = 5, Comment = "Excellent!" };
+
+            // Act
+            await service.AddOrUpdateReview(1, dto);
+
+            // Assert
+            var review = await db.BusinessReviews.FirstAsync(r => r.ReviewId == 1);
+            review.Rating.Should().Be(5);
+            review.Comment.Should().Be("Excellent!");
+        }
+
+        [Fact]
+        public async Task AddOrUpdateReview_ThrowsException_WhenRatingInvalid()
         {
-            ReviewId = 1,
-            UserId = 1,
-            BusinessId = 1,
-            Rating = 5,
-            Comment = "Excellent service and food!",
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
-    }
+            // Arrange
+            var db = GetDbContext();
+            var service = new ReviewService(db);
+            var dto = new ReviewRequestDto { BusinessId = 1, Rating = 6, Comment = "Too high" };
 
-    [Fact]
-    public async Task AddOrUpdateReview_ShouldCreateNewReview()
-    {
-        // Arrange
-        var db = GetDbContext();
-        var user = ValidUser();
-        var category = ValidCategory();
-        var subcategory = ValidSubcategory();
-        var business = ValidBusiness();
+            // Act & Assert
+            var act = () => service.AddOrUpdateReview(1, dto);
+            await act.Should().ThrowAsync<Exception>().WithMessage("Rating must be between 1 and 5");
+        }
 
-        db.Users.Add(user);
-        db.Categories.Add(category);
-        db.Subcategories.Add(subcategory);
-        db.Businesses.Add(business);
-        await db.SaveChangesAsync();
-
-        var service = new ReviewService(db);
-        var reviewDto = new ReviewRequestDto
+        [Fact]
+        public async Task AddOrUpdateReview_ThrowsException_WhenRatingZero()
         {
-            BusinessId = 1,
-            UserId = 1,
-            Rating = 4,
-            Comment = "Good food!"
-        };
+            // Arrange
+            var db = GetDbContext();
+            var service = new ReviewService(db);
+            var dto = new ReviewRequestDto { BusinessId = 1, Rating = 0, Comment = "Zero" };
 
-        // Act
-        var result = await service.AddOrUpdateReview(reviewDto);
+            // Act & Assert
+            var act = () => service.AddOrUpdateReview(1, dto);
+            await act.Should().ThrowAsync<Exception>().WithMessage("Rating must be between 1 and 5");
+        }
 
-        // Assert
-        Assert.NotNull(result);
-        var review = await db.BusinessReviews.FirstOrDefaultAsync(r => r.UserId == 1 && r.BusinessId == 1);
-        Assert.NotNull(review);
-    }
+        // ──── GetReviewsByBusiness ────
 
-    [Fact]
-    public async Task AddOrUpdateReview_ShouldUpdateExistingReview()
-    {
-        // Arrange
-        var db = GetDbContext();
-        var user = ValidUser();
-        var category = ValidCategory();
-        var subcategory = ValidSubcategory();
-        var business = ValidBusiness();
-        var review = ValidReview();
-
-        db.Users.Add(user);
-        db.Categories.Add(category);
-        db.Subcategories.Add(subcategory);
-        db.Businesses.Add(business);
-        db.BusinessReviews.Add(review);
-        await db.SaveChangesAsync();
-
-        var service = new ReviewService(db);
-        var reviewDto = new ReviewRequestDto
+        [Fact]
+        public async Task GetReviewsByBusiness_ReturnsReviews_WhenExist()
         {
-            BusinessId = 1,
-            UserId = 1,
-            Rating = 3,
-            Comment = "Not bad!"
-        };
+            // Arrange
+            var db = GetDbContext();
+            SeedBaseData(db);
+            db.BusinessReviews.Add(new BusinessReview
+            {
+                ReviewId = 1, UserId = 1, BusinessId = 1,
+                Rating = 5, Comment = "Great!", CreatedAt = DateTime.UtcNow
+            });
+            await db.SaveChangesAsync();
 
-        // Act
-        var result = await service.AddOrUpdateReview(reviewDto);
+            var service = new ReviewService(db);
 
-        // Assert
-        Assert.NotNull(result);
-        var updated = await db.BusinessReviews.FirstOrDefaultAsync(r => r.ReviewId == 1);
-        Assert.Equal(3, updated.Rating);
-    }
+            // Act
+            var result = await service.GetReviewsByBusiness(1);
 
-    [Fact]
-    public async Task GetReviewsByBusiness_ShouldReturnBusinessReviews()
-    {
-        // Arrange
-        var db = GetDbContext();
-        var user = ValidUser();
-        var category = ValidCategory();
-        var subcategory = ValidSubcategory();
-        var business = ValidBusiness();
-        var review = ValidReview();
+            // Assert
+            result.Should().HaveCount(1);
+            result[0].Rating.Should().Be(5);
+        }
 
-        db.Users.Add(user);
-        db.Categories.Add(category);
-        db.Subcategories.Add(subcategory);
-        db.Businesses.Add(business);
-        db.BusinessReviews.Add(review);
-        await db.SaveChangesAsync();
-
-        var service = new ReviewService(db);
-
-        // Act
-        var result = await service.GetReviewsByBusiness(1);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.NotEmpty(result);
-    }
-
-    [Fact]
-    public async Task GetReviewsByBusiness_WithNoReviews_ShouldReturnEmptyList()
-    {
-        // Arrange
-        var db = GetDbContext();
-        var category = ValidCategory();
-        var subcategory = ValidSubcategory();
-        var business = ValidBusiness();
-
-        db.Categories.Add(category);
-        db.Subcategories.Add(subcategory);
-        db.Businesses.Add(business);
-        await db.SaveChangesAsync();
-
-        var service = new ReviewService(db);
-
-        // Act
-        var result = await service.GetReviewsByBusiness(1);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Empty(result);
-    }
-
-    [Fact]
-    public async Task GetSummary_ShouldReturnReviewSummary()
-    {
-        // Arrange
-        var db = GetDbContext();
-        var user = ValidUser();
-        var category = ValidCategory();
-        var subcategory = ValidSubcategory();
-        var business = ValidBusiness();
-        var review1 = ValidReview();
-        var review2 = new BusinessReview
+        [Fact]
+        public async Task GetReviewsByBusiness_ReturnsEmptyList_WhenNoReviews()
         {
-            ReviewId = 2,
-            UserId = 1,
-            BusinessId = 1,
-            Rating = 4,
-            Comment = "Pretty good",
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
+            // Arrange
+            var db = GetDbContext();
+            var service = new ReviewService(db);
 
-        db.Users.Add(user);
-        db.Categories.Add(category);
-        db.Subcategories.Add(subcategory);
-        db.Businesses.Add(business);
-        db.BusinessReviews.Add(review1);
-        db.BusinessReviews.Add(review2);
-        await db.SaveChangesAsync();
+            // Act
+            var result = await service.GetReviewsByBusiness(999);
 
-        var service = new ReviewService(db);
+            // Assert
+            result.Should().NotBeNull();
+            result.Should().BeEmpty();
+        }
 
-        // Act
-        var result = await service.GetSummary(1);
+        // ──── GetSummary ────
 
-        // Assert
-        Assert.NotNull(result);
-        Assert.Equal(2, result.TotalReviews);
-    }
-
-    [Fact]
-    public async Task GetSummary_ShouldCalculateAverageRating()
-    {
-        // Arrange
-        var db = GetDbContext();
-        var user = ValidUser();
-        var category = ValidCategory();
-        var subcategory = ValidSubcategory();
-        var business = ValidBusiness();
-        var review1 = new BusinessReview
+        [Fact]
+        public async Task GetSummary_ReturnsCorrectSummary()
         {
-            ReviewId = 1,
-            UserId = 1,
-            BusinessId = 1,
-            Rating = 5,
-            Comment = "Excellent!",
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
-        var review2 = new BusinessReview
+            // Arrange
+            var db = GetDbContext();
+            SeedBaseData(db);
+            db.BusinessReviews.AddRange(
+                new BusinessReview { ReviewId = 1, UserId = 1, BusinessId = 1, Rating = 5, CreatedAt = DateTime.UtcNow },
+                new BusinessReview { ReviewId = 2, UserId = 1, BusinessId = 1, Rating = 3, CreatedAt = DateTime.UtcNow }
+            );
+            await db.SaveChangesAsync();
+
+            var service = new ReviewService(db);
+
+            // Act
+            var result = await service.GetSummary(1);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.TotalReviews.Should().Be(2);
+            result.AverageRating.Should().Be(4.0);
+        }
+
+        [Fact]
+        public async Task GetSummary_ReturnsZero_WhenNoReviews()
         {
-            ReviewId = 2,
-            UserId = 1,
-            BusinessId = 1,
-            Rating = 3,
-            Comment = "Average",
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
+            // Arrange
+            var db = GetDbContext();
+            var service = new ReviewService(db);
 
-        db.Users.Add(user);
-        db.Categories.Add(category);
-        db.Subcategories.Add(subcategory);
-        db.Businesses.Add(business);
-        db.BusinessReviews.Add(review1);
-        db.BusinessReviews.Add(review2);
-        await db.SaveChangesAsync();
+            // Act
+            var result = await service.GetSummary(999);
 
-        var service = new ReviewService(db);
+            // Assert
+            result.TotalReviews.Should().Be(0);
+            result.AverageRating.Should().Be(0);
+        }
 
-        // Act
-        var result = await service.GetSummary(1);
+        // ──── Edge Case Tests ────
 
-        // Assert
-        Assert.NotNull(result);
-        Assert.Equal(4, result.AverageRating);
+        [Fact]
+        public async Task AddOrUpdateReview_BoundaryRating1_ShouldSucceed()
+        {
+            var db = GetDbContext();
+            SeedBaseData(db);
+            var service = new ReviewService(db);
+            var dto = new ReviewRequestDto { BusinessId = 1, Rating = 1, Comment = "Terrible" };
+
+            await service.AddOrUpdateReview(1, dto);
+
+            var review = await db.BusinessReviews.FirstAsync();
+            review.Rating.Should().Be(1);
+        }
+
+        [Fact]
+        public async Task AddOrUpdateReview_BoundaryRating5_ShouldSucceed()
+        {
+            var db = GetDbContext();
+            SeedBaseData(db);
+            var service = new ReviewService(db);
+            var dto = new ReviewRequestDto { BusinessId = 1, Rating = 5, Comment = "Excellent" };
+
+            await service.AddOrUpdateReview(1, dto);
+
+            var review = await db.BusinessReviews.FirstAsync();
+            review.Rating.Should().Be(5);
+        }
+
+        [Fact]
+        public async Task AddOrUpdateReview_NegativeRating_ShouldThrowException()
+        {
+            var db = GetDbContext();
+            SeedBaseData(db);
+            var service = new ReviewService(db);
+            var dto = new ReviewRequestDto { BusinessId = 1, Rating = -1 };
+
+            var act = () => service.AddOrUpdateReview(1, dto);
+            await act.Should().ThrowAsync<Exception>().WithMessage("Rating must be between 1 and 5");
+        }
+
+        [Fact]
+        public async Task AddOrUpdateReview_ZeroRating_ShouldThrowException()
+        {
+            var db = GetDbContext();
+            SeedBaseData(db);
+            var service = new ReviewService(db);
+            var dto = new ReviewRequestDto { BusinessId = 1, Rating = 0 };
+
+            var act = () => service.AddOrUpdateReview(1, dto);
+            await act.Should().ThrowAsync<Exception>().WithMessage("Rating must be between 1 and 5");
+        }
+
+        [Fact]
+        public async Task AddOrUpdateReview_Rating6_ShouldThrowException()
+        {
+            var db = GetDbContext();
+            SeedBaseData(db);
+            var service = new ReviewService(db);
+            var dto = new ReviewRequestDto { BusinessId = 1, Rating = 6 };
+
+            var act = () => service.AddOrUpdateReview(1, dto);
+            await act.Should().ThrowAsync<Exception>().WithMessage("Rating must be between 1 and 5");
+        }
     }
 }
+

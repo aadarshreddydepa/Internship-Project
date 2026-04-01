@@ -1,217 +1,174 @@
 using Xunit;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Threading.Tasks;
+using FluentAssertions;
 
-public class UserServiceTests
+namespace Localink.Tests.Services
 {
-    private AppDbContext GetDbContext()
+    public class UserServiceTests
     {
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseInMemoryDatabase(databaseName: $"UserDb_{Guid.NewGuid()}")
-            .ConfigureWarnings(w =>
-                w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.InMemoryEventId.TransactionIgnoredWarning))
-            .Options;
-        return new AppDbContext(options);
-    }
-
-    private User ValidUser()
-    {
-        return new User
+        private AppDbContext GetDbContext()
         {
-            UserId = 1,
-            AccountType = "user",
-            FullName = "John Doe",
-            Email = "john@example.com",
-            PhoneNumber = "+919876543210",
-            PasswordHash = "hashed_password",
-            IsEmailVerified = true,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
-    }
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+                .UseInMemoryDatabase(databaseName: $"UserDb_{Guid.NewGuid()}")
+                .Options;
+            return new AppDbContext(options);
+        }
 
-    private Address ValidAddress()
-    {
-        return new Address
+        private void SeedUser(AppDbContext db)
         {
-            AddressId = 1,
-            UserId = 1,
-            Country = "India",
-            State = "Maharashtra",
-            City = "Mumbai",
-            StreetAddress = "123 Main Street",
-            Pincode = "400001"
-        };
-    }
-
-    [Fact]
-    public async Task GetUserProfileAsync_ShouldReturnUserProfile()
-    {
-        // Arrange
-        var db = GetDbContext();
-        var user = ValidUser();
-        var address = ValidAddress();
-
-        db.Users.Add(user);
-        db.Addresses.Add(address);
-        await db.SaveChangesAsync();
-
-        var service = new UserService(db);
-
-        // Act
-        var result = await service.GetUserProfileAsync(1);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Equal("John Doe", result.FullName);
-    }
-
-    [Fact]
-    public async Task GetUserProfileAsync_WithInvalidUserId_ShouldReturnNull()
-    {
-        // Arrange
-        var db = GetDbContext();
-        var service = new UserService(db);
-
-        // Act
-        var result = await service.GetUserProfileAsync(999);
-
-        // Assert
-        Assert.Null(result);
-    }
-
-    [Fact]
-    public async Task UpdateUserProfileAsync_ShouldUpdateProfile()
-    {
-        // Arrange
-        var db = GetDbContext();
-        var user = ValidUser();
-        db.Users.Add(user);
-        await db.SaveChangesAsync();
-
-        var service = new UserService(db);
-
-        var updateDto = new UpdateUserProfileDto
-        {
-            FullName = "Jane Doe",
-            Phone = "+919876543211",
-            Address = new AddressDto
+            db.Users.Add(new User
             {
-                Country = "India",
-                State = "Tamil Nadu",
-                City = "Chennai",
-                StreetAddress = "456 Oak Street",
-                Pincode = "600001"
-            }
-        };
-
-        // Act
-        var result = await service.UpdateUserProfileAsync(1, updateDto);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Equal("Jane Doe", result.FullName);
-    }
-
-    [Fact]
-    public async Task UpdateUserProfileAsync_WithInvalidUserId_ShouldReturnNull()
-    {
-        // Arrange
-        var db = GetDbContext();
-        var service = new UserService(db);
-
-        var updateDto = new UpdateUserProfileDto
-        {
-            FullName = "Jane Doe",
-            Phone = "+919876543211",
-            Address = new AddressDto
+                UserId = 1,
+                AccountType = "user",
+                FullName = "John Doe",
+                Email = "john@test.com",
+                PhoneNumber = "9876543210",
+                PasswordHash = "hash",
+                CountryCode = "+91"
+            });
+            db.Addresses.Add(new Address
             {
+                AddressId = 1,
+                UserId = 1,
                 Country = "India",
-                State = "Tamil Nadu",
-                City = "Chennai",
-                StreetAddress = "456 Oak Street",
-                Pincode = "600001"
-            }
-        };
+                State = "TS",
+                City = "Hyderabad",
+                StreetAddress = "123 Main St",
+                Pincode = "500001"
+            });
+            db.SaveChanges();
+        }
 
-        // Act
-        var result = await service.UpdateUserProfileAsync(999, updateDto);
+        // ──── GetUserProfileAsync ────
 
-        // Assert
-        Assert.Null(result);
-    }
-
-    [Fact]
-    public async Task UpdateUserProfileAsync_ShouldCreateAddressIfNotExists()
-    {
-        // Arrange
-        var db = GetDbContext();
-        var user = ValidUser();
-        db.Users.Add(user);
-        await db.SaveChangesAsync();
-
-        var service = new UserService(db);
-
-        var updateDto = new UpdateUserProfileDto
+        [Fact]
+        public async Task GetUserProfileAsync_ReturnsProfile_WhenExists()
         {
-            FullName = "John Doe",
-            Phone = "+919876543210",
-            Address = new AddressDto
-            {
-                Country = "India",
-                State = "Maharashtra",
-                City = "Mumbai",
-                StreetAddress = "123 Main Street",
-                Pincode = "400001"
-            }
-        };
+            // Arrange
+            var db = GetDbContext();
+            SeedUser(db);
+            var service = new UserService(db);
 
-        // Act
-        var result = await service.UpdateUserProfileAsync(1, updateDto);
+            // Act
+            var result = await service.GetUserProfileAsync(1);
 
-        // Assert
-        Assert.NotNull(result);
-        var address = await db.Addresses.FirstOrDefaultAsync(a => a.UserId == 1);
-        Assert.NotNull(address);
-        Assert.Equal("Mumbai", address.City);
-    }
+            // Assert
+            result.Should().NotBeNull();
+            result!.FullName.Should().Be("John Doe");
+            result.Email.Should().Be("john@test.com");
+            result.Phone.Should().Be("9876543210");
+            result.Address.Should().NotBeNull();
+            result.Address.City.Should().Be("Hyderabad");
+        }
 
-    [Fact]
-    public async Task UpdateUserProfileAsync_ShouldUpdateAddressIfExists()
-    {
-        // Arrange
-        var db = GetDbContext();
-        var user = ValidUser();
-        var address = ValidAddress();
-
-        db.Users.Add(user);
-        db.Addresses.Add(address);
-        await db.SaveChangesAsync();
-
-        var service = new UserService(db);
-
-        var updateDto = new UpdateUserProfileDto
+        [Fact]
+        public async Task GetUserProfileAsync_ReturnsNull_WhenNotFound()
         {
-            FullName = "John Doe",
-            Phone = "+919876543210",
-            Address = new AddressDto
+            // Arrange
+            var db = GetDbContext();
+            var service = new UserService(db);
+
+            // Act
+            var result = await service.GetUserProfileAsync(999);
+
+            // Assert
+            result.Should().BeNull();
+        }
+
+        // ──── UpdateUserProfileAsync ────
+
+        [Fact]
+        public async Task UpdateUserProfileAsync_ReturnsTrue_WhenUserExists()
+        {
+            // Arrange
+            var db = GetDbContext();
+            SeedUser(db);
+            var service = new UserService(db);
+            var dto = new UpdateUserProfileDto
             {
-                Country = "India",
-                State = "Tamil Nadu",
-                City = "Chennai",
-                StreetAddress = "789 New Street",
-                Pincode = "600001"
-            }
-        };
+                FullName = "John Updated",
+                Phone = "1111111111",
+                Address = new AddressDto
+                {
+                    Street = "New Street",
+                    City = "Mumbai",
+                    State = "MH",
+                    Country = "India",
+                    Pincode = "400001"
+                }
+            };
 
-        // Act
-        var result = await service.UpdateUserProfileAsync(1, updateDto);
+            // Act
+            var result = await service.UpdateUserProfileAsync(1, dto);
 
-        // Assert
-        Assert.NotNull(result);
-        var updatedAddress = await db.Addresses.FirstOrDefaultAsync(a => a.UserId == 1);
-        Assert.NotNull(updatedAddress);
-        Assert.Equal("Chennai", updatedAddress.City);
+            // Assert
+            result.Should().BeTrue();
+            var user = await db.Users.FirstAsync(u => u.UserId == 1);
+            user.FullName.Should().Be("John Updated");
+            user.PhoneNumber.Should().Be("1111111111");
+
+            var address = await db.Addresses.FirstAsync(a => a.UserId == 1);
+            address.City.Should().Be("Mumbai");
+        }
+
+        [Fact]
+        public async Task UpdateUserProfileAsync_ReturnsFalse_WhenUserNotFound()
+        {
+            // Arrange
+            var db = GetDbContext();
+            var service = new UserService(db);
+            var dto = new UpdateUserProfileDto
+            {
+                FullName = "Nobody",
+                Address = new AddressDto()
+            };
+
+            // Act
+            var result = await service.UpdateUserProfileAsync(999, dto);
+
+            // Assert
+            result.Should().BeFalse();
+        }
+
+        [Fact]
+        public async Task UpdateUserProfileAsync_CreatesAddress_WhenNoExistingAddress()
+        {
+            // Arrange
+            var db = GetDbContext();
+            db.Users.Add(new User
+            {
+                UserId = 2,
+                AccountType = "user",
+                FullName = "Jane",
+                Email = "jane@test.com",
+                PasswordHash = "hash",
+                CountryCode = "+91"
+            });
+            await db.SaveChangesAsync();
+
+            var service = new UserService(db);
+            var dto = new UpdateUserProfileDto
+            {
+                FullName = "Jane Updated",
+                Phone = "2222222222",
+                Address = new AddressDto
+                {
+                    Street = "456 Ave",
+                    City = "Delhi",
+                    State = "DL",
+                    Country = "India",
+                    Pincode = "110001"
+                }
+            };
+
+            // Act
+            var result = await service.UpdateUserProfileAsync(2, dto);
+
+            // Assert
+            result.Should().BeTrue();
+            var address = await db.Addresses.FirstOrDefaultAsync(a => a.UserId == 2);
+            address.Should().NotBeNull();
+            address!.City.Should().Be("Delhi");
+        }
     }
 }

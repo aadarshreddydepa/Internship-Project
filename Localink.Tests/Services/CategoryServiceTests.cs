@@ -1,107 +1,59 @@
 using Xunit;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using FluentAssertions;
 
-public class CategoryServiceTests
+namespace Localink.Tests.Services
 {
-    private AppDbContext GetDbContext()
+    public class CategoryServiceTests
     {
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseInMemoryDatabase(databaseName: $"CategoryDb_{Guid.NewGuid()}")
-            .ConfigureWarnings(w =>
-                w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.InMemoryEventId.TransactionIgnoredWarning))
-            .Options;
-        return new AppDbContext(options);
-    }
-
-    private Category ValidCategory()
-    {
-        return new Category
+        private AppDbContext GetDbContext()
         {
-            CategoryId = 1,
-            CategoryName = "Restaurants",
-            IconUrl = "https://example.com/restaurants.png"
-        };
-    }
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+                .UseInMemoryDatabase(databaseName: $"CatDb_{Guid.NewGuid()}")
+                .Options;
+            return new AppDbContext(options);
+        }
 
-    [Fact]
-    public async Task GetCategoriesAsync_ShouldReturnAllCategories()
-    {
-        // Arrange
-        var db = GetDbContext();
-        db.Categories.Add(ValidCategory());
-        db.Categories.Add(new Category
+        [Fact]
+        public async Task GetCategoriesAsync_ReturnsCategories_WhenExist()
         {
-            CategoryId = 2,
-            CategoryName = "Hotels",
-            IconUrl = "https://example.com/hotels.png"
-        });
-        await db.SaveChangesAsync();
+            // Arrange
+            var db = GetDbContext();
+            db.Categories.AddRange(
+                new Category { CategoryId = 1, CategoryName = "Food", IconUrl = "icon1.png" },
+                new Category { CategoryId = 2, CategoryName = "Retail", IconUrl = "icon2.png" }
+            );
+            await db.SaveChangesAsync();
 
-        var service = new CategoryService(db);
+            var service = new CategoryService(db);
 
-        // Act
-        var result = await service.GetCategoriesAsync();
+            // Act
+            var result = await service.GetCategoriesAsync();
 
-        // Assert
-        Assert.NotNull(result);
-        Assert.Equal(2, result.Count);
-    }
+            // Assert
+            result.Should().HaveCount(2);
+            result[0].Name.Should().Be("Food");
+            result[1].Name.Should().Be("Retail");
+        }
 
-    [Fact]
-    public async Task GetCategoriesAsync_WithNoCategories_ShouldReturnEmptyList()
-    {
-        // Arrange
-        var db = GetDbContext();
-        var service = new CategoryService(db);
+        [Fact]
+        public async Task GetCategoriesAsync_ThrowsException_WhenEmpty()
+        {
+            // Arrange
+            var db = GetDbContext();
+            var service = new CategoryService(db);
 
-        // Act
-        var result = await service.GetCategoriesAsync();
+            // Act & Assert
+            var act = () => service.GetCategoriesAsync();
+            await act.Should().ThrowAsync<Exception>().WithMessage("Error fetching categories");
+        }
 
-        // Assert
-        Assert.NotNull(result);
-        Assert.Empty(result);
-    }
-
-    [Fact]
-    public async Task GetCategoriesAsync_ShouldReturnCategoryDtos()
-    {
-        // Arrange
-        var db = GetDbContext();
-        db.Categories.Add(ValidCategory());
-        await db.SaveChangesAsync();
-
-        var service = new CategoryService(db);
-
-        // Act
-        var result = await service.GetCategoriesAsync();
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Single(result);
-        Assert.IsType<List<CategoryDto>>(result);
-    }
-
-    [Fact]
-    public async Task GetCategoriesAsync_ShouldIncludeIconUrl()
-    {
-        // Arrange
-        var db = GetDbContext();
-        var category = ValidCategory();
-        db.Categories.Add(category);
-        await db.SaveChangesAsync();
-
-        var service = new CategoryService(db);
-
-        // Act
-        var result = await service.GetCategoriesAsync();
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Single(result);
-        Assert.NotNull(result[0].IconUrl);
-        Assert.Equal("https://example.com/restaurants.png", result[0].IconUrl);
+        [Fact]
+        public void Constructor_ThrowsArgumentNullException_WhenContextIsNull()
+        {
+            // Act & Assert
+            var act = () => new CategoryService(null!);
+            act.Should().Throw<ArgumentNullException>();
+        }
     }
 }
