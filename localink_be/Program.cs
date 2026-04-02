@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using localink_be.Hubs;
 using System.Text;
 using DotNetEnv;
 
@@ -65,12 +66,14 @@ builder.Services.AddControllers()
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSignalR();
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
         policy => policy
-            .AllowAnyOrigin()
+            .WithOrigins("http://localhost:4200")
+            .AllowCredentials()
             .AllowAnyMethod()
             .AllowAnyHeader());
 });
@@ -100,6 +103,7 @@ app.UseAuthorization();
 // ROUTES
 app.MapGet("/", () => "Localink API is running");
 app.MapControllers();
+app.MapHub<NotificationHub>("/notifications");
 
 app.Run();
 

@@ -1,12 +1,16 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.SignalR;
+using localink_be.Hubs;
 
 public class ReviewService : IReviewService
 {
     private readonly AppDbContext _context;
+    private readonly IHubContext<NotificationHub> _hubContext;
 
-    public ReviewService(AppDbContext context)
+    public ReviewService(AppDbContext context, IHubContext<NotificationHub> hubContext)
     {
         _context = context;
+        _hubContext = hubContext;
     }
 
     
@@ -43,6 +47,12 @@ public class ReviewService : IReviewService
         }
 
         await _context.SaveChangesAsync();
+
+        var business = await _context.Businesses.FirstOrDefaultAsync(b => b.BusinessId == dto.BusinessId);
+        if (business != null)
+        {
+            await _hubContext.Clients.Group($"client_{business.UserId}").SendAsync("ReceiveNotification", $"You received a new {dto.Rating}-star review for {business.BusinessName}!");
+        }
     }
 
     public async Task<List<ReviewResponseDto>> GetReviewsByBusiness(long businessId)
