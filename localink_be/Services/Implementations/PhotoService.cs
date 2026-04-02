@@ -103,4 +103,5 @@ public class PhotoService : IPhotoService
         _db.BusinessPhotos.Add(photo);
         await _db.SaveChangesAsync();
     }
+
 }

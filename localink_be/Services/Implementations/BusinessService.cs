@@ -88,6 +88,10 @@ public class BusinessService : IBusinessService
 
         return business;
     }
+public async Task<Business?> UpdateBusinessAsync(long id, Business updated)
+{
+    var existing = await _db.Businesses.FindAsync(id);
+    if (existing == null) return null;
 
     public async Task<bool> UpdateBusinessFullAsync(long id, UpdateBusinessDto dto)
     {
@@ -289,6 +293,8 @@ public class BusinessService : IBusinessService
         {
             return await _db.Businesses
                 .Where(b => b.UserId == userId)
+                .Include(b => b.Category)
+                .Include(b => b.Subcategory)
                 .Select(b => new BusinessDto
                 {
                     Id = b.BusinessId,
