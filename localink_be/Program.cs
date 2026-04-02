@@ -16,6 +16,11 @@ builder.Services.AddScoped<IBusinessService, BusinessService>();
 builder.Services.AddScoped<IContactService, ContactService>();
 builder.Services.AddScoped<IHoursService, HoursService>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
+builder.Services.AddHttpClient<BusinessLocationService>();
+builder.Services.AddMemoryCache();
+builder.Services.AddHttpClient();
+
+builder.Services.AddScoped<IBusinessPincodeService, BusinessPincodeService>();
 
 builder.Services.AddControllers();
 

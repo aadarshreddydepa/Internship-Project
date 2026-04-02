@@ -10,19 +10,19 @@
       <ng-select
         class="phone-code"
         [items]="phoneCountries"
-        bindLabel="code"
+        bindLabel="searchLabel"
         bindValue="code"
         formControlName="phoneCode"
-        [searchable]="false"
+        [searchable]="true"
         [clearable]="false">
 
         <ng-template ng-label-tmp let-item="item">
-          <span class="flag">{{item.flag}}</span> {{item.code}}
+          <span class="flag">{{item.flag}}</span> +{{item.code}}
         </ng-template>
 
         <ng-template ng-option-tmp let-item="item">
           <span class="flag">{{item.flag}}</span>
-          {{item.name}} ({{item.code}})
+          {{item.name}} (+{{item.code}})
         </ng-template>
 
       </ng-select>
@@ -77,12 +77,8 @@
       <ng-select
         [items]="countries"
         bindLabel="name"
-        bindValue="name"
         placeholder="Select Country"
         formControlName="country"
-        [searchable]="true"
-        [clearable]="true"
-        [virtualScroll]="true"
         (change)="onCountryChange()">
       </ng-select>
 
@@ -94,18 +90,13 @@
     <!-- STATE -->
     <div class="location-field">
       <label>State *</label>
-      <ng-select
-        [items]="states"
-        bindLabel="name"
-        bindValue="name"
-        placeholder="Select State"
-        formControlName="state"
-        [searchable]="true"
-        [clearable]="true"
-        [virtualScroll]="true"
-        [disabled]="!contactForm.get('country')?.value"
-        (change)="onStateChange($event)">
-      </ng-select>
+        <ng-select
+          [items]="states" 
+          bindLabel="name"
+          placeholder="Select State"
+          formControlName="state"
+          (change)="onStateChange()">
+        </ng-select>
 
       <div class="error" *ngIf="contactForm.get('state')?.touched && contactForm.get('state')?.invalid">
         State is required
@@ -118,13 +109,8 @@
       <ng-select
         [items]="cities"
         bindLabel="name"
-        bindValue="name"
         placeholder="Select City"
-        formControlName="city"
-        [searchable]="true"
-        [clearable]="true"
-        [virtualScroll]="true"
-        [disabled]="!contactForm.get('state')?.value">
+        formControlName="city">
       </ng-select>
 
       <div class="error" *ngIf="contactForm.get('city')?.touched && contactForm.get('city')?.invalid">
@@ -142,10 +128,25 @@
 
     <label>Pincode *</label>
 
-    <input type="text" formControlName="pincode" placeholder="Pincode">
+    <input type="text" formControlName="pincode" placeholder="Pincode" (blur)="validatePincode()">
 
     <div class="error" *ngIf="contactForm.get('pincode')?.touched && contactForm.get('pincode')?.invalid">
-    Enter a valid 6 digit pincode
+
+      <div *ngIf="contactForm.get('pincode')?.errors?.['invalidCountry']">
+   Pincode does not belong to selected country
+</div>
+
+<div *ngIf="contactForm.get('pincode')?.errors?.['invalidState']">
+   Pincode does not match selected state
+</div>
+
+<div *ngIf="contactForm.get('pincode')?.errors?.['invalidCity']">
+   Pincode does not match selected city
+</div>
+
+<div *ngIf="contactForm.get('pincode')?.errors?.['invalidPincode']">
+   Invalid pincode
+</div>
     </div>
 
     </div>
