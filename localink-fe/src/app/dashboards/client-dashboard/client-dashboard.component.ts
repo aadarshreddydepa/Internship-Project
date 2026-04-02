@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ProfileComponent } from '../../pages/profile/profile.component';
@@ -52,7 +52,8 @@ export class ClientDashboardComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private dashboardService: ClientDashboardService
+    private dashboardService: ClientDashboardService,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {}
   toggleProfile(): void {
     this.showProfile = true;
@@ -66,6 +67,8 @@ export class ClientDashboardComponent implements OnInit {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
   ngOnInit() {
+    if (!isPlatformBrowser(this.platformId)) return;
+
     this.fetchBusinesses();
     this.loadCategories();
 

@@ -1,5 +1,5 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
-import { CanActivate, Router } from '@angular/router';
+import { CanActivate, ActivatedRouteSnapshot, Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 
 @Injectable({
@@ -12,37 +12,33 @@ export class AuthGuard implements CanActivate {
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
-  canActivate(route: any): boolean {
+  canActivate(route: ActivatedRouteSnapshot): boolean {
 
-  if (!isPlatformBrowser(this.platformId)) {
+    // SSR — no auth context on server, don't pre-render protected routes
+    if (!isPlatformBrowser(this.platformId)) {
+      return false;
+    }
+
+    const token = localStorage.getItem('token');
+    const userRole = localStorage.getItem('userType');
+
+    // ── No token → redirect to login ──
+    if (!token) {
+      this.router.navigate(['/']);
+      return false;
+    }
+
+    // ── Role-based check via route data ──
+    const allowedRoles: string[] | undefined = route.data?.['roles'];
+
+    if (allowedRoles && allowedRoles.length > 0) {
+      if (!userRole || !allowedRoles.includes(userRole)) {
+        // User doesn't have the required role → redirect to login
+        this.router.navigate(['/']);
+        return false;
+      }
+    }
+
     return true;
   }
-
-  const token = localStorage.getItem('token');
-  const role = localStorage.getItem('userType');
-
-  if (!token) {
-    this.router.navigate(['/']);
-    return false;
-  }
-
-  const path = route.routeConfig?.path;
-
-  if (path?.includes('admin') && role !== 'admin') {
-    this.router.navigate(['/']);
-    return false;
-  }
-
-  if (path?.includes('client') && role !== 'client') {
-    this.router.navigate(['/']);
-    return false;
-  }
-
-  if (path?.includes('user') && role !== 'user') {
-    this.router.navigate(['/']);
-    return false;
-  }
-
-  return true;
-}
 }

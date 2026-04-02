@@ -13,7 +13,8 @@
 
     <div class="info-row">
       <span>Email</span>
-      <p>{{ user.email }}</p>
+      <p *ngIf="!isEditMode">{{ user.email }}</p>
+      <input *ngIf="isEditMode" [(ngModel)]="editableUser.email" />
     </div>
 
     <div class="info-row">

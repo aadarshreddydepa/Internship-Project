@@ -45,6 +45,10 @@ public class UserService : IUserService
             return false;
         user.FullName = dto.FullName;
         user.PhoneNumber = dto.Phone;
+        if (!string.IsNullOrEmpty(dto.Email))
+        {
+            user.Email = dto.Email;
+        }
         var address = await _db.Addresses.FirstOrDefaultAsync(a => a.UserId == userId);
 
         if (address == null)
