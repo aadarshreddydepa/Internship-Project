@@ -24,7 +24,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         sql => sql.EnableRetryOnFailure()
     )
 );
+builder.Services.AddControllers();
 
+builder.Services.AddHttpClient<ILocationService, LocationService>();
+builder.Services.AddHttpClient<IPostalService, PostalService>();
+builder.Services.AddMemoryCache();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
@@ -34,7 +38,6 @@ builder.Services.AddScoped<IContactService, ContactService>();
 builder.Services.AddScoped<IHoursService, HoursService>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
 
-builder.Services.AddControllers();
 
 
 
@@ -121,8 +124,6 @@ builder.Services.AddCors(options =>
               .AllowAnyOrigin();
     });
 });
-
-builder.Services.AddHttpClient();
 
 var app = builder.Build();
 

@@ -221,19 +221,35 @@ margin-bottom: 4px;
 .form-group input,
 .form-group select,
 ::ng-deep .ng-select-container {
-height: 34px !important;
-padding: 6px 8px;
-width: 100%;
+  height: 34px !important;
+  min-height: 34px !important;
 
-background: rgba(255,255,255,0.05);
-border: 1px solid rgba(255,255,255,0.12);
-border-radius: 8px;
+  display: flex;
+  align-items: center;
 
-color: white;
-font-size: 12px;
+  padding: 0 8px !important;
 
-transition: all 0.25s ease;
+  background: rgba(255,255,255,0.05) !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+  border-radius: 8px !important;                 
+
+  color: white;
+  font-size: 12px;
+
+  transition: all 0.25s ease;
 }
+::ng-deep .ng-select .ng-select-container .ng-value-container {
+  padding: 0 !important;
+}
+::ng-deep .ng-select-container .ng-value-label {
+  line-height: 34px;
+}
+::ng-deep .ng-select-container .ng-arrow-wrapper {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
 .address-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -304,36 +320,55 @@ border-color: #C8A97E;
 box-shadow: 0 0 6px rgba(200,169,126,0.3);
 }
 
-/* ========================= */
-/* PHONE FIX */
-/* ========================= */
-
 .phone-group {
   display: flex;
-  gap: 10px;
+  gap: 8px; 
   width: 100%;
 }
 
+/* CODE BOX (LEFT PART) */
 .code-box {
-  width: 80px;
-  flex-shrink: 0;
+  flex: 0 0 85px; 
+  max-width: 90px;
+}
+
+/* TEXT FIX (NO CUTTING) */
+.code-box ::ng-deep .ng-value-label {
+  white-space: nowrap;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* REMOVE EXTRA MARGIN */
+.code-box ::ng-deep .ng-value {
+  margin-left: 0 !important;
+}
+
+/* ARROW SPACING FIX */
+.code-box ::ng-deep .ng-arrow-wrapper {
+  padding-left: 4px;
+  padding-right: 2px;
+}
+
+/* PHONE NUMBER FIELD (RIGHT PART) */
+.number-box {
+  flex: 1;
+  min-width: 0;
+}
+
+.number-box input {
+  width: 100%;
+  height: 34px;
+  box-sizing: border-box;
+  border-radius: 8px;
+
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
 }
 
 .code-box input {
   width: 100%;
 }
-
-.number-box {
-  flex: 1;
-}
-
-.number-box input {
-  width: 100%;
-}
-
-/* ========================= */
-/* PASSWORD FIX */
-/* ========================= */
 
 .password-wrapper {
 position: relative;
@@ -356,15 +391,12 @@ font-size: 14px;
 }
 .address-row {
   grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  margin-bottom: 10px;
+  column-gap: 10px; 
+  row-gap: 0px;       
 }
 .full-width {
   grid-column: span 2;
 }
-/* ========================= */
-/* BUTTON */
-/* ========================= */
 
 .signup-btn {
 width: 100%;
@@ -386,10 +418,6 @@ transition: all 0.25s ease;
 transform: translateY(-2px);
 box-shadow: 0 6px 20px rgba(200,169,126,0.4);
 }
-
-/* ===================================== */
-/* FIX: REMOVE DUPLICATE PASSWORD ICON */
-/* ===================================== */
 
 input[type="password"] {
   appearance: none;
@@ -417,3 +445,20 @@ margin-top: 3px;
 border-color: #ff4d4f;
 }
 
+.login-redirect {
+  margin-top: 10px;
+  text-align: center;
+  color: #ccc;
+  font-size: 14px;
+}
+
+.login-redirect a {
+  color: #d4b07b; /* match your theme */
+  text-decoration: none;
+  margin-left: 5px;
+  font-weight: 500;
+}
+
+.login-redirect a:hover {
+  text-decoration: underline;
+}

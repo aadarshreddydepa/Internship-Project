@@ -5,6 +5,8 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { Router } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
 import { HttpClient } from '@angular/common/http';
+import { LocationService } from '../services/location.service';
+import { PostalService } from '../services/postal.service';
 
 declare var grecaptcha: any; 
 @Component({
@@ -21,11 +23,13 @@ export class SignupComponent implements OnInit, AfterViewInit {
   showPassword = false;
   showConfirmPassword = false;
   showSuccessPopup = false;
+  isPincodeFocused = false;
 
-  // JSON DATA
-  locationData: any[] = [];
+  // // JSON DATA
+  // locationData: any[] = [];
   countries: string[] = [];
   states: string[] = [];
+  cities: any[] = [];
 
   selectedType: 'user' | 'client' = 'user';
   currentStep = 1;
@@ -41,7 +45,9 @@ export class SignupComponent implements OnInit, AfterViewInit {
     private authService: AuthService,
     private router: Router,
     private http: HttpClient,
+    private locationService: LocationService,
     private ngZone: NgZone,
+    private postalService: PostalService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.signupForm = this.fb.group({
@@ -49,30 +55,32 @@ export class SignupComponent implements OnInit, AfterViewInit {
 
       name: ['', [
         Validators.required,
-        Validators.pattern('^\\S(.*\\S)?$')
+        Validators.pattern('^[A-Za-z]+(\\s[A-Za-z]+)*$')
       ]],
 
       email: ['', [
         Validators.required,
-        Validators.pattern('^[a-zA-Z0-9]+([._%+-]?[a-zA-Z0-9]+)*@[a-zA-Z0-9-]+(\\.[a-zA-Z]{2,})+$'),
+        Validators.pattern(
+    '^(?!.*\\.\\.)(?!.*\\.$)(?!^\\.)([A-Za-z0-9]+([._%+-][A-Za-z0-9]+)*)@[A-Za-z0-9-]+(\\.[A-Za-z]{2,})+$'
+  ),
         Validators.pattern('^\\S+$')
       ]],
 
       phone: ['', [
         Validators.required,
-        Validators.pattern('^[0-9]{10}$')
+        Validators.pattern('^[1-9][0-9]{9}$')
       ]],
 
-      countryCode: ['+91', Validators.required],
+      countryCode: [null, Validators.required],
 
-      street: ['', Validators.required],
+      street: ['', [Validators.required, Validators.pattern(/^(?!\d+$)[A-Za-z0-9\s\-\:\/\,\.]+$/)]],
       city: ['', Validators.required],
       state: ['', Validators.required],
       country: ['', Validators.required],
 
       pincode: ['', [
         Validators.required,
-        Validators.pattern('^[1-9][0-9]{5}$')
+        Validators.pattern('^[0-9A-Za-z\\-\\s]{3,10}$')
       ]],
 
       password: ['', [
@@ -90,31 +98,121 @@ export class SignupComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     this.signupForm.patchValue({ userType: 'user' });
 
-    this.http.get<any[]>('assets/countries.json').subscribe(data => {
-    this.locationData = data;
-    this.countries = data.map(c => c.name); // full objects for ng-select
+    // disable initially
+    this.signupForm.get('pincode')?.disable();
+
+    this.locationService.getCountries()
+    .subscribe((data: any[]) => {
+      this.countries = data;
+    });
+
+    // listen to ALL changes
+    this.signupForm.valueChanges.subscribe(() => {
+      this.onCityChange();
     });
   }
+  allowOnlyLetters(event: KeyboardEvent) {
+    const char = event.key;
 
-  // COUNTRY CHANGE
- onCountryChange(event: any) {
+    if (!/^[a-zA-Z\s]$/.test(char)) {
+      event.preventDefault();
+    }
+  }
 
-  //handle both string and object
-  const countryName = typeof event === 'string' ? event : event?.name;
+  validatePincode() {
+    const control = this.signupForm.get('pincode');
 
-  const country = this.locationData.find(
-    (c: any) => c.name === countryName
-  );
+    // skip if disabled
+    if (control?.disabled) return;
 
-  console.log('Selected country:', countryName);
-  console.log('Matched object:', country);
+    const pincode = this.signupForm.get('pincode')?.value;
+    const country = this.signupForm.get('country')?.value;
 
-  this.states = (country?.states || []).map((s: any) => s.name);
+    // prevent unnecessary API calls
+    if (!pincode || pincode.length < 5 || !country) return;
 
-  this.signupForm.patchValue({
-    state: ''
-  });
-}
+    this.postalService.validate(pincode, country.name)
+      .subscribe({
+        next: (res: any) => {
+
+          const data = res;
+
+          if (!data.features || data.features.length === 0) {
+            this.signupForm.get('pincode')?.setErrors({ invalidPostal: true });
+            return;
+          }
+
+          const location = data.features[0].properties;
+
+          const cityName = location.city || location.town || location.village;
+          const stateName = location.state;
+
+          // find matching objects
+          const normalize = (val: string) => val?.toLowerCase().replace(/\s/g, '');
+          const matchedState = this.states.find((s: any) =>
+            normalize(s.name) === normalize(stateName)
+          );
+          const matchedCity = this.cities.find((c: any) =>
+            normalize(c.name) === normalize(cityName)
+          );
+
+
+          // Optional autofill
+          this.signupForm.patchValue({
+            state: matchedState || null,
+            city: matchedCity || null
+          });
+
+          this.signupForm.get('pincode')?.setErrors(null);
+        },
+        error: () => {
+          // DO NOT block user
+          console.warn('Postal validation failed');
+        }
+      });
+  }
+
+  onCountryChange(country: any) {
+    this.signupForm.patchValue({
+      countryCode: country.phonecode
+    });
+
+    this.locationService.getStates(country.iso2)
+      .subscribe(data => {
+        this.states = data;
+        this.cities = [];
+      });
+
+    this.signupForm.patchValue({
+      state: '',
+      city: '',
+      pincode: ''
+    });
+    this.signupForm.get('pincode')?.disable();
+  }
+
+  onStateChange(state: any) {
+    const country = this.signupForm.get('country')?.value;
+
+    this.locationService.getCities(country.iso2, state.iso2)
+      .subscribe(data => {
+        this.cities = data;
+      });
+
+    this.signupForm.patchValue({ city: '', pincode: '' });
+    this.signupForm.get('pincode')?.disable();
+  }
+  onCityChange() {
+    const country = this.signupForm.get('country')?.value;
+    const state = this.signupForm.get('state')?.value;
+    const city = this.signupForm.get('city')?.value;
+
+    if (country && state && city) {
+      this.signupForm.get('pincode')?.enable();
+    } else {
+      this.signupForm.get('pincode')?.disable();
+    }
+  }
 
   // STEP NAVIGATION
   nextStep() {
@@ -209,6 +307,12 @@ allowOnlyNumbers(event: KeyboardEvent) {
     event.preventDefault();
   }
 }
+customSearch = (term: string, item: any) => {
+  term = term.toLowerCase();
+
+  return item.name.toLowerCase().includes(term) ||
+         item.phonecode.includes(term.replace('+', ''));
+};
   renderCaptcha() {
     if (!isPlatformBrowser(this.platformId)) return;
 
