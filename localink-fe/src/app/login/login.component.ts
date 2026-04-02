@@ -14,9 +14,10 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../core/services/auth.service';
 import { TokenService } from '../core/services/token.service';
 import { ForgotPasswordComponent } from '../forgot-password/forgot-password.component';
+import { environment } from '../../environments/environment';
 
 
-// ✅ IMPORTANT (global grecaptcha)
+// IMPORTANT (global grecaptcha)
 declare var grecaptcha: any;
 
 @Component({
@@ -153,7 +154,7 @@ export class LoginComponent implements AfterViewInit {
         error: (err: any) => {
           this.handleError(err);
 
-          // ✅ RESET CAPTCHA
+          // RESET CAPTCHA
           if (typeof grecaptcha !== 'undefined') {
             grecaptcha.reset();
             this.captchaToken = '';
@@ -214,7 +215,7 @@ export class LoginComponent implements AfterViewInit {
         this.captchaRendered = true;
 
         grecaptcha.render('loginCaptcha', {
-          sitekey: '6LeWsJ0sAAAAAKwBUTRqFvX9qufIJVUrrId14onY',
+          sitekey: environment.recaptchaSiteKey,
           callback: (token: string) => {
             this.onCaptchaResolved(token);
           }

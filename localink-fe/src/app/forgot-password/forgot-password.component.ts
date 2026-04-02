@@ -17,6 +17,7 @@ import {
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { AuthService } from '../core/services/auth.service';
 import { Subject, takeUntil } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 declare var grecaptcha: any;
 
@@ -213,7 +214,7 @@ export class ForgotPasswordComponent implements AfterViewInit, OnDestroy {
         this.captchaRendered = true;
 
         grecaptcha.render('forgotCaptcha', {
-          sitekey: '6LeWsJ0sAAAAAKwBUTRqFvX9qufIJVUrrId14onY',
+          sitekey: environment.recaptchaSiteKey,
           callback: (token: string) => {
             this.onCaptchaResolved(token);
           }
