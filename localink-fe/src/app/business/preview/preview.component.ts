@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
+ 
 @Component({
   selector: 'app-preview',
   standalone: true,
@@ -9,10 +9,10 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./preview.component.css']
 })
 export class PreviewComponent {
-
+ 
   @Input() businessData: any;
   @Input() contactData: any;
   @Input() hoursData: any[] = [];
   @Input() photoData: string | null = null;
-
+ 
 }

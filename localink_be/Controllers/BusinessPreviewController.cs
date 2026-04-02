@@ -12,7 +12,7 @@ public class BusinessPreviewController : ControllerBase
         _db = db;
     }
 
-    // GET: api/business/{businessId}/preview
+
     [HttpGet]
     public async Task<IActionResult> GetBusinessPreview(long businessId)
     {

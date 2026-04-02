@@ -9,7 +9,6 @@ public class ContactService : IContactService
         _db = db;
     }
 
-    // ADD CONTACT (used during registration)
     public async Task AddContactAsync(RegisterBusinessDto dto, long businessId)
     {
         if (string.IsNullOrWhiteSpace(dto.PhoneCode) || string.IsNullOrWhiteSpace(dto.PhoneNumber))
@@ -35,7 +34,6 @@ public class ContactService : IContactService
         await _db.SaveChangesAsync();
     }
 
-    // UPDATE CONTACT
     public async Task<BusinessContact?> UpdateContactAsync(long businessId, BusinessContact updated)
     {
         var existing = await _db.BusinessContacts
@@ -57,9 +55,7 @@ public class ContactService : IContactService
         await _db.SaveChangesAsync();
         return existing;
     }
-
-    // DELETE CONTACT
-    public async Task<bool> DeleteContactAsync(int contactId)
+    public async Task<bool> DeleteContactAsync(long contactId)
     {
         var contact = await _db.BusinessContacts.FindAsync(contactId);
         if (contact == null) return false;
@@ -69,7 +65,6 @@ public class ContactService : IContactService
         return true;
     }
 
-    // GET CONTACT BY BUSINESS ID
     public async Task<object?> GetContactByBusinessIdAsync(long businessId)
     {
         var contact = await _db.BusinessContacts
@@ -88,6 +83,6 @@ public class ContactService : IContactService
             })
             .FirstOrDefaultAsync();
 
-        return contact; // null if not found
+        return contact; 
     }
 }

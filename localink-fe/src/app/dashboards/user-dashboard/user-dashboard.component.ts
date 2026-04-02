@@ -1,31 +1,83 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Subject, debounceTime, distinctUntilChanged, switchMap, filter } from 'rxjs';
+
 import { CategoryService, Category } from '../../services/category.service';
 import { PopularBusinessesComponent } from '../../popular-businesses/popular-businesses.component';
+import { ProfileComponent } from '../../pages/profile/profile.component';
+import { UserProfile, UserService } from '../../services/user.service';
+import { SearchService, BusinessDto } from '../../services/search.service';
 
 @Component({
   selector: 'app-search',
   standalone: true,
-  imports: [CommonModule, FormsModule, PopularBusinessesComponent],
+  imports: [CommonModule, FormsModule, PopularBusinessesComponent, ProfileComponent],
   templateUrl: './user-dashboard.component.html',
   styleUrl: './user-dashboard.component.css'
 })
 export class UserDashboardComponent implements OnInit {
 
   categories: Category[] = [];
-  username: string = 'Sankeerth';
+  username: string = '';
   searchTerm: string = '';
+
+  searchResults: BusinessDto[] = [];
+  private searchSubject = new Subject<string>();
+
+  showProfile = false;
 
   constructor(
     private categoryService: CategoryService,
-    private router: Router
+    private userService: UserService,
+    private businessService: SearchService,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnInit(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+
     this.loadCategories();
+    this.loadUser();
+
+    this.searchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      filter((query: string) => query.trim().length > 3),
+      switchMap(query => this.businessService.searchBusinesses(query))
+    ).subscribe({
+      next: (data) => {
+        this.searchResults = data;
+        console.log(data);
+      },
+      error: (err) => console.error(err)
+    });
   }
+
+  onSearchChange(value: string) {
+    this.searchTerm = value;
+
+    const trimmed = value?.trim();
+
+    if (!trimmed) {
+      this.searchResults = []; 
+      return;
+    }
+
+    this.searchSubject.next(trimmed);
+  }
+
+ loadUser() {
+    this.userService.getUserProfile().subscribe({
+      next: (data: UserProfile) => {
+        this.username = data.fullName;
+      },
+      error: (err) => {
+        console.error('Error fetching user', err);
+      }
+    });
+  }
+
   loadCategories(): void {
     this.categoryService.getCategories().subscribe({
       next: (data) => {
@@ -38,23 +90,22 @@ export class UserDashboardComponent implements OnInit {
   }
 
   get filteredCategories(): Category[] {
-    const term = this.searchTerm.trim().toLowerCase();
-    if (!term) return this.categories;
-    return this.categories.filter(c =>
-      c.name.toLowerCase().includes(term)
-    );
+    return this.categories;
   }
 
-  goToProfile(): void {
-    this.router.navigate(['/profile']);
+  toggleProfile(): void {
+    this.showProfile = true;
+  }
+
+  closeProfile(): void {
+    this.showProfile = false;
   }
 
   scrollToTop(): void {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  //  NAVIGATION (IMPORTANT)
   openCategory(categoryId: number): void {
-    this.router.navigate(['/subcategory', categoryId]);
+    window.location.href = `/subcategory/${categoryId}`;
   }
 }

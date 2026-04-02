@@ -1,54 +1,56 @@
 <div class="page-wrapper">
-
+ 
   <div class="wizard-container">
-
+ 
     <!-- HEADER -->
     <div class="header">
       <h2>Register Your Business</h2>
       <p>Join our directory and reach more customers</p>
     </div>
-
+ 
     <!-- STEP PROGRESS -->
     <div class="stepper">
-
+ 
   <div class="step" [class.active]="currentStep >= 1">
     <div class="circle">1</div>
     <span>Basic Info</span>
   </div>
-
+ 
   <div class="line"></div>
-
+ 
   <div class="step" [class.active]="currentStep >= 2">
     <div class="circle">2</div>
     <span>Contact Details</span>
   </div>
-
-  
+ 
+ 
   <div class="line"></div>
-
+ 
   <div class="step" [class.active]="currentStep >= 3">
     <div class="circle">3</div>
     <span>Additional Info</span>
   </div>
-
+ 
   <div class="line"></div>
-
+ 
   <div class="step" [class.active]="currentStep >= 4">
     <div class="circle">4</div>
     <span>Preview</span>
   </div>
-
-
+ 
+ 
 </div>
     <!-- FORM CARD -->
     <div class="form-card">
-
+ 
+      <!-- STEP 1 : BASIC INFO -->
+ 
       <!-- STEP 1 : BASIC INFO -->
 
       <!-- STEP 1 : BASIC INFO -->
       <div *ngIf="currentStep === 1">
         <h3>Basic Information</h3>
-
+ 
         <form [formGroup]="businessForm">
 
         <!-- CATEGORY + SUBCATEGORY FIRST -->
@@ -134,50 +136,50 @@
 
 
       <!-- STEP 2 : CONTACT DETAILS -->
-
+ 
       <div *ngIf="currentStep === 2">
-
+ 
         <app-contact-details
           [initialData]="contactData"
           (next)="saveContactAndNext($event)"
           (previous)="goToPrevious()">
         </app-contact-details>
-
+ 
       </div>
-    
+   
      
-
+ 
       <!-- STEP 3 : ADDITIONAL INFO -->
-
+ 
       <div *ngIf="currentStep === 3">
-
+ 
         <h3>Additional Information</h3>
         <app-hours [initialHours]="hoursData" (hoursSaved)="saveHours($event)"></app-hours>
         <app-photo-upload [initialPhoto]="photoData" (photoSelected)="savePhoto($event)"></app-photo-upload>
-
+ 
         <div class="error" *ngIf="hoursErrorMessage">
           {{ hoursErrorMessage }}
         </div>
         <div class="button-container step3-buttons">
-
+ 
           <button
             class="previous-btn"
             (click)="goToPrevious()">
-
+ 
             Previous
-
+ 
           </button>
           <button class="next-btn" (click)="goToNext()">
             Next
           </button>
-
+ 
         </div>
-
+ 
       </div>
-
+ 
       <!-- STEP 4 : PREVIEW -->
        <div *ngIf="currentStep === 4">
-        
+       
         <app-preview
           [businessData]="businessData"
           [contactData]="contactData"
@@ -188,21 +190,21 @@
           {{ submitSuccessMessage }}
         </div>
         <div class="button-container preview-buttons">
-
+ 
           <button
             class="previous-btn"
             (click)="goToPrevious()">
             Edit Details
           </button>
-
+ 
           <button
             class="submit-btn"
             (click)="submitRegistration()">
             Submit Registration
           </button>
-
+ 
         </div>
         </div>
   </div>
-
-</div>
+</div> 
+ 

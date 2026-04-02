@@ -52,7 +52,14 @@ export class BusinessListComponent implements OnInit {
     this.service.getBusinessesBySubcategory(this.subcategoryId)
       .subscribe({
         next: (data) => {
-          this.businesses = data;
+
+          this.businesses = data.map((b: any) => ({
+            ...b,
+            primaryImage: b.primaryImage
+              ? 'http://localhost:5138' + b.primaryImage
+              : null
+          }));
+
           this.totalPages = Math.ceil(this.businesses.length / this.pageSize);
           this.updatePage();
         },

@@ -1,103 +1,167 @@
 <div class="dashboard">
-<h1 class="title">Admin Business Dashboard</h1>
-<div class="tabs">
+  <header class="header">
 
-<button [class.active]="currentSection==='pending'" (click)="currentSection='pending'">Pending</button>
-<button [class.active]="currentSection==='approved'" (click)="currentSection='approved'">Approved</button>
-<button [class.active]="currentSection==='rejected'" (click)="currentSection='rejected'">Rejected</button>
-<button [class.active]="currentSection==='inactive'" (click)="currentSection='inactive'">Deactivated</button>
+    <div class="logo" (click)="scrollToTop()">Localink</div>
 
+    <div class="header-right">
+
+      <h2 class="welcome">Welcome, {{ username || 'User'}}</h2>
+
+      <div class="profile" (click)="toggleProfile()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+      </div>
+
+    </div>
+
+  </header>
+
+  <h1 class="title">Admin Business Dashboard</h1>
+
+  <div class="tabs">
+    <button [class.active]="currentSection==='pending'" (click)="currentSection='pending'">Pending</button>
+    <button [class.active]="currentSection==='approved'" (click)="currentSection='approved'">Approved</button>
+    <button [class.active]="currentSection==='rejected'" (click)="currentSection='rejected'">Rejected</button>
+    <button [class.active]="currentSection==='inactive'" (click)="currentSection='inactive'">Deactivated</button>
+  </div>
+
+  <div class="toolbar">
+    <input type="text" placeholder="Search business..." [(ngModel)]="searchTerm">
+    <button (click)="downloadExcel()" [disabled]="filteredBusinesses.length===0">
+      Export Excel
+    </button>
+  </div>
+
+  <div *ngIf="filteredBusinesses.length===0" class="empty">
+    No businesses available in this section.
+  </div>
+
+  <table *ngIf="filteredBusinesses.length>0">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Category</th>
+        <th>Contact</th>
+        <th>City</th>
+        <th *ngIf="currentSection==='rejected'">Rejection Reason</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let b of filteredBusinesses">
+
+        <td class="link" (click)="openDetails(b)">
+          {{b.name}}
+        </td>
+
+        <td>{{b.category || 'N/A'}}</td>
+
+        <td>
+          <div>{{b.phone || 'N/A'}}</div>
+          <div class="sub-text">{{b.email || 'N/A'}}</div>
+        </td>
+
+        <td>{{b.address || 'N/A'}}</td>
+
+        <td *ngIf="currentSection==='rejected'">
+          {{b.rejectionComment || '-'}}
+        </td>
+
+        <td>
+          <span class="badge"
+            [ngClass]="{
+              'pending': b.status==='Pending',
+              'approved': b.status==='Approved',
+              'rejected': b.status==='Rejected',
+              'inactive': b.status==='Inactive'
+            }">
+            {{b.status}}
+          </span>
+        </td>
+
+        <td class="actions">
+          <button *ngIf="currentSection==='pending'" class="approve" (click)="approve(b.id)">Approve</button>
+          <button *ngIf="currentSection==='pending'" class="reject" (click)="openRejectModal(b.id)">Reject</button>
+          <button *ngIf="currentSection==='approved'" class="deactivate" (click)="deactivate(b.id)">Deactivate</button>
+          <button *ngIf="currentSection==='inactive'" class="activate" (click)="activate(b.id)">Activate</button>
+        </td>
+
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- PREMIUM DETAILS CARD -->
+  <div class="modal" *ngIf="selectedBusiness">
+    <div class="detail-card">
+
+      <div class="card-header">
+        <h2>{{selectedBusiness.name}}</h2>
+        <span class="badge">{{selectedBusiness.status}}</span>
+      </div>
+
+      <div class="card-grid">
+        <div>
+          <label>Category</label>
+          <p>{{selectedBusiness.category || 'N/A'}}</p>
+        </div>
+
+        <div>
+          <label>Phone</label>
+          <p>{{selectedBusiness.phone || 'N/A'}}</p>
+        </div>
+
+        <div>
+          <label>Email</label>
+          <p>{{selectedBusiness.email || 'N/A'}}</p>
+        </div>
+
+        <div>
+          <label>Address</label>
+          <p>{{selectedBusiness.address || 'N/A'}}</p>
+        </div>
+      </div>
+
+      <div class="description">
+        <label>Description</label>
+        <p>{{selectedBusiness.description || 'No description available'}}</p>
+      </div>
+
+      <div class="card-actions">
+        <button (click)="closeModal()">Close</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Reject Modal unchanged -->
+  <div class="modal" *ngIf="rejectModalOpen">
+    <div class="modal-box">
+      <h2>Reject Business</h2>
+      <textarea [(ngModel)]="rejectComment" rows="4"></textarea>
+      <div class="modal-actions">
+        <button class="cancel" (click)="closeRejectModal()">Cancel</button>
+        <button class="confirm" (click)="submitRejection()">Reject</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" *ngIf="showToast">{{toastMessage}}</div>
 </div>
-<div class="toolbar">
-<input type="text" placeholder="Search business..." [(ngModel)]="searchTerm">
-<button (click)="downloadExcel()" [disabled]="filteredBusinesses.length===0">
-Export Excel
-</button>
+<div 
+  class="overlay" 
+  *ngIf="showProfile"
+  (click)="closeProfile()">
 </div>
 
-<div *ngIf="filteredBusinesses.length===0" class="empty">
-No businesses available in this section.
-</div>
+<div 
+  class="profile-drawer" 
+  [class.open]="showProfile">
 
-<table *ngIf="filteredBusinesses.length>0">
-<thead>
+  <app-profile></app-profile>
 
-<tr>
-
-<th>Name</th>
-<th>Category</th>
-<th>Contact</th>
-
-<th *ngIf="currentSection==='rejected'">Rejection Reason</th>
-
-<th>Status</th>
-<th>Actions</th>
-
-</tr>
-
-</thead>
-<tbody>
-
-<tr *ngFor="let b of filteredBusinesses">
-
-<td class="link" (click)="openDetails(b)">
-{{b.name}}
-</td>
-
-<td>{{b.category}}</td>
-<td>{{b.contact}}</td>
-
-<td *ngIf="currentSection==='rejected'">
-{{b.rejectionComment}}
-</td>
-
-<td>
-<span class="badge">{{b.status}}</span>
-</td>
-
-<td class="actions">
-<button *ngIf="currentSection==='pending'" class="approve" (click)="approve(b.id)">
-Approve
-</button>
-<button *ngIf="currentSection==='pending'" class="reject" (click)="openRejectModal(b.id)">
-Reject
-</button>
-<button *ngIf="currentSection==='approved'" class="deactivate" (click)="deactivate(b.id)">
-Deactivate
-</button>
-<button *ngIf="currentSection==='inactive'" class="activate" (click)="activate(b.id)">
-Activate
-</button>
-</td>
-</tr>
-</tbody>
-</table>
-
-<div class="modal" *ngIf="selectedBusiness">
-<div class="modal-box">
-<h2>{{selectedBusiness.name}}</h2>
-
-<p><b>Category:</b> {{selectedBusiness.category}}</p>
-<p><b>Contact:</b> {{selectedBusiness.contact}}</p>
-<p><b>Description:</b> {{selectedBusiness.description}}</p>
-
-<button (click)="closeModal()">Close</button>
-</div>
-</div>
-
-<div class="modal" *ngIf="rejectModalOpen">
-<div class="modal-box">
-<h2>Reject Business</h2>
-<p>Enter reason for rejection</p>
-<textarea [(ngModel)]="rejectComment" rows="4"></textarea>
-<div class="modal-actions">
-<button class="cancel" (click)="closeRejectModal()">Cancel</button>
-<button class="confirm" [disabled]="!rejectComment.trim()" (click)="submitRejection()">
-Reject
-</button>
-</div>
-</div>
-</div>
-
-<div class="toast" *ngIf="showToast">{{toastMessage}}</div>
 </div>

@@ -76,13 +76,6 @@ describe('UserDashboardComponent', () => {
     expect(result[0].name).toBe('Food');
   });
 
-  it('should navigate to profile', () => {
-
-    component.goToProfile();
-
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['/profile']);
-  });
-
   it('should navigate to subcategory', () => {
 
     component.openCategory(5);

@@ -72,24 +72,26 @@ public class PhotoService : IPhotoService
 
         return true;
     }
+
+
     public async Task SavePhotoAsync(string photoBase64, long businessId)
     {
         if (string.IsNullOrWhiteSpace(photoBase64)) return;
-
+ 
         var bytes = Convert.FromBase64String(photoBase64);
-
+ 
         var rootPath = _env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
         var uploadsPath = Path.Combine(rootPath, "uploads");
         if (!Directory.Exists(uploadsPath))
             Directory.CreateDirectory(uploadsPath);
-
+ 
         var fileName = $"{Guid.NewGuid()}.jpg";
         var filePath = Path.Combine(uploadsPath, fileName);
-
+ 
         await File.WriteAllBytesAsync(filePath, bytes);
-
+ 
         var imageUrl = $"/uploads/{fileName}";
-
+ 
         var photo = new BusinessPhoto
         {
             BusinessId = businessId,
@@ -97,7 +99,7 @@ public class PhotoService : IPhotoService
             IsPrimary = true,
             CreatedAt = DateTime.UtcNow
         };
-
+ 
         _db.BusinessPhotos.Add(photo);
         await _db.SaveChangesAsync();
     }

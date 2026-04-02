@@ -5,6 +5,8 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { Router } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
 import { HttpClient } from '@angular/common/http';
+import { isPlatformBrowser } from '@angular/common';
+import { Inject, PLATFORM_ID } from '@angular/core';
 
 @Component({
   selector: 'app-signup',
@@ -20,8 +22,8 @@ export class SignupComponent implements OnInit, AfterViewInit {
   showPassword = false;
   showConfirmPassword = false;
   showSuccessPopup = false;
-
-  // ✅ JSON DATA
+  errorMessage = '';
+  // JSON DATA
   locationData: any[] = [];
   countries: string[] = [];
   states: string[] = [];
@@ -35,13 +37,12 @@ export class SignupComponent implements OnInit, AfterViewInit {
     3: ['password', 'confirmPassword']
   };
 
-  isTypeLocked = false;
-
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private http: HttpClient
+    private http: HttpClient,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.signupForm = this.fb.group({
       userType: ['', Validators.required],
@@ -85,20 +86,20 @@ export class SignupComponent implements OnInit, AfterViewInit {
     }, { validators: this.passwordMatchValidator });
   }
 
-  // ✅ LOAD JSON
+  // LOAD JSON
   ngOnInit() {
     this.signupForm.patchValue({ userType: 'user' });
 
     this.http.get<any[]>('assets/countries.json').subscribe(data => {
   this.locationData = data;
-  this.countries = data; // full objects for ng-select
+  this.countries = data.map(c => c.name); // full objects for ng-select
 });
   }
 
-  // ✅ COUNTRY CHANGE
+  // COUNTRY CHANGE
  onCountryChange(event: any) {
 
-  // 🔥 handle both string and object
+  //handle both string and object
   const countryName = typeof event === 'string' ? event : event?.name;
 
   const country = this.locationData.find(
@@ -108,13 +109,12 @@ export class SignupComponent implements OnInit, AfterViewInit {
   console.log('Selected country:', countryName);
   console.log('Matched object:', country);
 
-  this.states = country?.states || [];
+  this.states = (country?.states || []).map((s: any) => s.name);
 
   this.signupForm.patchValue({
     state: ''
   });
 }
-
   // STEP NAVIGATION
   nextStep() {
     const fields = this.stepFields[this.currentStep];
@@ -142,13 +142,9 @@ export class SignupComponent implements OnInit, AfterViewInit {
 
   // TYPE SWITCH
   selectType(type: 'user' | 'client') {
-    if (this.isTypeLocked) return;
-
-    this.selectedType = type;
-    this.signupForm.patchValue({ userType: type });
-
-    if (type === 'client') this.isTypeLocked = true;
-  }
+  this.selectedType = type;
+  this.signupForm.patchValue({ userType: type });
+}
 
   // PASSWORD VALIDATION
   passwordMatchValidator(form: AbstractControl): ValidationErrors | null {
@@ -158,50 +154,60 @@ export class SignupComponent implements OnInit, AfterViewInit {
   }
 
   // SUBMIT
+  isSubmitting = false;
   onSubmit() {
-    if (this.signupForm.valid) {
+      this.errorMessage = '';
 
-      const { countryCode, ...rest } = this.signupForm.value;
+      if (this.signupForm.invalid || this.isSubmitting) return;
 
-      const formData = {
-        ...rest,
-        country_code: countryCode
+      this.isSubmitting = true;
+
+      const { confirmPassword, ...raw } = this.signupForm.value;
+
+      const payload = {
+        ...raw,
+        email: raw.email.trim().toLowerCase(), 
+        name: raw.name.trim(),
+        userType: this.selectedType
       };
 
-      this.authService.register(formData).subscribe({
+      this.authService.register(payload).subscribe({
         next: () => {
           this.showSuccessPopup = true;
+
           setTimeout(() => {
             this.router.navigate(['/login']);
-          }, 1500);
+          }, 2000);
         },
-        error: (err) => {
-          console.error(err);
-          alert(err.error?.message || 'Signup failed');
+        error: (err: any) => {
+          this.errorMessage = err?.error?.message || 'Signup failed';
+          this.isSubmitting = false;
         }
       });
     }
-  }
 
   // PASSWORD TOGGLE
   togglePassword() {
     this.showPassword = !this.showPassword;
   }
-
   toggleConfirmPassword() {
     this.showConfirmPassword = !this.showConfirmPassword;
   }
-
   get f() {
     return this.signupForm.controls;
   }
-
   closePopup() {
   this.showSuccessPopup = false;
 }
-
-  // 🎨 CANVAS ANIMATION (UNCHANGED)
+allowOnlyNumbers(event: KeyboardEvent) {
+  const charCode = event.key.charCodeAt(0);
+  if (charCode < 48 || charCode > 57) {
+    event.preventDefault();
+  }
+}
+  // CANVAS ANIMATION (UNCHANGED)
   ngAfterViewInit() {
+    if(!isPlatformBrowser(this.platformId)) return;
     const glow = document.querySelector('.cursor-glow') as HTMLElement;
 
     document.addEventListener('mousemove', (e) => {
