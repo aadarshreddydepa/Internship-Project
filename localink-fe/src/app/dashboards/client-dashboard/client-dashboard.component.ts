@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ProfileComponent } from '../../pages/profile/profile.component';
 import { ClientDashboardService } from '../../services/client-dashboard.service';
+import { NotificationService } from '../../services/notification.service';
 
 interface Business {
   id: number;
@@ -45,6 +46,7 @@ export class ClientDashboardComponent implements OnInit {
 
   isLoading = true;
   fullName: string = '';
+  liveNotification: string | null = null;
 
   countries: any[] = [];
   states: string[] = []; 
@@ -53,6 +55,7 @@ export class ClientDashboardComponent implements OnInit {
   constructor(
     private router: Router,
     private dashboardService: ClientDashboardService,
+    private notificationService: NotificationService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
   toggleProfile(): void {
@@ -120,11 +123,22 @@ export class ClientDashboardComponent implements OnInit {
     this.dashboardService.getUserProfile().subscribe({
       next: (res) => {
         this.fullName = res.fullName;
+        if (res.userId) {
+          this.notificationService.startConnection(res.userId.toString());
+          this.notificationService.notification$.subscribe(msg => {
+            this.liveNotification = msg;
+            setTimeout(() => this.liveNotification = null, 6000);
+          });
+        }
       },
       error: () => {
         this.fullName = 'User';
       }
     });
+  }
+
+  ngOnDestroy() {
+    this.notificationService.stopConnection();
   }
 
   trackById(index: number, item: Business) {
