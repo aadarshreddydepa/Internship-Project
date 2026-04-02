@@ -27,4 +27,8 @@ export class UserService {
   getUserProfile() {
     return this.http.get<UserProfile>(`${this.baseUrl}/profile`);
   }
+  
+  updateUserProfile(payload: any) {
+    return this.http.put(`http://localhost:5138/api/v1/user/profile`, payload);
+  }
 }

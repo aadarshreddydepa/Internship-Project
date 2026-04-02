@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService, AdminBusiness } from '../../services/admin.service';
 import { UserProfile, UserService } from '../../services/user.service';
@@ -30,10 +30,13 @@ export class AdminDashboardComponent implements OnInit {
   rejectBusinessId: number | null = null;
 
   constructor(private service: AdminService,
-              private userService: UserService
+              private userService: UserService,
+              @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnInit(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+
     this.loadBusinesses();
     this.loadUser();
   }

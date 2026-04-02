@@ -48,3 +48,5 @@ localink_be/bin/
 localink_be/obj/
 localink_be/obj/
 localink-fe/angular.json
+Localink.Tests/bin/
+Localink.Tests/obj/

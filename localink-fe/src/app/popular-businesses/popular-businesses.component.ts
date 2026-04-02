@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { PopularService, PopularBusiness } from '../services/popular.service';
 
 @Component({
@@ -13,9 +13,14 @@ export class PopularBusinessesComponent implements OnInit {
 
   businesses: PopularBusiness[] = [];
 
-  constructor(private popularService: PopularService) {}
+  constructor(
+    private popularService: PopularService,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {}
 
   ngOnInit(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    
     this.popularService.getTopBusinesses().subscribe({
       next: (data) => {
         this.businesses = data;

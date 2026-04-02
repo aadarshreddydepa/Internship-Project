@@ -1,4 +1,3 @@
-
 <div *ngIf="isLoggedIn && user" class="profile-container">
 
   <h2 class="title">Account Details</h2>
@@ -7,41 +6,77 @@
 
     <div class="info-row">
       <span>Username</span>
-      <p>{{ user.fullName }}</p>
+
+      <p *ngIf="!isEditMode">{{ user.fullName }}</p>
+      <input *ngIf="isEditMode" [(ngModel)]="editableUser.fullName" />
     </div>
 
     <div class="info-row">
       <span>Email</span>
-      <p>{{ user.email }}</p>
+      <p *ngIf="!isEditMode">{{ user.email }}</p>
+      <input *ngIf="isEditMode" [(ngModel)]="editableUser.email" />
     </div>
 
     <div class="info-row">
       <span>Address</span>
-      <div class="address">
+
+      <div class="address" *ngIf="!isEditMode">
         <p>{{ user.address?.street }}, {{ user.address?.city }}</p>
         <p>{{ user.address?.state }} - {{ user.address?.pincode }}</p>
         <p>{{ user.address?.country }}</p>
+      </div>
+
+      <div class="address" *ngIf="isEditMode">
+        <input [(ngModel)]="editableUser.address.street" placeholder="Street" />
+        <input [(ngModel)]="editableUser.address.city" placeholder="City" />
+        <input [(ngModel)]="editableUser.address.state" placeholder="State" />
+        <input [(ngModel)]="editableUser.address.pincode" placeholder="Pincode" />
+        <input [(ngModel)]="editableUser.address.country" placeholder="Country" />
       </div>
     </div>
 
     <div class="info-row">
       <span>Phone</span>
-      <p>{{ user.phone }}</p>
+
+      <p *ngIf="!isEditMode">{{ user.phone }}</p>
+      <input *ngIf="isEditMode" [(ngModel)]="editableUser.phone" />
     </div>
 
   </div>
 
   <div class="actions">
-    <button class="primary-btn">Edit Profile</button>
-    <button class="logout-btn" (click)="logout()">Logout</button>
+
+  <!-- LEFT SIDE -->
+  <div class="left-actions">
+
+    <button *ngIf="!isEditMode" class="primary-btn" (click)="enableEdit()">
+      Edit Profile
+    </button>
+
+    <button *ngIf="isEditMode" class="primary-btn" (click)="saveProfile()">
+      Save
+    </button>
+
+    <button *ngIf="isEditMode" class="secondary-btn" (click)="cancelEdit()">
+      Cancel
+    </button>
+
   </div>
+
+  <!-- RIGHT SIDE -->
+  <div class="right-actions">
+    <button class="logout-btn" (click)="logout()">
+      Logout
+    </button>
+  </div>
+
+</div>
 
 </div>
 
 <div *ngIf="isLoggedIn && isLoading" class="loading">
   Loading profile...
 </div>
-
 <div *ngIf="!isLoggedIn" class="not-logged-in">
 
   <h2>You're not logged in</h2>
