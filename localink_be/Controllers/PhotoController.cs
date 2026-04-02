@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 [ApiController]
 [Route("api/v1/business/{businessId}/photos")]
@@ -12,6 +13,7 @@ public class PhotoController : ControllerBase
     }
 
     // POST: api/business/{businessId}/photos
+    [Authorize(Roles = "client")]
     [HttpPost]
     public async Task<IActionResult> UploadPhoto(long businessId, IFormFile file)
     {
@@ -28,6 +30,7 @@ public class PhotoController : ControllerBase
     }
 
     // DELETE: api/photos/{photoId}
+    [Authorize(Roles = "client")]
     [HttpDelete("~/api/v1/photos/{photoId}")]
     public async Task<IActionResult> DeletePhoto(long photoId)
     {

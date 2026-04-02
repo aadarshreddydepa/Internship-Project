@@ -1,198 +1,113 @@
-.profile-wrapper{
-  max-width:900px;
-  margin:60px auto;
-  padding:20px;
+/* MAIN CONTAINER */
+.profile-container {
+  padding: 40px 35px;
+  color: #F8F4F0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
-/* PROFILE CARD */
-
-.profile-card{
-  background:#2A2A2A;
-  border:1px solid #484948;
-  border-radius:14px;
-  padding:30px;
-  margin-bottom:30px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+/* TITLE */
+.title {
+  font-size: 24px;
+  margin-bottom: 30px;
+  color: #C8A97E;
+  font-weight: 600;
 }
 
-.profile-card h2{
-  color:#C8A97E;
-  margin-bottom:20px;
-  font-weight:600;
+/* CARD BLOCK */
+.info-block {
+  background: #1A1A1A;
+  border: 1px solid #2F2F2F;
+  border-radius: 12px;
+  padding: 25px;
 }
 
-/*  UNIFORM LABELS */
-
-.info-row span,
-.address-grid label{
-  font-size:13px;
-  color:#B19F91;
-  display:block;
-  margin-bottom:6px;
+/* ROW */
+.info-row {
+  display: flex;
+  align-items: flex-start;
+  padding: 16px 0;
+  border-bottom: 1px solid #2A2A2A;
 }
 
-/* TEXT */
-
-.info-row p{
-  margin-top:4px;
-  color:#F8F4F0;
+/* REMOVE LAST BORDER */
+.info-row:last-child {
+  border-bottom: none;
 }
 
-/* INPUTS */
-
-.profile-card input,
-.profile-card select{
-  width:100%;
-  padding:12px;
-  border-radius:8px;
-  border:1px solid #484948;
-  background:#343434;
-  color:#F8F4F0;
-  font-size:14px;
-  outline:none;
+/* LABEL */
+.info-row span {
+  color: #B19F91;
+  font-size: 14px;
+  min-width: 90px;
 }
 
-/* FOCUS */
+/* VALUE (IMPORTANT FIX) */
+.info-row p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  word-break: break-word;
 
-.profile-card input:focus,
-.profile-card select:focus{
-  border:1px solid #C8A97E;
-  box-shadow:0 0 0 2px rgba(200,169,126,0.25);
+  margin-left: auto;   
+  text-align: left;
+  max-width: 65%;
 }
 
-/* ADDRESS */
-
-.address-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-  margin-top:10px;
+/* ADDRESS (MAIN FIX) */
+.address {
+  margin-left: auto;    
+  text-align: left;
+  max-width: 65%;
 }
 
-.full-width{
-  grid-column: span 2;
+/* ADDRESS TEXT */
+.address p {
+  margin: 3px 0;
+  white-space: normal;
+  word-break: break-word;
 }
 
-/* BUTTONS */
-
-.profile-buttons{
-  display:flex;
-  gap:16px;
-  margin-top:20px;
+/* BUTTON */
+.actions {
+  margin-top: 25px;
 }
 
-.edit-btn,
-.change-password-btn{
-  background:#C8A97E;
-  border:none;
-  color:#1C1C1C;
-  padding:10px 18px;
-  border-radius:6px;
-  font-weight:600;
-  cursor:pointer;
+.primary-btn {
+  background: #C8A97E;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  color: #121212;
+  font-weight: 600;
+  transition: 0.2s;
 }
 
-.save-btn{
-  background:#4CAF50;
-  border:none;
-  padding:10px 18px;
-  border-radius:6px;
-  color:white;
-  cursor:pointer;
+.primary-btn:hover {
+  background: #d6b48a;
 }
 
-.save-btn{
-  background:#3A8F5A; /* active green */
-  border:none;
-  padding:10px 18px;
-  border-radius:6px;
-  color:#F8F4F0;
-  cursor:pointer;
-  transition: all 0.3s ease;
+.logout-btn {
+  margin-left: 10px;
+  background: #ff4d4f;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
 }
 
-/* 🔥 DISABLED = FADED GREEN */
-.save-btn:disabled{
-  background:rgba(58, 143, 90, 0.4); /* faded version */
-  color:rgba(248, 244, 240, 0.6);
-  cursor:not-allowed;
-  box-shadow:none;
+.login-btn {
+  margin-top: 15px;
+  background: #c8a97e;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
 }
 
-/* HOVER ONLY WHEN ENABLED */
-.save-btn:not(:disabled):hover{
-  background:#2F7A4C;
-}
-
-/*  ERROR MESSAGE (CLEAR RED) */
-
-.error{
-  color:#ff4d4f !important;
-  font-size:13px;
-  margin-top:6px;
-}
-
-/* VALIDATION */
-
-input.invalid{
-  border:2px solid #ff4d4f !important;
-}
-
-
-
-.phone-field{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-/* COUNTRY */
-
-.country-code{
-  width:110px;          /* smaller */
-  flex-shrink:0;
-  background:#343434;
-  border:1px solid #484948;
-  border-radius:8px;
-  color:#F8F4F0;
-  padding:12px;
-  font-size:13px;
-}
-
-/* PHONE INPUT */
-
-.phone-input{
-  flex:1;
-  min-width:0;          
-  background:#343434;
-  border:1px solid #484948;
-  border-radius:8px;
-  color:#F8F4F0;
-  padding:12px;
-  font-size:14px;
-}
-
-/* INVALID */
-
-.phone-input.invalid{
-  border:2px solid #ff4d4f;
-}
-
-.phone-field{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-/* override global width:100% */
-.phone-field .country-code{
-  width:140px !important;   /* 🔥 increased */
-  flex-shrink:0;
-}
-
-/* override global width:100% */
-.phone-field .phone-input{
-  width:auto !important;   /* 🔥 THIS FIXES IT */
-  flex:1;
-  min-width:0;
+.not-logged-in {
+  text-align: center;
+  margin-top: 50px;
 }

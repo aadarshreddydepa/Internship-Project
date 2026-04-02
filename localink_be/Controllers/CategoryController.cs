@@ -14,16 +14,8 @@ public class CategoryController : ControllerBase
         _service = service;
     }
 
-    // GET: api/categories/db
-    [HttpGet("db")]
-    public async Task<IActionResult> GetCategoriesFromDb()
-    {
-        var categories = await _db.Categories.ToListAsync();
-        return Ok(categories);
-    }
-
-    // GET: api/categories/{categoryId}/subcategories
     [HttpGet("{categoryId}/subcategories-db")]
+    
     public async Task<IActionResult> GetSubcategories(int categoryId)
     {
         var subcategories = await _db.Subcategories
@@ -36,7 +28,6 @@ public class CategoryController : ControllerBase
         return Ok(subcategories);
     }
 
-    // GET: api/categories
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {

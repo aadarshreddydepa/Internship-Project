@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-
+import { ProfileComponent } from '../../pages/profile/profile.component';
 import { ClientDashboardService } from '../../services/client-dashboard.service';
 
 interface Business {
@@ -16,13 +16,18 @@ interface Business {
     phone: string;
     email: string;
     city: string;
+    streetAddress?: string;
+    state?: string;
+    country?: string;
+    pincode?: string;
+    phoneCode?: string;
   };
 }
 
 @Component({
   selector: 'app-client-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ProfileComponent],
   templateUrl: './client-dashboard.component.html',
   styleUrls: ['./client-dashboard.component.css']
 })
@@ -31,66 +36,91 @@ export class ClientDashboardComponent implements OnInit {
   businesses: Business[] = [];
   selectedBusiness: Business | null = null;
   editingBusiness: Business | null = null;
+  showProfile = false;
+  categories: any[] = [];
+  filteredSubcategories: any[] = [];
+
+  selectedPhotos: any[] = [];
+  selectedFile: File | null = null;
 
   isLoading = true;
   fullName: string = '';
 
-  //  CATEGORY DATA (YOUR JSON)
-  categoriesMap: any = {
-    medical: ["Clinic","Pharmacy","Diagnostic Center","Dental Clinic","Eye Care","Physiotherapy"],
-    food: ["Restaurant","Cafe","Fast Food","Catering","Bakery","Food Truck"],
-    general: ["Supermarket","Convenience Store","Grocery","Department Store","Organic Store","Stationery Store"],
-    tutoring: ["Math Tutor","Science Tutor","Language Classes","Music Lessons","Art Classes","Coding Classes"],
-    repair: ["Phone Repair","Computer Repair","Appliance Repair","Car Repair","Plumbing","Electrical"],
-    home: ["Interior Design","Furniture","Gardening","Cleaning Services","Pest Control","Home Decor"]
-  };
+  // 🌍 LOCATION DATA
+  countries: any[] = [];
+  states: any[] = [];
+  cities: any[] = [];
 
-  categoryKeys: string[] = Object.keys(this.categoriesMap);
-  filteredSubcategories: string[] = [];
+  selectedCountryCode: string = '';
+  selectedStateCode: string = '';
 
   constructor(
     private router: Router,
     private dashboardService: ClientDashboardService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit() {
     this.fetchBusinesses();
+    this.loadCategories();
+
+    // ✅ Load countries from API
+    this.dashboardService.getCountries().subscribe(res => {
+      this.countries = res;
+    });
+  }
+
+  toggleProfile() { this.showProfile = true; }
+  closeProfile() { this.showProfile = false; }
+
+  scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  loadCategories() {
+    this.dashboardService.getCategories().subscribe({
+      next: (data) => this.categories = data
+    });
   }
 
   fetchBusinesses() {
-    const userId = 1;
+    this.dashboardService.getBusinessesByUser().subscribe({
+      next: (res: any[]) => {
 
-    this.dashboardService.getBusinessesByUser(userId)
-      .subscribe({
-        next: (res) => {
+        this.setUserName();
 
-          this.setUserName(userId);
+        this.businesses = res.map((b: any) => ({
+          id: b.id,
+          businessName: b.name,
+          category: b.categoryName?.toLowerCase(),
+          subcategory: b.subcategoryName,
+          status: b.status ?? 'Pending',
+          description: b.description,
+          contact: {
+            phone: (b.phoneNumber || '')
+              .replace(/^\+\d+\s*/, '')
+              .replace(/\s+/g, '')
+              .trim(),
+            phoneCode: b.phoneCode || '',
+            email: b.email || '',
+            city: b.city || '',
+            state: b.state || '',
+            streetAddress: b.streetAddress || '',
+            country: b.country || '',
+            pincode: b.pincode || ''
+          }
+        }));
 
-          this.businesses = res.map(b => ({
-            id: b.id,
-            businessName: b.name,
-            category: b.categoryName?.toLowerCase(),
-            subcategory: b.subcategoryName,
-            status: b.status ?? 'Pending',
-            description: b.description,
-            contact: {
-              phone: b.phoneNumber || '',
-              email: b.email || '',
-              city: b.city || ''
-            }
-          }));
-
-          this.isLoading = false;
-        },
-        error: (err) => {
-          console.error('Error fetching businesses:', err);
-          this.isLoading = false;
-        }
-      });
+        this.isLoading = false;
+      },
+      error: () => this.isLoading = false
+    });
   }
 
-  setUserName(userId: number) {
-    this.fullName = userId === 1 ? 'Sai Chandrasekhar' : 'User';
+  setUserName() {
+    this.dashboardService.getUserProfile().subscribe({
+      next: (res) => this.fullName = res.fullName,
+      error: () => this.fullName = 'User'
+    });
   }
 
   trackById(index: number, item: Business) {
@@ -102,37 +132,280 @@ export class ClientDashboardComponent implements OnInit {
   }
 
   editBusiness(id: number) {
-  const business = this.businesses.find(b => b.id === id);
+    const business = this.businesses.find(b => b.id === id);
+    if (!business) return;
 
-  if (business) {
     this.editingBusiness = JSON.parse(JSON.stringify(business));
 
-    // ✅ FIXED
-    this.onCategoryChange(this.editingBusiness!.category);
+    this.dashboardService.getPhotos(id).subscribe((res: any[]) => {
+      this.selectedPhotos = res;
+    });
+
+    // Load subcategories
+    const categoryObj = this.categories.find(
+      c => c.name.toLowerCase() === this.editingBusiness?.category
+    );
+    if (categoryObj) this.loadSubcategories(categoryObj.id);
+
+    // 🌍 LOAD COUNTRY → STATE → CITY (FIXED)
+    if (this.editingBusiness?.contact.country) {
+
+      const country = this.countries.find(
+        c => c.name === this.editingBusiness!.contact.country
+      );
+
+      if (country) {
+        this.selectedCountryCode = country.iso2;
+
+        this.dashboardService.getStates(this.selectedCountryCode)
+          .subscribe(states => {
+            this.states = states;
+
+            const state = states.find(
+              s => s.name === this.editingBusiness!.contact.state
+            );
+
+            if (state) {
+              this.selectedStateCode = state.iso2;
+
+              this.dashboardService.getCities(
+                this.selectedCountryCode,
+                this.selectedStateCode
+              ).subscribe(cities => {
+                this.cities = cities;
+              });
+            }
+          });
+      }
+    }
   }
-}
 
-  // ✅ CATEGORY CHANGE
-onCategoryChange(category: string) {
-  this.filteredSubcategories = this.categoriesMap[category] || [];
+  loadSubcategories(categoryId: number) {
+    this.dashboardService.getSubcategories(categoryId)
+      .subscribe((res: any[]) => this.filteredSubcategories = res);
+  }
 
-  const sub = this.editingBusiness?.subcategory || '';
+  onCategoryChange(category: string) {
+    const categoryObj = this.categories.find(
+      c => c.name.toLowerCase() === category
+    );
+    if (categoryObj) this.loadSubcategories(categoryObj.id);
+  }
 
-  if (!this.filteredSubcategories.includes(sub)) {
+  // 🌍 COUNTRY CHANGE
+  onCountryChange(countryName: string) {
+    const country = this.countries.find(c => c.name === countryName);
+    if (!country) return;
+
+    this.selectedCountryCode = country.iso2;
+
+    this.dashboardService.getStates(this.selectedCountryCode)
+      .subscribe(res => {
+        this.states = res;
+        this.cities = [];
+      });
+
     if (this.editingBusiness) {
-      this.editingBusiness.subcategory = '';
+      this.editingBusiness.contact.state = '';
+      this.editingBusiness.contact.city = '';
+      this.editingBusiness.contact.phoneCode = '+' + country.phonecode;
     }
   }
-}
-  saveEdits() {
-    console.log('Updated Business:', this.editingBusiness);
 
-    const index = this.businesses.findIndex(b => b.id === this.editingBusiness?.id);
-    if (index !== -1 && this.editingBusiness) {
-      this.businesses[index] = this.editingBusiness;
+  // 🌍 STATE CHANGE
+  onStateChange(stateName: string) {
+    const state = this.states.find(s => s.name === stateName);
+    if (!state) return;
+
+    this.selectedStateCode = state.iso2;
+
+    this.dashboardService.getCities(
+      this.selectedCountryCode,
+      this.selectedStateCode
+    ).subscribe(res => this.cities = res);
+
+    if (this.editingBusiness) {
+      this.editingBusiness.contact.city = '';
     }
+  }
 
-    this.editingBusiness = null;
+  pincodeError: string = '';
+
+onPincodeChange() {
+  const eb = this.editingBusiness;
+  if (!eb) return;
+
+  const pincode = eb.contact.pincode;
+  if (!pincode) return;
+
+  // ✅ Preserve address
+  const existingAddress = eb.contact.streetAddress;
+
+  // ✅ Reset old values (IMPORTANT)
+  eb.contact.state = '';
+  eb.contact.city = '';
+  this.states = [];
+  this.cities = [];
+  this.pincodeError = '';
+
+  this.dashboardService.validatePincode(pincode)
+    .subscribe(res => {
+
+      if (!res.results || res.results.length === 0) {
+        this.pincodeError = "Invalid pincode";
+        return;
+      }
+
+      const data = res.results[0];
+
+      const countryName = data.country;
+      const stateName = data.state;
+      const cityName = data.city || data.county || data.state_district;
+
+      // ✅ Set country
+      eb.contact.country = countryName || '';
+
+      const country = this.countries.find(
+        c => c.name.toLowerCase() === countryName?.toLowerCase()
+      );
+
+      if (!country) return;
+
+      this.selectedCountryCode = country.iso2;
+
+      // ✅ Load states
+      this.dashboardService.getStates(this.selectedCountryCode)
+        .subscribe(states => {
+
+          this.states = states;
+
+          const state = states.find(s =>
+            stateName &&
+            s.name.toLowerCase().includes(stateName.toLowerCase())
+          );
+
+          if (state) {
+            eb.contact.state = state.name;
+            this.selectedStateCode = state.iso2;
+
+            // ✅ Load cities
+            this.dashboardService.getCities(
+              this.selectedCountryCode,
+              this.selectedStateCode
+            ).subscribe(cities => {
+
+              this.cities = cities;
+
+              const city = cities.find(c =>
+                cityName &&
+                c.name.toLowerCase().includes(cityName.toLowerCase())
+              );
+
+              // ❌ VALIDATION: mismatch check
+              if (
+                eb.contact.city &&
+                cityName &&
+                !eb.contact.city.toLowerCase().includes(cityName.toLowerCase())
+              ) {
+                this.pincodeError = "Pincode does not match selected city";
+                return;
+              }
+
+              eb.contact.city = city
+                ? city.name
+                : cityName || '';
+
+              // ✅ Restore address
+              eb.contact.streetAddress = existingAddress;
+            });
+
+          } else {
+            eb.contact.state = stateName || '';
+            eb.contact.city = cityName || '';
+            eb.contact.streetAddress = existingAddress;
+          }
+        });
+    });
+}
+  getPhonePattern(): string {
+    const code = this.editingBusiness?.contact?.phoneCode;
+    if (code === '+91') return '^[6-9][0-9]{9}$';
+    if (code === '+1') return '^[0-9]{10}$';
+    return '^[0-9]{6,12}$';
+  }
+
+  // ✅ FIXED PINCODE
+  getPincodePattern(): string {
+    if (this.editingBusiness?.contact.country === 'India') {
+      return '^[0-9]{6}$';
+    }
+    return '^[0-9]{4,10}$';
+  }
+
+  onFileSelected(event: any) {
+    this.selectedFile = event.target.files[0];
+  }
+
+  uploadImage() {
+    if (!this.selectedFile || !this.editingBusiness) return;
+
+    this.dashboardService.uploadPhoto(
+      this.editingBusiness.id,
+      this.selectedFile
+    ).subscribe(() => {
+
+      this.dashboardService.getPhotos(this.editingBusiness!.id)
+        .subscribe((res: any[]) => this.selectedPhotos = res);
+
+      this.selectedFile = null;
+    });
+  }
+
+  deleteImage(photoId: number) {
+    this.dashboardService.deletePhoto(photoId).subscribe(() => {
+      this.selectedPhotos = this.selectedPhotos.filter(p => p.photoId !== photoId);
+    });
+  }
+
+  saveEdits() {
+    if (!this.editingBusiness) return;
+
+    const categoryObj = this.categories.find(
+      c => c.name.toLowerCase() === this.editingBusiness!.category
+    );
+
+    const subcategoryObj = this.filteredSubcategories.find(
+      s => s.name === this.editingBusiness!.subcategory
+    );
+
+    // ✅ FIXED PHONE CODE
+    const country = this.countries.find(
+      c => c.name === this.editingBusiness?.contact?.country
+    );
+
+    const payload = {
+      businessName: this.editingBusiness.businessName,
+      description: this.editingBusiness.description,
+      categoryId: categoryObj?.id,
+      subcategoryId: subcategoryObj?.id,
+      phoneCode: country ? '+' + country.phonecode : '',
+      phoneNumber: this.editingBusiness.contact.phone.trim(),
+      email: this.editingBusiness.contact.email,
+      city: this.editingBusiness.contact.city,
+      streetAddress: this.editingBusiness.contact.streetAddress,
+      state: this.editingBusiness.contact.state,
+      country: this.editingBusiness.contact.country,
+      pincode: this.editingBusiness.contact.pincode
+    };
+
+    this.dashboardService.updateBusiness(this.editingBusiness.id, payload)
+      .subscribe({
+        next: () => {
+          this.fetchBusinesses();
+          this.editingBusiness = null;
+        },
+        error: (err) => console.error(err)
+      });
   }
 
   cancelEdit() {
@@ -141,6 +414,9 @@ onCategoryChange(category: string) {
 
   viewBusiness(id: number) {
     this.selectedBusiness = this.businesses.find(b => b.id === id) || null;
+
+    this.dashboardService.getPhotos(id)
+      .subscribe((res: any[]) => this.selectedPhotos = res);
   }
 
   closeView() {

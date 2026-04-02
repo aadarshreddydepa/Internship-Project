@@ -1,11 +1,14 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, map } from 'rxjs';
 
 export interface PopularBusiness {
   id: number;
   name: string;
   category: string;
+  description: string;
+  image: string | null;
   rating: number;
-  image: string;
 }
 
 @Injectable({
@@ -13,15 +16,26 @@ export interface PopularBusiness {
 })
 export class PopularService {
 
-  private businesses: PopularBusiness[] = [
-    { id: 1, name: 'Business Name 1', category: 'Medical',       rating: 4.0, image: '' },
-    { id: 2, name: 'Business Name 2', category: 'Food & Dining', rating: 4.5, image: '' },
-    { id: 3, name: 'Business Name 3', category: 'General Store', rating: 3.5, image: '' },
-    { id: 4, name: 'Business Name 4', category: 'Tutoring',      rating: 5.0, image: '' }
-  ];
+  private baseUrl = 'http://localhost:5138/api/v1';
 
-  getPopularBusinesses(): PopularBusiness[] {
-    return this.businesses;
+  constructor(private http: HttpClient) {}
+
+  getTopBusinesses(): Observable<PopularBusiness[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/business`)
+      .pipe(
+        map((data) =>
+          data.slice(0, 8).map((b: any) => ({
+
+            id: b.businessId,
+            name: b.businessName,
+            category: `${b.categoryName  || 'General'} -> ${b.subcategoryName || ''}`,
+            description: b.description || 'No description available',
+            image: b.primaryImage
+              ? 'http://localhost:5138' + b.primaryImage
+              : null,
+            rating: 4
+          }))
+        )
+      );
   }
-
 }

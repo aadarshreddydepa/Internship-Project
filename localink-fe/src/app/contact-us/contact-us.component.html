@@ -1,0 +1,35 @@
+<div class="contact-page">
+  <div class="contact-container">
+
+    <h2>Contact Us</h2>
+
+    <!-- Contact Info -->
+    <div class="contact-info">
+      <p class="label">Email</p>
+      <p class="value">{{ 'support@localink.com' }}</p>
+
+      <p class="label">Phone</p>
+      <p class="value">+91 9876543210</p>
+    </div>
+
+    <!-- Feedback Text -->
+    <p class="feedback-text">
+      We’d love to hear your feedback. Let us know how we can improve your experience.
+    </p>
+
+    <!-- Form -->
+    <form (ngSubmit)="submitFeedback()">
+      <textarea 
+        [(ngModel)]="feedbackText"
+        name="feedback"
+        required
+        placeholder="Enter your feedback"
+      ></textarea>
+
+      <button type="submit">Submit</button>
+    </form>
+
+    <p *ngIf="successMessage">{{ successMessage }}</p>
+
+  </div>
+</div>
