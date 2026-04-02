@@ -62,7 +62,7 @@ export class RegisterBusinessComponent {
   }
 
   ngOnInit(): void {
-  this.http.get<any>('http://localhost:5138/api/v1/categories')
+  this.http.get<any>('http://localhost:5145/api/v1/categories')
     .subscribe(data => {
       this.categories = data;
     });
@@ -71,7 +71,7 @@ export class RegisterBusinessComponent {
   onCategoryChange() {
     const categoryId = this.businessForm.get('category')?.value;
 
-    this.http.get<any>(`http://localhost:5138/api/v1/categories/${categoryId}/subcategories`)
+  this.http.get<any>(`http://localhost:5145/api/v1/categories/${categoryId}/subcategories`)
       .subscribe(data => {
         this.subcategories = data;
       });

@@ -52,12 +52,19 @@
 
     <div class="carousel">
 
-      <div class="business-card" *ngFor="let business of searchResults">
+      <div class="business-card"
+           *ngFor="let business of searchResults"
+           [routerLink]="['/business', business.id]"
+           [queryParams]="{
+             categoryName: business.categoryName,
+             subcategoryName: business.subcategoryName,
+             subcategoryId: business.subcategoryId
+           }">
 
         <div class="image-placeholder">
           <img 
             *ngIf="business.primaryImage" 
-            [src]="'http://localhost:5138' + business.primaryImage"
+            [src]="'http://localhost:5145' + business.primaryImage"
             [alt]="business.name"
           />
           <span *ngIf="!business.primaryImage">No Image</span>

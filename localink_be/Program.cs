@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using localink_be.Services.Interfaces;
+using localink_be.Services.Implementations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -83,7 +85,10 @@ if (app.Environment.IsDevelopment())
 // GLOBAL ERROR HANDLER
 app.UseMiddleware<ExceptionMiddleware>();
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseStaticFiles();
 

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { BusinessListService } from '../../services/business-list.service';
@@ -14,6 +14,8 @@ import { FormsModule } from '@angular/forms';
 })
 export class BusinessDetailComponent implements OnInit {
 
+  @ViewChild('reviewFormSection') reviewFormSection?: ElementRef<HTMLDivElement>;
+
   business: any;
   categoryName = '';
   subcategoryName = '';
@@ -26,6 +28,7 @@ export class BusinessDetailComponent implements OnInit {
   showReviewForm = false;
   showAllReviews = false;
   comment = '';
+  submitError = '';
   enableAiSuggestions = false;
   aiSuggestions: string[] = [];
   typingTimer: any;
@@ -54,10 +57,19 @@ subcategoryId!: number;
       this.businessService.getBusinessById(id).subscribe({
         next: (data: any) => {
           const primaryPhoto = data.photos?.find((p: any) => p.isPrimary);
+
+          if (!this.categoryId && data.categoryId) {
+            this.categoryId = data.categoryId;
+          }
+
+          if (!this.subcategoryId && data.subcategoryId) {
+            this.subcategoryId = data.subcategoryId;
+          }
+
           this.business = {
             ...data,
             primaryImage: primaryPhoto
-              ? 'http://localhost:5138' + primaryPhoto.imageUrl
+              ? 'http://localhost:5145' + primaryPhoto.imageUrl
               : null
           };
         },
@@ -124,8 +136,16 @@ subcategoryId!: number;
       return;
     }
 
+    const businessId = this.business?.businessId ?? this.business?.id;
+    if (!businessId) {
+      this.submitError = 'Unable to identify the business. Please refresh and try again.';
+      return;
+    }
+
+    this.submitError = '';
+
     const payload = {
-      businessId: this.business.businessId,
+      businessId,
       rating: this.rating,
       comment: this.comment
     };
@@ -135,10 +155,17 @@ subcategoryId!: number;
         this.comment = '';
         this.rating = 0;
         this.aiSuggestions = [];
-        this.loadReviews(this.business.businessId);
+        this.showReviewForm = false;
+        this.loadReviews(businessId);
       },
-      error: () => {
-        alert('Failed to submit review');
+      error: (err: any) => {
+        if (err?.status === 401) {
+          alert('Please login again to submit a review.');
+          return;
+        }
+
+        const apiMessage = err?.error?.error || err?.error?.message || err?.message;
+        this.submitError = apiMessage || 'Failed to submit review.';
       }
     });
   }
@@ -182,8 +209,24 @@ subcategoryId!: number;
   get visibleReviews() {
     return this.showAllReviews ? this.reviews : this.reviews.slice(0, 6);
   }
-  toggleReviewForm() {
-    this.showReviewForm = !this.showReviewForm;
+  openReviewForm() {
+    this.showReviewForm = true;
+    this.submitError = '';
+
+    setTimeout(() => {
+      this.reviewFormSection?.nativeElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+
+      const textarea = this.reviewFormSection?.nativeElement.querySelector('textarea');
+      textarea?.focus();
+    }, 0);
+  }
+
+  closeReviewForm() {
+    this.showReviewForm = false;
+    this.submitError = '';
   }
 
   toggleViewMore() {

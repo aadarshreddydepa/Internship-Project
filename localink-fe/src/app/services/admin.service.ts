@@ -22,7 +22,7 @@ export interface AdminBusiness {
 })
 export class AdminService {
 
-  private apiUrl = 'http://localhost:5138/api/v1/admin';
+  private apiUrl = 'http://localhost:5145/api/v1/admin';
 
   constructor(private http: HttpClient) {}
 

@@ -1,0 +1,57 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Users\\saichandrasekhar.s\\Downloads\\Internship-Project-feature-dev-1\\Internship-Project-feature-dev-1\\localink_be\\wwwroot\\uploads\\321dcec5-b642-4941-acfa-05fff90c727a.jpg",
+      "PackagePath": "staticwebassets\\uploads\\321dcec5-b642-4941-acfa-05fff90c727a.jpg"
+    },
+    {
+      "Id": "C:\\Users\\saichandrasekhar.s\\Downloads\\Internship-Project-feature-dev-1\\Internship-Project-feature-dev-1\\localink_be\\wwwroot\\uploads\\3eb44fd6-30ab-49ec-9175-309553eb44fb.jpg",
+      "PackagePath": "staticwebassets\\uploads\\3eb44fd6-30ab-49ec-9175-309553eb44fb.jpg"
+    },
+    {
+      "Id": "C:\\Users\\saichandrasekhar.s\\Downloads\\Internship-Project-feature-dev-1\\Internship-Project-feature-dev-1\\localink_be\\wwwroot\\uploads\\41500a71-3f95-4e90-bede-15ff8561dc84_cafe.jpg",
+      "PackagePath": "staticwebassets\\uploads\\41500a71-3f95-4e90-bede-15ff8561dc84_cafe.jpg"
+    },
+    {
+      "Id": "C:\\Users\\saichandrasekhar.s\\Downloads\\Internship-Project-feature-dev-1\\Internship-Project-feature-dev-1\\localink_be\\wwwroot\\uploads\\587717aa-8ceb-45d8-8843-c82805caacd8.jpg",
+      "PackagePath": "staticwebassets\\uploads\\587717aa-8ceb-45d8-8843-c82805caacd8.jpg"
+    },
+    {
+      "Id": "C:\\Users\\saichandrasekhar.s\\Downloads\\Internship-Project-feature-dev-1\\Internship-Project-feature-dev-1\\localink_be\\wwwroot\\uploads\\8be61e2b-3892-4da2-95a6-b068080a08b9.jpg",
+      "PackagePath": "staticwebassets\\uploads\\8be61e2b-3892-4da2-95a6-b068080a08b9.jpg"
+    },
+    {
+      "Id": "C:\\Users\\saichandrasekhar.s\\Downloads\\Internship-Project-feature-dev-1\\Internship-Project-feature-dev-1\\localink_be\\wwwroot\\uploads\\be5a4e93-bfd8-40e2-80b0-fb9433d997a4.jpg",
+      "PackagePath": "staticwebassets\\uploads\\be5a4e93-bfd8-40e2-80b0-fb9433d997a4.jpg"
+    },
+    {
+      "Id": "C:\\Users\\saichandrasekhar.s\\Downloads\\Internship-Project-feature-dev-1\\Internship-Project-feature-dev-1\\localink_be\\wwwroot\\uploads\\dafe8bd3-58ac-4b48-b471-80029efdf271.jpg",
+      "PackagePath": "staticwebassets\\uploads\\dafe8bd3-58ac-4b48-b471-80029efdf271.jpg"
+    },
+    {
+      "Id": "C:\\Users\\saichandrasekhar.s\\Downloads\\Internship-Project-feature-dev-1\\Internship-Project-feature-dev-1\\localink_be\\wwwroot\\uploads\\e0d32f79-7e9e-4348-9806-a78041f55146.jpg",
+      "PackagePath": "staticwebassets\\uploads\\e0d32f79-7e9e-4348-9806-a78041f55146.jpg"
+    },
+    {
+      "Id": "C:\\Users\\saichandrasekhar.s\\Downloads\\Internship-Project-feature-dev-1\\Internship-Project-feature-dev-1\\localink_be\\wwwroot\\uploads\\efc1ca09-a978-4b8b-9bd2-7472ed54613d.jpg",
+      "PackagePath": "staticwebassets\\uploads\\efc1ca09-a978-4b8b-9bd2-7472ed54613d.jpg"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.localink_be.props",
+      "PackagePath": "build\\localink_be.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.localink_be.props",
+      "PackagePath": "buildMultiTargeting\\localink_be.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.localink_be.props",
+      "PackagePath": "buildTransitive\\localink_be.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.localink_be.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

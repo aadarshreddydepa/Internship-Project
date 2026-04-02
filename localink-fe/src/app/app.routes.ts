@@ -53,7 +53,8 @@ export const routes: Routes = [
   },
   { 
     path: 'user-dashboard', 
-    component: UserDashboardComponent 
+    component: UserDashboardComponent,
+    canActivate: [AuthGuard]
   },
   { 
     path: 'client-dashboard',

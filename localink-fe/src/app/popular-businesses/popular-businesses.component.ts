@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { PopularService, PopularBusiness } from '../services/popular.service';
 
 @Component({
   selector: 'app-popular-businesses',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './popular-businesses.component.html',
   styleUrl: './popular-businesses.component.css'
 })

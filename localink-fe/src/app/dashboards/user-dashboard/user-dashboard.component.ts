@@ -2,17 +2,20 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged, switchMap, filter } from 'rxjs';
+import { Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 
 import { CategoryService, Category } from '../../services/category.service';
 import { PopularBusinessesComponent } from '../../popular-businesses/popular-businesses.component';
 import { ProfileComponent } from '../../pages/profile/profile.component';
 import { UserProfile, UserService } from '../../services/user.service';
 import { SearchService, BusinessDto } from '../../services/search.service';
+import { TokenService } from '../../core/services/token.service';
 
 @Component({
   selector: 'app-search',
   standalone: true,
-  imports: [CommonModule, FormsModule, PopularBusinessesComponent, ProfileComponent],
+  imports: [CommonModule, FormsModule, RouterModule, PopularBusinessesComponent, ProfileComponent],
   templateUrl: './user-dashboard.component.html',
   styleUrl: './user-dashboard.component.css'
 })
@@ -30,7 +33,9 @@ export class UserDashboardComponent implements OnInit {
   constructor(
     private categoryService: CategoryService,
     private userService: UserService,
-    private businessService: SearchService
+    private businessService: SearchService,
+    private tokenService: TokenService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -70,6 +75,11 @@ export class UserDashboardComponent implements OnInit {
         this.username = data.fullName;
       },
       error: (err) => {
+        if (err?.status === 401) {
+          this.tokenService.logout();
+          this.router.navigate(['/']);
+          return;
+        }
         console.error('Error fetching user', err);
       }
     });

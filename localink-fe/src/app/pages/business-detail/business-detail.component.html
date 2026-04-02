@@ -101,7 +101,7 @@
         Be the first person to review this business
       </p>
 
-      <button class="add-review-btn-inline" (click)="toggleReviewForm()">
+      <button type="button" class="add-review-btn-inline" (click)="openReviewForm()">
         Add Review
       </button>
 
@@ -109,12 +109,12 @@
 
     <!-- HAS REVIEWS STATE -->
     <div *ngIf="totalReviews > 0" class="add-review-container">
-      <button class="add-review-btn" (click)="toggleReviewForm()">
+      <button type="button" class="add-review-btn" (click)="openReviewForm()">
         Add Review
       </button>
     </div>
 
-    <div *ngIf="showReviewForm" class="add-review">
+    <div *ngIf="showReviewForm" class="add-review" #reviewFormSection>
 
       <div class="star-rating">
         <span
@@ -128,7 +128,7 @@
         </span>
       </div>
 
-      <div class="ai-toggle-container" style="margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+      <div class="ai-toggle-container">
         <input type="checkbox" id="aiToggle" [(ngModel)]="enableAiSuggestions" />
         <label for="aiToggle">Enable AI-Generated Suggestions (Based on keywords)</label>
       </div>
@@ -136,19 +136,24 @@
       <textarea [(ngModel)]="comment" (ngModelChange)="onCommentChange()" placeholder="Write your review or enter keywords..."></textarea>
 
       <!-- AI Suggestions Section -->
-      <div *ngIf="enableAiSuggestions && aiSuggestions.length > 0" class="suggestions-container" style="margin-top: 10px;">
-        <p style="font-size: 0.9em; font-weight: bold; margin-bottom: 5px;">AI Suggestions (Click to append):</p>
-        <div style="display: flex; flex-direction: column; gap: 8px;">
+      <div *ngIf="enableAiSuggestions && aiSuggestions.length > 0" class="suggestions-container">
+        <p class="suggestions-title">AI Suggestions (Click to append):</p>
+        <div class="suggestions-list">
           <button *ngFor="let suggestion of aiSuggestions" 
+                  type="button"
                   (click)="appendSuggestion(suggestion)" 
-                  class="suggestion-chip" 
-                  style="text-align: left; padding: 8px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; cursor: pointer; color: #333;">
+                  class="suggestion-chip">
             {{ suggestion }}
           </button>
         </div>
       </div>
 
-      <button class="submit" (click)="submitReview()" style="margin-top: 15px;">Submit</button>
+  <button type="button" class="submit" (click)="submitReview()" style="margin-top: 15px;">Submit</button>
+  <button type="button" class="direction-btn" (click)="closeReviewForm()" style="margin-top: 15px; margin-left: 10px;">Cancel</button>
+
+      <p *ngIf="submitError" style="color:#ff8f8f; margin-top: 10px;">
+        {{ submitError }}
+      </p>
 
     </div>
 

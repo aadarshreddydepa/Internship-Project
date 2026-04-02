@@ -18,13 +18,17 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
     return next(req);
   }
 
-  if (token) {
+  if (token && tokenService.hasValidToken()) {
     const cloned = req.clone({
       setHeaders: {
         Authorization: `Bearer ${token}`
       }
     });
     return next(cloned);
+  }
+
+  if (token && !tokenService.hasValidToken()) {
+    tokenService.logout();
   }
 
   return next(req);

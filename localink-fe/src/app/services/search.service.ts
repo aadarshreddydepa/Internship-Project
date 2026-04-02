@@ -25,7 +25,7 @@ export interface BusinessDto {
 })
 export class SearchService {
 
-  private baseUrl = 'http://localhost:5138/api/v1/business'; 
+  private baseUrl = 'http://localhost:5145/api/v1/business'; 
 
   constructor(private http: HttpClient) {}
 

@@ -56,7 +56,7 @@ export class ContactDetailsComponent implements OnInit {
  
   ngOnInit() {
     //  Load countries from REST Countries
-    this.http.get<any>('http://localhost:5138/api/v1/location/countries')
+  this.http.get<any>('http://localhost:5145/api/v1/location/countries')
       .subscribe(res => {
         this.countries = res.map((c: any) => ({
           name: c.name.common,
@@ -84,7 +84,7 @@ export class ContactDetailsComponent implements OnInit {
     }
  
     //  Fetch states from CountriesNow
-    this.http.post<any>('http://localhost:5138/api/v1/location/states', {
+  this.http.post<any>('http://localhost:5145/api/v1/location/states', {
       country: countryObj.name
     }).subscribe(res => {
       this.states = res.data.states.map((s: any) => ({
@@ -106,7 +106,7 @@ export class ContactDetailsComponent implements OnInit {
     }
  
     // Fetch cities from CountriesNow
-    this.http.post<any>('http://localhost:5138/api/v1/location/cities', {
+  this.http.post<any>('http://localhost:5145/api/v1/location/cities', {
       country: countryObj.name,
       state: state.name
     }).subscribe(res => {

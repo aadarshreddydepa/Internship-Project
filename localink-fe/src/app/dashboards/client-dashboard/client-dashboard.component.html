@@ -35,14 +35,16 @@
  
   <div *ngIf="!isLoading">
     <div *ngIf="businesses.length > 0; else emptyState" class="business-list">
-      <div class="card" *ngFor="let b of businesses; trackBy: trackById">
+   <div class="card"
+     *ngFor="let b of businesses; trackBy: trackById"
+     (click)="openBusinessDetail(b)">
         <h3>{{ b.businessName }}</h3>
         <p>{{ b.category | titlecase}} - {{ b.subcategory | titlecase}}</p>
         <span class="status">{{ b.status | titlecase}}</span>
  
         <div class="actions">
-          <button class="btn-outline" (click)="viewBusiness(b.id)">View</button>
-          <button class="btn-primary" (click)="editBusiness(b.id)">Edit</button>
+          <button class="btn-outline" (click)="$event.stopPropagation(); viewBusiness(b.id)">View</button>
+          <button class="btn-primary" (click)="$event.stopPropagation(); editBusiness(b.id)">Edit</button>
         </div>
       </div>
     </div>
@@ -90,7 +92,7 @@
  
     <img
       *ngFor="let p of selectedPhotos"
-      [src]="'http://localhost:5138' + p.imageUrl"
+  [src]="'http://localhost:5145' + p.imageUrl"
       class="view-image"
     />
   </div>
@@ -249,7 +251,7 @@
           <h4>Existing Images</h4>
  
           <div *ngFor="let p of selectedPhotos">
-            <img [src]="'http://localhost:5138' + p.imageUrl"
+            <img [src]="'http://localhost:5145' + p.imageUrl"
                  style="width:120px;height:120px;margin:5px;border-radius:8px;" />
  
             <button type="button"

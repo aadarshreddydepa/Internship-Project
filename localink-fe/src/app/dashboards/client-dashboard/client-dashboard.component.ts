@@ -128,6 +128,15 @@ export class ClientDashboardComponent implements OnInit {
     return item.id;
   }
 
+  openBusinessDetail(business: Business) {
+    this.router.navigate(['/business', business.id], {
+      queryParams: {
+        categoryName: business.category,
+        subcategoryName: business.subcategory
+      }
+    });
+  }
+
   addBusiness() {
     this.router.navigate(['/register-business']);
   }

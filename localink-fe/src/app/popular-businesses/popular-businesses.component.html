@@ -6,7 +6,10 @@
 
   <div class="carousel">
 
-    <div class="business-card" *ngFor="let business of businesses" >
+    <div class="business-card"
+      *ngFor="let business of businesses"
+      [routerLink]="['/business', business.id]"
+      [queryParams]="{ categoryName: business.category }">
       <div class="image-placeholder">
         <img 
           *ngIf="business.image" 
