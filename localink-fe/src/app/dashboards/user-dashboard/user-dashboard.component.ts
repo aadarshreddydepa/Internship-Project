@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged, switchMap, filter } from 'rxjs';
 
@@ -30,10 +30,13 @@ export class UserDashboardComponent implements OnInit {
   constructor(
     private categoryService: CategoryService,
     private userService: UserService,
-    private businessService: SearchService
+    private businessService: SearchService,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnInit(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+
     this.loadCategories();
     this.loadUser();
 
