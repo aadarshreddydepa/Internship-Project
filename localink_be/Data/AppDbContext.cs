@@ -18,6 +18,7 @@ public class AppDbContext : DbContext
     public DbSet<Address> Addresses { get; set; }
     public DbSet<AdminDashboard> AdminDashboards { get; set; }
     public DbSet<BusinessReview> BusinessReviews { get; set; }
+    public DbSet<Feedback> Feedbacks { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

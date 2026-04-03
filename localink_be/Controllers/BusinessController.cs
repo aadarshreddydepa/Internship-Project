@@ -85,4 +85,20 @@ public class BusinessController : ControllerBase
     {
         return Ok(await _service.SearchBusinessesAsync(query));
     }
+    [HttpGet("validate-pincode/{pincode}")]
+public async Task<IActionResult> ValidatePincode(string pincode)
+{
+    using var client = new HttpClient();
+
+    var url = $"https://api.geoapify.com/v1/geocode/search?text={pincode}&format=json&apiKey=b5574329b50a49f49fe3b9ebbaf7a837";
+
+    var response = await client.GetAsync(url);
+
+    if (!response.IsSuccessStatusCode)
+        return BadRequest("Geoapify failed");
+
+    var content = await response.Content.ReadAsStringAsync();
+
+    return Content(content, "application/json");
+}
 }
