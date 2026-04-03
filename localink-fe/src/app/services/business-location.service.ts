@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class BusinessLocationService {
 
-  private baseUrl = 'https://localhost:5138/api/location'; // your backend
+  private baseUrl = 'http://localhost:5138/api/location'; // your backend
 
   constructor(private http: HttpClient) {}
 
