@@ -34,7 +34,7 @@ html, body {
   justify-content: center;
   transform: translateY(-20px); /* slight upward shift */
 }
-
+ 
 /* PLASMA BACKGROUND */
 .plasma-bg {
   position: absolute;

@@ -35,12 +35,7 @@ public class RegisterRequest
     [Required]
     public string City { get; set; } = string.Empty;
 
-    [Required]
     public string Street { get; set; } = string.Empty;
 
-    [Required]
     public string Pincode { get; set; } = string.Empty;
-
-    [Required]
-    public string CaptchaToken { get; set; }
 }
