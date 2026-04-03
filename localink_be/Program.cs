@@ -46,6 +46,7 @@ builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<ICaptchaService, CaptchaService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IFavoritesService, FavoritesService>();
 
 var jwtKey = builder.Configuration["Jwt:Key"];
 

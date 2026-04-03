@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using localink_be.Data;
+using localink_be.Models.Entities;
+using localink_be.Models.DTOs;
 
 [ApiController]
 [Route("api/[controller]")]

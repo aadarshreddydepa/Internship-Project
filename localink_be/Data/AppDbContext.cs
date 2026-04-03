@@ -23,6 +23,7 @@ namespace localink_be.Data
         public DbSet<AdminDashboard> AdminDashboards { get; set; }
         public DbSet<BusinessReview> BusinessReviews { get; set; }
         public DbSet<Feedback> Feedbacks { get; set; }
+        public DbSet<Favorite> Favorites { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -34,6 +35,7 @@ namespace localink_be.Data
             ConfigureBusinessHours(modelBuilder);
             ConfigureUser(modelBuilder);
             ConfigureBusinessReview(modelBuilder);
+            ConfigureFavorite(modelBuilder);
         }
 
         private void ConfigureCategory(ModelBuilder modelBuilder)
@@ -163,6 +165,32 @@ namespace localink_be.Data
                     .WithMany()
                     .HasForeignKey(r => r.UserId)
                     .OnDelete(DeleteBehavior.NoAction);
+            });
+        }
+
+        private void ConfigureFavorite(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Favorite>(entity =>
+            {
+                entity.ToTable("Favorites");
+                entity.HasKey(f => f.Id);
+                entity.Property(f => f.Id).HasColumnName("favorite_id");
+                entity.Property(f => f.UserId).HasColumnName("user_id");
+                entity.Property(f => f.BusinessId).HasColumnName("business_id");
+                entity.Property(f => f.CreatedAt).HasColumnName("created_at");
+
+                entity.HasOne(f => f.User)
+                    .WithMany()
+                    .HasForeignKey(f => f.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(f => f.Business)
+                    .WithMany()
+                    .HasForeignKey(f => f.BusinessId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasIndex(f => new { f.UserId, f.BusinessId })
+                    .IsUnique();
             });
         }
     }
