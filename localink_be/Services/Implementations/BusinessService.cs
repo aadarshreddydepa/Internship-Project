@@ -88,10 +88,7 @@ public class BusinessService : IBusinessService
 
         return business;
     }
-public async Task<Business?> UpdateBusinessAsync(long id, Business updated)
-{
-    var existing = await _db.Businesses.FindAsync(id);
-    if (existing == null) return null;
+
 
     public async Task<bool> UpdateBusinessFullAsync(long id, UpdateBusinessDto dto)
     {
