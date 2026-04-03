@@ -108,7 +108,6 @@ export class ForgotPasswordComponent implements AfterViewInit, OnDestroy {
     this.showConfirmPassword = !this.showConfirmPassword;
   }
 
-  // ✅ STEP 1 → SEND OTP
   verifyEmail() {
     this.emailSubmitted = true;
 
@@ -149,7 +148,7 @@ export class ForgotPasswordComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  // ✅ STEP 2 → RESET PASSWORD
+  
   resetPassword() {
     this.resetSubmitted = true;
 
@@ -183,7 +182,6 @@ export class ForgotPasswordComponent implements AfterViewInit, OnDestroy {
     this.captchaError = false;
   }
 
-  // ✅ SAFE COUNTDOWN (NO MEMORY LEAK)
   startCountdown() {
     this.countdown = 3;
 

@@ -1,13 +1,14 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, NgZone, Inject, PLATFORM_ID } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { Router } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
 import { HttpClient } from '@angular/common/http';
-import { isPlatformBrowser } from '@angular/common';
-import { Inject, PLATFORM_ID } from '@angular/core';
+import { LocationService } from '../services/location.service';
+import { PostalService } from '../services/postal.service';
 
+declare var grecaptcha: any; 
 @Component({
   selector: 'app-signup',
   standalone: true,
@@ -18,15 +19,17 @@ import { Inject, PLATFORM_ID } from '@angular/core';
 export class SignupComponent implements OnInit, AfterViewInit {
 
   signupForm: FormGroup;
-
+  captchaToken: string = '';
   showPassword = false;
   showConfirmPassword = false;
   showSuccessPopup = false;
-  errorMessage = '';
-  // JSON DATA
-  locationData: any[] = [];
+  isPincodeFocused = false;
+
+  // // JSON DATA
+  // locationData: any[] = [];
   countries: string[] = [];
   states: string[] = [];
+  cities: any[] = [];
 
   selectedType: 'user' | 'client' = 'user';
   currentStep = 1;
@@ -42,6 +45,9 @@ export class SignupComponent implements OnInit, AfterViewInit {
     private authService: AuthService,
     private router: Router,
     private http: HttpClient,
+    private locationService: LocationService,
+    private ngZone: NgZone,
+    private postalService: PostalService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.signupForm = this.fb.group({
@@ -49,30 +55,32 @@ export class SignupComponent implements OnInit, AfterViewInit {
 
       name: ['', [
         Validators.required,
-        Validators.pattern('^\\S(.*\\S)?$')
+        Validators.pattern('^[A-Za-z]+(\\s[A-Za-z]+)*$')
       ]],
 
       email: ['', [
         Validators.required,
-        Validators.pattern('^[a-zA-Z0-9]+([._%+-]?[a-zA-Z0-9]+)*@[a-zA-Z0-9-]+(\\.[a-zA-Z]{2,})+$'),
+        Validators.pattern(
+    '^(?!.*\\.\\.)(?!.*\\.$)(?!^\\.)([A-Za-z0-9]+([._%+-][A-Za-z0-9]+)*)@[A-Za-z0-9-]+(\\.[A-Za-z]{2,})+$'
+  ),
         Validators.pattern('^\\S+$')
       ]],
 
       phone: ['', [
         Validators.required,
-        Validators.pattern('^[0-9]{10}$')
+        Validators.pattern('^[1-9][0-9]{9}$')
       ]],
 
-      countryCode: ['+91', Validators.required],
+      countryCode: [null, Validators.required],
 
-      street: ['', Validators.required],
+      street: ['', [Validators.required, Validators.pattern(/^(?!\d+$)[A-Za-z0-9\s\-\:\/\,\.]+$/)]],
       city: ['', Validators.required],
       state: ['', Validators.required],
       country: ['', Validators.required],
 
       pincode: ['', [
         Validators.required,
-        Validators.pattern('^[1-9][0-9]{5}$')
+        Validators.pattern('^[0-9A-Za-z\\-\\s]{3,10}$')
       ]],
 
       password: ['', [
@@ -90,31 +98,122 @@ export class SignupComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     this.signupForm.patchValue({ userType: 'user' });
 
-    this.http.get<any[]>('assets/countries.json').subscribe(data => {
-  this.locationData = data;
-  this.countries = data.map(c => c.name); // full objects for ng-select
-});
+    // disable initially
+    this.signupForm.get('pincode')?.disable();
+
+    this.locationService.getCountries()
+    .subscribe((data: any[]) => {
+      this.countries = data;
+    });
+
+    // listen to ALL changes
+    this.signupForm.valueChanges.subscribe(() => {
+      this.onCityChange();
+    });
+  }
+  allowOnlyLetters(event: KeyboardEvent) {
+    const char = event.key;
+
+    if (!/^[a-zA-Z\s]$/.test(char)) {
+      event.preventDefault();
+    }
   }
 
-  // COUNTRY CHANGE
- onCountryChange(event: any) {
+  validatePincode() {
+    const control = this.signupForm.get('pincode');
 
-  //handle both string and object
-  const countryName = typeof event === 'string' ? event : event?.name;
+    // skip if disabled
+    if (control?.disabled) return;
 
-  const country = this.locationData.find(
-    (c: any) => c.name === countryName
-  );
+    const pincode = this.signupForm.get('pincode')?.value;
+    const country = this.signupForm.get('country')?.value;
 
-  console.log('Selected country:', countryName);
-  console.log('Matched object:', country);
+    // prevent unnecessary API calls
+    if (!pincode || pincode.length < 5 || !country) return;
 
-  this.states = (country?.states || []).map((s: any) => s.name);
+    this.postalService.validate(pincode, country.name)
+      .subscribe({
+        next: (res: any) => {
 
-  this.signupForm.patchValue({
-    state: ''
-  });
-}
+          const data = res;
+
+          if (!data.features || data.features.length === 0) {
+            this.signupForm.get('pincode')?.setErrors({ invalidPostal: true });
+            return;
+          }
+
+          const location = data.features[0].properties;
+
+          const cityName = location.city || location.town || location.village;
+          const stateName = location.state;
+
+          // find matching objects
+          const normalize = (val: string) => val?.toLowerCase().replace(/\s/g, '');
+          const matchedState = this.states.find((s: any) =>
+            normalize(s.name) === normalize(stateName)
+          );
+          const matchedCity = this.cities.find((c: any) =>
+            normalize(c.name) === normalize(cityName)
+          );
+
+
+          // Optional autofill
+          this.signupForm.patchValue({
+            state: matchedState || null,
+            city: matchedCity || null
+          });
+
+          this.signupForm.get('pincode')?.setErrors(null);
+        },
+        error: () => {
+          // DO NOT block user
+          console.warn('Postal validation failed');
+        }
+      });
+  }
+
+  onCountryChange(country: any) {
+    this.signupForm.patchValue({
+      countryCode: country.phonecode
+    });
+
+    this.locationService.getStates(country.iso2)
+      .subscribe(data => {
+        this.states = data;
+        this.cities = [];
+      });
+
+    this.signupForm.patchValue({
+      state: '',
+      city: '',
+      pincode: ''
+    });
+    this.signupForm.get('pincode')?.disable();
+  }
+
+  onStateChange(state: any) {
+    const country = this.signupForm.get('country')?.value;
+
+    this.locationService.getCities(country.iso2, state.iso2)
+      .subscribe(data => {
+        this.cities = data;
+      });
+
+    this.signupForm.patchValue({ city: '', pincode: '' });
+    this.signupForm.get('pincode')?.disable();
+  }
+  onCityChange() {
+    const country = this.signupForm.get('country')?.value;
+    const state = this.signupForm.get('state')?.value;
+    const city = this.signupForm.get('city')?.value;
+
+    if (country && state && city) {
+      this.signupForm.get('pincode')?.enable();
+    } else {
+      this.signupForm.get('pincode')?.disable();
+    }
+  }
+
   // STEP NAVIGATION
   nextStep() {
     const fields = this.stepFields[this.currentStep];
@@ -156,35 +255,38 @@ export class SignupComponent implements OnInit, AfterViewInit {
   // SUBMIT
   isSubmitting = false;
   onSubmit() {
-      this.errorMessage = '';
+  if (!this.captchaToken) {
+    alert("Please complete CAPTCHA");
+    return;
+  }
+  if (this.signupForm.valid && !this.isSubmitting) {
 
-      if (this.signupForm.invalid || this.isSubmitting) return;
+    this.isSubmitting = true;
 
-      this.isSubmitting = true;
+    const { confirmPassword, ...payload } = this.signupForm.value;
 
-      const { confirmPassword, ...raw } = this.signupForm.value;
+    const formData = {
+      ...payload,
+      userType: this.selectedType,
+      captchaToken: this.captchaToken
+    };
 
-      const payload = {
-        ...raw,
-        email: raw.email.trim().toLowerCase(), 
-        name: raw.name.trim(),
-        userType: this.selectedType
-      };
+    this.authService.register(formData).subscribe({
+      next: () => {
+        this.showSuccessPopup = true;
 
-      this.authService.register(payload).subscribe({
-        next: () => {
-          this.showSuccessPopup = true;
-
-          setTimeout(() => {
-            this.router.navigate(['/login']);
-          }, 2000);
-        },
-        error: (err: any) => {
-          this.errorMessage = err?.error?.message || 'Signup failed';
-          this.isSubmitting = false;
-        }
-      });
-    }
+        //smooth delay before redirect
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 2000);
+      },
+      error: (err:any) => {
+        alert(err.error?.message || 'Signup failed');
+        this.isSubmitting = false;
+      }
+    });
+  }
+}
 
   // PASSWORD TOGGLE
   togglePassword() {
@@ -205,9 +307,31 @@ allowOnlyNumbers(event: KeyboardEvent) {
     event.preventDefault();
   }
 }
+customSearch = (term: string, item: any) => {
+  term = term.toLowerCase();
+
+  return item.name.toLowerCase().includes(term) ||
+         item.phonecode.includes(term.replace('+', ''));
+};
+  renderCaptcha() {
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    grecaptcha.ready(() => {
+      grecaptcha.render('recaptcha-container', {
+        sitekey: '6LeAuJwsAAAAAF0BaOuNYhhyq_1dWaCpY4G3-yFX',
+        callback: (token: string) => {
+          this.ngZone.run(() => {
+            this.captchaToken = token;
+            console.log('CAPTCHA TOKEN:', token);
+          });
+        }
+      });
+    });
+  }
+
   // CANVAS ANIMATION (UNCHANGED)
   ngAfterViewInit() {
-    if(!isPlatformBrowser(this.platformId)) return;
+    if (!isPlatformBrowser(this.platformId)) return;
     const glow = document.querySelector('.cursor-glow') as HTMLElement;
 
     document.addEventListener('mousemove', (e) => {
@@ -267,5 +391,6 @@ allowOnlyNumbers(event: KeyboardEvent) {
     };
 
     draw();
+    this.renderCaptcha();
   }
 }

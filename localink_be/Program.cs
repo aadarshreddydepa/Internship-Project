@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Text;
 using localink_be.Hubs;
 using System.Text;
 using DotNetEnv;
@@ -14,6 +16,23 @@ builder.Services.AddHttpClient();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        sql => sql.EnableRetryOnFailure()
+    )
+);
+builder.Services.AddControllers();
+
+builder.Services.AddHttpClient<ILocationService, LocationService>();
+builder.Services.AddHttpClient<IPostalService, PostalService>();
+builder.Services.AddMemoryCache();
+
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<ISubcategoryService, SubcategoryService>();
@@ -110,7 +129,11 @@ app.MapGet("/", () => "Localink API is running");
 app.MapControllers();
 app.MapHub<NotificationHub>("/notifications");
 
-app.Run();
 
+
+app.MapGet("/health", () => Results.Ok("API is running"));
+
+
+app.Run();
 // Required for WebApplicationFactory<Program> in integration tests
 public partial class Program { }

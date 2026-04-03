@@ -9,7 +9,7 @@ import {
   AbstractControl
 } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 
 import { AuthService } from '../core/services/auth.service';
 import { TokenService } from '../core/services/token.service';

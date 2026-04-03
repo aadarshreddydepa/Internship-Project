@@ -51,10 +51,13 @@
       <span class="input-title">
         {{ selectedType === 'client' ? 'Business Owner Name *' : 'Name *' }}
       </span>
-      <input type="text" formControlName="name" placeholder=" " />
+      <input type="text" formControlName="name" placeholder=" " (keypress)="allowOnlyLetters($event)"/>
 
       <div class="error" *ngIf="f['name'].touched && f['name']?.errors">
         <span *ngIf="f['name'].errors?.['required']">Name is required</span>
+        <span *ngIf="f['name'].errors?.['pattern']">
+          Only letters and spaces allowed
+        </span>
       </div>
     </div>
 
@@ -65,7 +68,27 @@
       <div class="phone-group">
 
         <div class="code-box">
-          <input type="text" formControlName="countryCode" placeholder=" " />
+          <ng-select
+            [items]="countries"
+            bindLabel="iso2"
+            bindValue="phonecode"
+            formControlName="countryCode"
+            [searchable]="true"
+            [clearable]="false"
+            placeholder="+ Code"
+          >
+
+            <!-- Dropdown list -->
+            <ng-template ng-option-tmp let-item="item">
+              {{ item.iso2 }}
+            </ng-template>
+
+            <!-- Selected value -->
+            <ng-template ng-label-tmp let-item="item">
+              +{{ item.phonecode }}
+            </ng-template>
+
+          </ng-select>
         </div>
 
         <div class="number-box">
@@ -78,10 +101,11 @@
         </div>
 
       </div>
+    </div>
 
       <div class="error" *ngIf="f['phone'].touched && f['phone']?.errors">
         <span *ngIf="f['phone'].errors?.['required']">Phone required</span>
-        <span *ngIf="f['phone'].errors?.['pattern']">Must be 10 digits</span>
+        <span *ngIf="f['phone'].errors?.['pattern']">Must be 10 digits and cannot start with 0</span>
       </div>
     </div>
 
@@ -92,24 +116,30 @@
 
       <div class="error" *ngIf="f['email'].touched && f['email']?.errors">
         <span *ngIf="f['email'].errors?.['required']">Email required</span>
-        <span *ngIf="f['email'].errors?.['pattern']">Invalid email</span>
+        <span *ngIf="f['email'].errors?.['pattern']">Invalid email format</span>
+        <span *ngIf="f['email'].errors?.['pattern']">No spaces allowed</span>
       </div>
     </div>
 
     <!-- ================= LOCATION ================= -->
-    <div class="form-grid">
+    <div class="address-row">
       <!-- COUNTRY -->
       <div class="form-group">
         <span class="input-title">Country *</span>
-        <ng-select
+        <!-- <ng-select
           [items]="countries"
           bindLabel="name"
           bindValue="name"
           formControlName="country"
           appendTo="body"
           (change)="onCountryChange($event)">
+        </ng-select> -->
+        <ng-select
+          [items]="countries"
+          bindLabel="name"
+          formControlName="country"
+          (change)="onCountryChange($event)">
         </ng-select>
-
         <div class="error" *ngIf="f['country'].touched && f['country']?.errors">
           <span>Country required</span>
         </div>
@@ -118,14 +148,19 @@
       <!-- STATE -->
       <div class="form-group">
         <span class="input-title">State *</span>
-        <ng-select
+        <!-- <ng-select
           [items]="states"
           bindLabel="name"
           bindValue="name"
           formControlName="state"
           appendTo="body">
+        </ng-select> -->
+        <ng-select
+          [items]="states"
+          bindLabel="name"
+          formControlName="state"
+          (change)="onStateChange($event)">
         </ng-select>
-
         <div class="error" *ngIf="f['state'].touched && f['state']?.errors">
           <span>State required</span>
         </div>
@@ -134,7 +169,13 @@
       <!-- CITY -->
       <div class="form-group">
         <span class="input-title">City *</span>
-        <input type="text" formControlName="city" placeholder=" " />
+        <!-- <input type="text" formControlName="city" placeholder=" " /> -->
+        <ng-select
+          [items]="cities"
+          bindLabel="name"
+          formControlName="city"
+          (change)="onCityChange()">
+        </ng-select>
 
         <div class="error" *ngIf="f['city'].touched && f['city']?.errors">
           <span>City required</span>
@@ -144,12 +185,23 @@
       <!-- PINCODE -->
       <div class="form-group">
         <span class="input-title">Pincode *</span>
-        <input type="text" formControlName="pincode" placeholder=" " />
+        <!-- <input type="text" formControlName="pincode" placeholder=" " /> -->
+        <input 
+          type="text" 
+          formControlName="pincode" 
+          placeholder=" "
+          (focus)="isPincodeFocused = true"
+          (blur)="validatePincode(); isPincodeFocused = false" 
+        />
+        <div class="error" 
+          *ngIf="isPincodeFocused && signupForm.get('pincode')?.disabled">
+          Select country, state, and city first
+        </div>
 
         <div class="error" *ngIf="f['pincode'].touched && f['pincode']?.errors">
           <span *ngIf="f['pincode'].errors?.['required']">Pincode required</span>
-          <span *ngIf="f['pincode'].errors?.['pattern']">
-            Must be 6 digits & not start with 0
+          <span *ngIf="f['pincode'].errors?.['invalidPostal']">
+            Invalid postal code for selected country
           </span>
         </div>
       </div>
@@ -208,15 +260,19 @@
       </div>
     </div>
 
+    <div id="recaptcha-container"></div>
     <!-- SUBMIT -->
     <button 
-  type="submit" 
-  class="signup-btn" 
-  [disabled]="signupForm.invalid || isSubmitting">
-  
-  {{ isSubmitting ? 'Creating...' : 'Sign Up' }}
-</button>
-
+      type="submit" 
+      class="signup-btn" 
+      [disabled]="signupForm.invalid || isSubmitting">
+      
+      {{ isSubmitting ? 'Creating...' : 'Sign Up' }}
+    </button>
+    <div class="login-redirect">
+      Already have an account?
+      <a routerLink="/">Login</a>
+    </div>
   </form>
 
 </div>
