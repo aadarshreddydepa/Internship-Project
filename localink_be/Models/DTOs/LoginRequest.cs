@@ -12,5 +12,5 @@ namespace localink_be.Models.DTOs
         [Required]
         public string CaptchaToken { get; set; } = string.Empty;
 
-}
+    }
 }

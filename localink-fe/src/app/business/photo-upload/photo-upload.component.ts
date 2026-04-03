@@ -23,7 +23,9 @@ export class PhotoUploadComponent {
  
   ngOnInit() {
     if(this.initialPhoto){
-      this.selectedImage = this.initialPhoto;
+      this.selectedImage = this.initialPhoto.startsWith('data:')
+      ? this.initialPhoto
+      : 'data:image/png;base64,' + this.initialPhoto;;
     }
   }
   onFileSelected(event: Event) {
@@ -64,7 +66,7 @@ export class PhotoUploadComponent {
       reader.onload = () => {
       const result = reader.result as string;
       this.selectedImage = result; // full Data URL for preview
- 
+
       const base64Data = result.split(',')[1]; // raw base64 for backend
       this.photoSelected.emit(base64Data);
     };

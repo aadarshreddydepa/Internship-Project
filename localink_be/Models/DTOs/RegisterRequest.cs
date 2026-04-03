@@ -40,5 +40,5 @@ namespace localink_be.Models.DTOs
         public string Street { get; set; } = string.Empty;
 
         public string Pincode { get; set; } = string.Empty;
-}
+    }
 }

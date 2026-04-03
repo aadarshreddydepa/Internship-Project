@@ -3,10 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using System.Text.RegularExpressions;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Threading.Tasks;
 using localink_be.Data;
 using localink_be.Models.Entities;
 using localink_be.Models.DTOs;
@@ -38,10 +35,10 @@ namespace localink_be.Services.Implementations
             var email = request.Email?.Trim().ToLower();
 
             if (string.IsNullOrWhiteSpace(email))
-                throw new ArgumentException("Invalid request");
+                throw new ArgumentException("Email is required");
 
             if (string.IsNullOrWhiteSpace(request.Password) || request.Password.Length < 8)
-                throw new ArgumentException("Invalid request");
+                throw new ArgumentException("Password must be at least 8 characters");
 
             User user = null!;
 
@@ -53,11 +50,11 @@ namespace localink_be.Services.Implementations
                 {
                     var emailExists = await _context.Users.AnyAsync(u => u.Email == email);
                     if (emailExists)
-                        throw new InvalidOperationException("Invalid request");
+                        throw new InvalidOperationException("Email already exists");
 
                     var phoneExists = await _context.Users.AnyAsync(u => u.PhoneNumber == request.Phone);
                     if (phoneExists)
-                        throw new InvalidOperationException("Invalid request");
+                        throw new InvalidOperationException("Phone number already exists");
 
                     user = new User
                     {
@@ -109,12 +106,12 @@ namespace localink_be.Services.Implementations
         public async Task<string> VerifyEmailAsync(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
-                throw new ArgumentException("Invalid request");
+                throw new ArgumentException("Email is required");
 
             var exists = await _context.Users
                 .AnyAsync(u => u.Email == email.Trim().ToLower());
 
-            return exists ? "Email exists" : "Invalid request";
+            return exists ? "Email exists" : "Email available";
         }
 
         public async Task<string> ResetPasswordAsync(ForgotPasswordRequest request)
@@ -168,6 +165,7 @@ namespace localink_be.Services.Implementations
             var isCaptchaValid = await _captchaService.VerifyAsync(captchaToken);
             if (!isCaptchaValid)
                 throw new UnauthorizedAccessException("Captcha validation failed");
+
             var normalizedEmail = email.Trim().ToLower();
 
             var user = await _context.Users
@@ -182,7 +180,7 @@ namespace localink_be.Services.Implementations
             var otp = GenerateOtp();
 
             user.PasswordResetOtp = otp;
-            user.OtpExpiry = DateTime.UtcNow.AddMinutes(1);
+            user.OtpExpiry = DateTime.UtcNow.AddMinutes(15);
             user.OtpAttempts = 0;
 
             await _context.SaveChangesAsync();
@@ -223,7 +221,6 @@ namespace localink_be.Services.Implementations
                 throw new UnauthorizedAccessException("OTP expired");
 
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword, 12);
-
             user.OtpAttempts = 0;
             user.PasswordResetOtp = null;
             user.OtpExpiry = null;
@@ -238,9 +235,7 @@ namespace localink_be.Services.Implementations
             var bytes = new byte[4];
             using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
             rng.GetBytes(bytes);
-
             int number = BitConverter.ToInt32(bytes, 0) & 0x7fffffff;
-
             return (number % 900000 + 100000).ToString();
         }
 

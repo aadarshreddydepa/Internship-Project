@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { ProfileComponent } from '../../pages/profile/profile.component';
 import { ClientDashboardService } from '../../services/client-dashboard.service';
 import { TranslateModule } from '@ngx-translate/core';
+import { NotificationService } from '../../services/notification.service';
 
 interface Business {
   id: number;
@@ -46,6 +47,7 @@ export class ClientDashboardComponent implements OnInit {
 
   isLoading = true;
   fullName: string = '';
+  liveNotification: string | null = null;
 
   countries: any[] = [];
   states: string[] = []; 
@@ -54,6 +56,7 @@ export class ClientDashboardComponent implements OnInit {
   constructor(
     private router: Router,
     private dashboardService: ClientDashboardService,
+    private notificationService: NotificationService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
   toggleProfile(): void {
@@ -80,7 +83,7 @@ export class ClientDashboardComponent implements OnInit {
 
   loadCategories() {
     this.dashboardService.getCategories().subscribe({
-      next: (data) => {
+      next: (data: any) => {
         this.categories = data;
       }
     });
@@ -121,11 +124,22 @@ export class ClientDashboardComponent implements OnInit {
     this.dashboardService.getUserProfile().subscribe({
       next: (res) => {
         this.fullName = res.fullName;
+        if (res.userId) {
+          this.notificationService.startConnection(res.userId.toString());
+          this.notificationService.notification$.subscribe(msg => {
+            this.liveNotification = msg;
+            setTimeout(() => this.liveNotification = null, 6000);
+          });
+        }
       },
       error: () => {
         this.fullName = 'User';
       }
     });
+  }
+
+  ngOnDestroy() {
+    this.notificationService.stopConnection();
   }
 
   trackById(index: number, item: Business) {
@@ -221,7 +235,7 @@ export class ClientDashboardComponent implements OnInit {
 
     this.dashboardService.uploadPhoto(
       this.editingBusiness.id,
-      this.selectedFile
+      this.selectedFile!
     )
     .subscribe(() => {
       this.dashboardService.getPhotos(this.editingBusiness!.id)
@@ -251,21 +265,21 @@ export class ClientDashboardComponent implements OnInit {
     );
 
     const payload = {
-      businessName: this.editingBusiness.businessName,
-      description: this.editingBusiness.description,
+      businessName: this.editingBusiness!.businessName,
+      description: this.editingBusiness!.description,
       categoryId: categoryObj?.id,
       subcategoryId: subcategoryObj?.id,
       phoneCode: this.selectedCountry?.code || '',
-      phoneNumber: this.editingBusiness.contact.phone,
-      email: this.editingBusiness.contact.email,
-      city: this.editingBusiness.contact.city,
-      streetAddress: this.editingBusiness.contact.streetAddress,
-      state: this.editingBusiness.contact.state,
-      country: this.editingBusiness.contact.country,
-      pincode: this.editingBusiness.contact.pincode
+      phoneNumber: this.editingBusiness!.contact.phone,
+      email: this.editingBusiness!.contact.email,
+      city: this.editingBusiness!.contact.city,
+      streetAddress: this.editingBusiness!.contact.streetAddress,
+      state: this.editingBusiness!.contact.state,
+      country: this.editingBusiness!.contact.country,
+      pincode: this.editingBusiness!.contact.pincode
     };
 
-    this.dashboardService.updateBusiness(this.editingBusiness.id, payload)
+    this.dashboardService.updateBusiness(this.editingBusiness!.id, payload)
       .subscribe({
         next: () => {
           this.fetchBusinesses();

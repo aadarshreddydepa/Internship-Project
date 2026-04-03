@@ -99,6 +99,7 @@ namespace localink_be.Services.Implementations
         return business;
     }
 
+
     public async Task<bool> UpdateBusinessFullAsync(long id, UpdateBusinessDto dto)
     {
         var business = await _db.Businesses.FindAsync(id);
@@ -303,6 +304,8 @@ namespace localink_be.Services.Implementations
 
             return await _db.Businesses
                 .Where(b => b.UserId == userId)
+                .Include(b => b.Category)
+                .Include(b => b.Subcategory)
                 .Select(b => new BusinessDto
                 {
                     Id = b.BusinessId,
@@ -522,7 +525,7 @@ namespace localink_be.Services.Implementations
                     businessesQuery = businessesQuery.Where(b =>
                         _db.BusinessHours.Any(h =>
                             h.BusinessId == b.BusinessId &&
-                            h.DayOfWeek == currentDay &&
+                            h.DayOfWeek == currentDay.ToString() &&
                             h.Mode == "open" &&
                             _db.BusinessHourSlots.Any(s =>
                                 s.BusinessHourId == h.BusinessHourId &&

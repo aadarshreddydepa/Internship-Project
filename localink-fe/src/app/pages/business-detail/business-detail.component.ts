@@ -59,6 +59,25 @@ subcategoryId!: number;
               ? 'http://localhost:5138' + primaryPhoto.imageUrl
               : null
           };
+          // Fallback: Use category/subcategory from business data if query params were empty
+          if (!this.categoryName && data.categoryName) {
+            this.categoryName = data.categoryName;
+          }
+          if (!this.categoryName && data.category?.categoryName) {
+            this.categoryName = data.category.categoryName;
+          }
+          if (!this.subcategoryName && data.subcategoryName) {
+            this.subcategoryName = data.subcategoryName;
+          }
+          if (!this.subcategoryName && data.subcategory?.subcategoryName) {
+            this.subcategoryName = data.subcategory.subcategoryName;
+          }
+          if ((!this.categoryId || this.categoryId === 0) && data.categoryId) {
+            this.categoryId = data.categoryId;
+          }
+          if ((!this.subcategoryId || this.subcategoryId === 0) && data.subcategoryId) {
+            this.subcategoryId = data.subcategoryId;
+          }
         }
       });
     }

@@ -300,3 +300,98 @@ app-photo-upload{
   font-style: italic;
   opacity: 0.8;
 }
+
+/* Responsive adjustments */
+
+/* Tablet screens (≤ 768px) */
+@media (max-width: 768px) {
+  .wizard-container {
+    width: 100%;
+    max-width: 100%;
+    padding: 0 15px;
+  }
+
+  .two-column {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .stepper {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .step {
+    flex: 1;
+    text-align: center;
+  }
+
+  .line {
+    flex: 1;
+    height: 2px;
+    background: #484948;
+    margin: 0 4px;
+  }
+
+  .form-card {
+    padding: 25px;
+  }
+}
+
+/* Mobile screens (≤ 480px) */
+@media (max-width: 480px) {
+  .header h2 {
+    font-size: 20px;
+  }
+
+  .header p {
+    font-size: 12px;
+  }
+
+  .form-card {
+    padding: 20px;
+  }
+
+  button {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .button-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .circle {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+
+  .stepper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: nowrap;
+    width: 100%;
+  }
+
+  .step {
+    flex: 1;
+    text-align: center;
+  }
+
+  .line {
+    flex: 1;
+    height: 2px;
+    background: #484948;
+    margin: 0 4px;
+  }
+}

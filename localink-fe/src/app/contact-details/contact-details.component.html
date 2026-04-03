@@ -10,19 +10,19 @@
       <ng-select
         class="phone-code"
         [items]="phoneCountries"
-        bindLabel="code"
+        bindLabel="searchLabel"
         bindValue="code"
         formControlName="phoneCode"
-        [searchable]="false"
+        [searchable]="true"
         [clearable]="false">
 
         <ng-template ng-label-tmp let-item="item">
-          <span class="flag">{{item.flag}}</span> {{item.code}}
+          <span class="flag">{{item.flag}}</span> +{{item.code}}
         </ng-template>
 
         <ng-template ng-option-tmp let-item="item">
           <span class="flag">{{item.flag}}</span>
-          {{item.name}} ({{item.code}})
+          {{item.name}} (+{{item.code}})
         </ng-template>
 
       </ng-select>
@@ -72,7 +72,6 @@
 
     <!-- LOCATION ROW -->
     <div class="location-row">
-
 
     <!-- COUNTRY -->
     <div class="location-field">
@@ -141,11 +140,15 @@
 
     <label>{{ 'CONTACT.PINCODE' | translate }} *</label>
 
-    <input type="text" formControlName="pincode" placeholder="{{ 'CONTACT.PLACEHOLDER_PINCODE' | translate }}">
+    <input type="text" formControlName="pincode" placeholder="{{ 'CONTACT.PLACEHOLDER_PINCODE' | translate }}" (blur)="validatePincode()">
 
     <div class="error" *ngIf="contactForm.get('pincode')?.touched && contactForm.get('pincode')?.invalid">
       <div *ngIf="contactForm.get('pincode')?.errors?.['required']">{{ 'ERRORS.REQUIRED' | translate }}</div>
       <div *ngIf="contactForm.get('pincode')?.errors?.['pattern']">{{ 'VALIDATION.PINCODE_PATTERN' | translate }}</div>
+      <div *ngIf="contactForm.get('pincode')?.errors?.['invalidCountry']">{{ 'VALIDATION.PINCODE_COUNTRY' | translate }}</div>
+      <div *ngIf="contactForm.get('pincode')?.errors?.['invalidState']">{{ 'VALIDATION.PINCODE_STATE' | translate }}</div>
+      <div *ngIf="contactForm.get('pincode')?.errors?.['invalidCity']">{{ 'VALIDATION.PINCODE_CITY' | translate }}</div>
+      <div *ngIf="contactForm.get('pincode')?.errors?.['invalidPincode']">{{ 'VALIDATION.PINCODE_INVALID' | translate }}</div>
     </div>
 
     </div>

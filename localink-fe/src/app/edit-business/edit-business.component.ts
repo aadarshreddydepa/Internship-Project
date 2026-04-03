@@ -58,7 +58,7 @@ export class EditBusinessBusinessComponent implements OnInit {
       subcategory: ['', Validators.required]
     });
 
-    // 🔥 Keep data synced always
+    //  Keep data synced always
     this.businessForm.valueChanges.subscribe(val => {
       this.businessData = val;
     });

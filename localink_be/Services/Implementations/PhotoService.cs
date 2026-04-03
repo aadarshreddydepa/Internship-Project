@@ -92,5 +92,6 @@ namespace localink_be.Services.Implementations
         _db.BusinessPhotos.Add(photo);
         await _db.SaveChangesAsync();
     }
+
 }
 }

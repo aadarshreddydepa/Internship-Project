@@ -12,8 +12,8 @@
     {{ 'BUSINESS.BACK_TO_LIST' | translate }}
   </a>
 
-    <p class="category">
-    {{ categoryName | titlecase }} › {{ subcategoryName | titlecase }}
+    <p class="category" *ngIf="categoryName || subcategoryName">
+    {{ (categoryName || business.categoryName) | titlecase }} › {{ (subcategoryName || business.subcategoryName) | titlecase }}
   </p>
 
   <!-- MAIN CARD -->

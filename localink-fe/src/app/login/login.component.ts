@@ -1,6 +1,6 @@
 import { Component, AfterViewInit } from '@angular/core';
 import { Inject, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+
 import {
   FormBuilder,
   Validators,
@@ -9,7 +9,7 @@ import {
   AbstractControl
 } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 
 import { AuthService } from '../core/services/auth.service';
@@ -184,8 +184,6 @@ export class LoginComponent implements AfterViewInit {
       this.errorMessage = 'Login failed. Try again';
     }
 
-    // trigger animation error
-
     this.isLoading = false;
     this.triggerErrorAnimation();
   }
@@ -232,6 +230,7 @@ export class LoginComponent implements AfterViewInit {
 
         grecaptcha.render('loginCaptcha', {
           sitekey: environment.recaptchaSiteKey,
+          theme: 'dark',
           callback: (token: string) => {
             this.onCaptchaResolved(token);
           }

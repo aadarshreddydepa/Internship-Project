@@ -48,9 +48,9 @@
       <div class="info-row">
         <span class="label">{{ 'CONTACT.ADDRESS' | translate }}</span>
         <span class="value">
-          {{contactData?.address}}, {{contactData?.city}},
-          {{contactData?.state}}, {{contactData?.pincode}},
-          {{contactData?.country}}
+          {{contactData?.address}}, {{contactData?.city?.name || contactData?.city}},
+          {{contactData?.state?.name || contactData?.state}}, {{contactData?.pincode}},
+          {{contactData?.country?.name || contactData?.country}}
         </span>
       </div>
     </div>
@@ -83,7 +83,6 @@
       <h3>{{ 'BUSINESS.PHOTO' | translate }}</h3>
       <div class="photo-box">
         <img [src]="photoData ? 'data:image/png;base64,' + photoData : ''" alt="{{ 'BUSINESS.PHOTO' | translate }}">
- 
       </div>
     </div>
   </div>

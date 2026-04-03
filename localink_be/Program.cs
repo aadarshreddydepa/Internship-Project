@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using localink_be.Hubs;
 using System.Text;
 using DotNetEnv;
 using localink_be.Data;
@@ -30,6 +31,15 @@ builder.Services.AddScoped<IBusinessService, BusinessService>();
 builder.Services.AddScoped<IContactService, ContactService>();
 builder.Services.AddScoped<IHoursService, HoursService>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
+
+// CACHING SERVICES
+builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<ICacheService, CacheService>();
+
+// HTTP CLIENTS WITH CACHE
+builder.Services.AddHttpClient<BusinessLocationService>();
+builder.Services.AddScoped<IBusinessLocationService, BusinessLocationService>();
+builder.Services.AddScoped<IBusinessPincodeService, BusinessPincodeService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
@@ -75,12 +85,14 @@ builder.Services.AddControllers()
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSignalR();
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
         policy => policy
-            .AllowAnyOrigin()
+            .WithOrigins("http://localhost:4200")
+            .AllowCredentials()
             .AllowAnyMethod()
             .AllowAnyHeader());
 });
@@ -110,6 +122,7 @@ app.UseAuthorization();
 // ROUTES
 app.MapGet("/", () => "Localink API is running");
 app.MapControllers();
+app.MapHub<NotificationHub>("/notifications");
 
 app.Run();
 

@@ -34,7 +34,6 @@ html, body {
   justify-content: center;
   transform: translateY(-20px); /* slight upward shift */
 }
-
 /* PLASMA BACKGROUND */
 .plasma-bg {
   position: absolute;
@@ -222,21 +221,16 @@ input[type="password"]::-ms-reveal,
 input[type="password"]::-ms-clear {
   display: none;
 }
-
-/* ===================================== */
-/* 🔥 FIX: REMOVE DUPLICATE PASSWORD ICON */
-/* ===================================== */
-
+ 
+ 
 input[type="password"] {
   appearance: none;
   -webkit-appearance: none;
 }
-
 input[type="password"]::-ms-reveal,
 input[type="password"]::-ms-clear {
   display: none;
 }
-
 input[type="password"]::-webkit-credentials-auto-fill-button,
 input[type="password"]::-webkit-textfield-decoration-container,
 input[type="password"]::-webkit-caps-lock-indicator {

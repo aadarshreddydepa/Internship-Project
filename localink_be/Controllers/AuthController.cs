@@ -7,7 +7,6 @@ using localink_be.Services.Interfaces;
 
 namespace localink_be.Controllers
 {
-
     [AllowAnonymous]
     [ApiController]
     [Route("api/v1/auth")]
@@ -19,6 +18,7 @@ namespace localink_be.Controllers
         {
             _authService = authService;
         }
+
         private IActionResult ValidateRequest()
         {
             if (!ModelState.IsValid)
@@ -76,19 +76,19 @@ namespace localink_be.Controllers
 
         // SEND OTP
         [HttpPost("forgot-password")]
-    public async Task<IActionResult> SendOtp([FromBody] SendOtpRequest request)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest(new { success = false, errors = ModelState });
-
-        var result = await _authService.SendResetOtpAsync(request.Email,request.CaptchaToken);
-
-        return Ok(new
+        public async Task<IActionResult> SendOtp([FromBody] SendOtpRequest request)
         {
-            success = true,
-            message = result
-        });
-    }
+            if (!ModelState.IsValid)
+                return BadRequest(new { success = false, errors = ModelState });
+
+            var result = await _authService.SendResetOtpAsync(request.Email, request.CaptchaToken);
+
+            return Ok(new
+            {
+                success = true,
+                message = result
+            });
+        }
 
         // RESET PASSWORD
         [HttpPost("reset-password")]
@@ -108,6 +108,6 @@ namespace localink_be.Controllers
                 success = true,
                 message = result
             });
-}
+        }
     }
 }
