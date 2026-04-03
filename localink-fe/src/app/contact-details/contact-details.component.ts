@@ -1,3 +1,4 @@
+
 import { Component, EventEmitter, Output, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -38,22 +39,37 @@ export class ContactDetailsComponent implements OnInit {
     this.contactForm = this.fb.group({
       phoneCode: ['91', Validators.required],
       phone: [
+
         '',
+
         [
+
           Validators.required,
+
           Validators.pattern(/^[3-9][0-9]{9}$/)
+
         ]
+
       ],
       email: [
+
         '',
+
         [
+
           Validators.required,
+
           Validators.pattern(/^[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+
         ]
+
       ],
       website: [
+
         '',
+
         Validators.pattern(/^(https?:\/\/)?(www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$/)
+
       ],
       address: [
         '',

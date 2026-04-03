@@ -1,7 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/feature/dev-3
 @Injectable({
   providedIn: 'root'
 })

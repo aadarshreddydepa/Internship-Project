@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { PopularService, PopularBusiness } from '../services/popular.service';
 
 @Component({
@@ -10,15 +10,27 @@ import { PopularService, PopularBusiness } from '../services/popular.service';
   styleUrl: './popular-businesses.component.css'
 })
 export class PopularBusinessesComponent implements OnInit {
+
   businesses: PopularBusiness[] = [];
-  constructor(private popularService: PopularService) {}
+
+  constructor(
+    private popularService: PopularService,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {}
+
   ngOnInit(): void {
-    this.businesses = this.popularService.getPopularBusinesses();
+    if (!isPlatformBrowser(this.platformId)) return;
+    
+    this.popularService.getTopBusinesses().subscribe({
+      next: (data) => {
+        this.businesses = data;
+      },
+      error: (err) => {
+        console.error('Error fetching popular businesses', err);
+      }
+    });
   }
-  /**
-   * Returns a 5-character star string based on the rating.
-   * Full stars (★) for each whole point, half for .5, empty (☆) for the rest.
-   */
+
   getStars(rating: number): string {
     const full  = Math.floor(rating);
     const half  = rating % 1 >= 0.5 ? 1 : 0;

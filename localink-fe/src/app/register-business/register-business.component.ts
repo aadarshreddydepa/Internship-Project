@@ -83,7 +83,21 @@ export class RegisterBusinessComponent {
   goToNext() {
     if (this.currentStep === 1) {
       if (this.businessForm.valid) {
-        this.businessData = this.businessForm.value;
+        const formValue = this.businessForm.value;
+
+      const selectedCategory = this.categories.find(
+        c => c.id == formValue.category
+      );
+
+      const selectedSubcategory = this.subcategories.find(
+        s => s.id == formValue.subcategory
+      );
+
+        this.businessData = {
+          ...formValue,
+          categoryName: selectedCategory?.name,
+          subcategoryName: selectedSubcategory?.name
+        };
         this.currentStep = 2;
       } else {
         this.businessForm.markAllAsTouched();

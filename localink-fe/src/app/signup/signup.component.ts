@@ -5,6 +5,8 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { Router } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
 import { HttpClient } from '@angular/common/http';
+import { isPlatformBrowser } from '@angular/common';
+import { Inject, PLATFORM_ID } from '@angular/core';
 
 @Component({
   selector: 'app-signup',
@@ -20,7 +22,7 @@ export class SignupComponent implements OnInit, AfterViewInit {
   showPassword = false;
   showConfirmPassword = false;
   showSuccessPopup = false;
-
+  errorMessage = '';
   // JSON DATA
   locationData: any[] = [];
   countries: string[] = [];
@@ -39,7 +41,8 @@ export class SignupComponent implements OnInit, AfterViewInit {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private http: HttpClient
+    private http: HttpClient,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.signupForm = this.fb.group({
       userType: ['', Validators.required],
@@ -112,7 +115,6 @@ export class SignupComponent implements OnInit, AfterViewInit {
     state: ''
   });
 }
-
   // STEP NAVIGATION
   nextStep() {
     const fields = this.stepFields[this.currentStep];
@@ -154,33 +156,35 @@ export class SignupComponent implements OnInit, AfterViewInit {
   // SUBMIT
   isSubmitting = false;
   onSubmit() {
-  if (this.signupForm.valid && !this.isSubmitting) {
+      this.errorMessage = '';
 
-    this.isSubmitting = true;
+      if (this.signupForm.invalid || this.isSubmitting) return;
 
-    const { confirmPassword, ...payload } = this.signupForm.value;
+      this.isSubmitting = true;
 
-    const formData = {
-      ...payload,
-      userType: this.selectedType
-    };
+      const { confirmPassword, ...raw } = this.signupForm.value;
 
-    this.authService.register(formData).subscribe({
-      next: () => {
-        this.showSuccessPopup = true;
+      const payload = {
+        ...raw,
+        email: raw.email.trim().toLowerCase(), 
+        name: raw.name.trim(),
+        userType: this.selectedType
+      };
 
-        //smooth delay before redirect
-        setTimeout(() => {
-          this.router.navigate(['/login']);
-        }, 2000);
-      },
-      error: (err:any) => {
-        alert(err.error?.message || 'Signup failed');
-        this.isSubmitting = false;
-      }
-    });
-  }
-}
+      this.authService.register(payload).subscribe({
+        next: () => {
+          this.showSuccessPopup = true;
+
+          setTimeout(() => {
+            this.router.navigate(['/login']);
+          }, 2000);
+        },
+        error: (err: any) => {
+          this.errorMessage = err?.error?.message || 'Signup failed';
+          this.isSubmitting = false;
+        }
+      });
+    }
 
   // PASSWORD TOGGLE
   togglePassword() {
@@ -201,9 +205,9 @@ allowOnlyNumbers(event: KeyboardEvent) {
     event.preventDefault();
   }
 }
-
   // CANVAS ANIMATION (UNCHANGED)
   ngAfterViewInit() {
+    if(!isPlatformBrowser(this.platformId)) return;
     const glow = document.querySelector('.cursor-glow') as HTMLElement;
 
     document.addEventListener('mousemove', (e) => {

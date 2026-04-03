@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
@@ -50,25 +50,48 @@ export class ClientDashboardComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private dashboardService: ClientDashboardService
+    private dashboardService: ClientDashboardService,
+    private notificationService: NotificationService,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {}
+  toggleProfile(): void {
+    this.showProfile = true;
+  }
 
-  ngOnInit(): void {
+  closeProfile(): void {
+    this.showProfile = false;
+  }
+
+  scrollToTop(): void {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  ngOnInit() {
+    if (!isPlatformBrowser(this.platformId)) return;
+
     this.fetchBusinesses();
+    this.loadCategories();
+
+    fetch('assets/countries.json')
+      .then(res => res.json())
+      .then(data => this.countries = data);
   }
 
   fetchBusinesses() {
     const userId = 2;
 
-    this.dashboardService.getBusinessesByUser(userId)
+  fetchBusinesses() {
+    this.dashboardService.getBusinessesByUser()
       .subscribe({
-        next: (res) => {
+        next: (res: any[]) => {
+
+          this.setUserName();
 
           this.setUserName(userId);
 
           this.businesses = res.map(b => ({
             id: b.id,
             businessName: b.name,
+            category: b.categoryName?.toLowerCase(),
             category: b.categoryName?.toLowerCase(),
             subcategory: b.subcategoryName,
             status: b.status ?? 'Pending',
@@ -141,6 +164,11 @@ onCategoryChange(category: string) {
 
   viewBusiness(id: number) {
     this.selectedBusiness = this.businesses.find(b => b.id === id) || null;
+
+    this.dashboardService.getPhotos(id)
+      .subscribe((res: any[]) => {
+        this.selectedPhotos = res;
+      });
   }
 
   closeView() {

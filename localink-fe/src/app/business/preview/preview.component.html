@@ -4,47 +4,47 @@
     <!-- BUSINESS INFO -->
     <div class="section">
       <h3>Business Information</h3>
-
+ 
       <div class="info-row">
         <span class="label">Business Name</span>
         <span class="value">{{businessData?.businessName}}</span>
       </div>
-
+ 
       <div class="info-row">
         <span class="label">Description</span>
         <span class="value">{{businessData?.description}}</span>
       </div>
-
+ 
       <div class="info-row">
         <span class="label">Category</span>
-        <span class="value">{{businessData?.category}}</span>
+        <span class="value">{{businessData?.categoryName | titlecase}}</span>
       </div>
-
+ 
       <div class="info-row">
         <span class="label">Subcategory</span>
-        <span class="value">{{businessData?.subcategory}}</span>
+        <span class="value">{{businessData?.subcategoryName | titlecase}}</span>
       </div>
     </div>
-
+ 
     <!-- CONTACT DETAILS -->
     <div class="section">
       <h3>Contact Details</h3>
-
+ 
       <div class="info-row">
         <span class="label">Phone</span>
         <span class="value">{{contactData?.phone}}</span>
       </div>
-
+ 
       <div class="info-row">
         <span class="label">Email</span>
         <span class="value">{{contactData?.email}}</span>
       </div>
-
+ 
       <div class="info-row">
         <span class="label">Website</span>
         <span class="value">{{contactData?.website || '—'}}</span>
       </div>
-
+ 
       <div class="info-row">
         <span class="label">Address</span>
         <span class="value">
@@ -54,7 +54,7 @@
         </span>
       </div>
     </div>
-
+ 
     <!-- BUSINESS HOURS -->
     <div class="section">
       <h3>Business Hours</h3>
@@ -64,11 +64,11 @@
         <span class="time" *ngIf="day.mode === 'closed'">
           Closed
         </span>
-
+ 
         <span class="time" *ngIf="day.mode === '24h'">
           24 Hours
         </span>
-        
+       
         <span class="time" *ngIf="day.mode === 'custom'">
           <span *ngFor="let s of day.slots; let last = last">
             {{s.open}} - {{s.close}}
@@ -77,7 +77,7 @@
         </span>
       </div>
     </div>
-
+ 
     <!-- BUSINESS PHOTO -->
     <div class="section" *ngIf="photoData">
       <h3>Business Photo</h3>
