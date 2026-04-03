@@ -7,4 +7,7 @@ public class LoginRequest
 
     [Required]
     public string Password { get; set; } = string.Empty;
+    [Required]
+    public string CaptchaToken { get; set; } = string.Empty;
+
 }

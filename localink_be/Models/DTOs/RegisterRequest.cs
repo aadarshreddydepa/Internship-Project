@@ -21,7 +21,9 @@ public class RegisterRequest
     public string CountryCode { get; set; } = string.Empty;
 
     [Required]
-    [MinLength(6)]
+    [MinLength(8)]
+    [RegularExpression(@"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).+$",
+    ErrorMessage = "Password must contain uppercase, lowercase and number")]
     public string Password { get; set; } = string.Empty;
 
     [Required]

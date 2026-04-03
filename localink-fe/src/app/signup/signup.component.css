@@ -24,8 +24,6 @@ position: relative;
 overflow: hidden;
 }
 
-/* BACKGROUND EFFECTS */
-
 .plasma-bg {
 position: absolute;
 width: 160%;
@@ -149,6 +147,13 @@ radial-gradient(circle at 30% 80%, rgba(255,215,160,0.1), transparent),
   padding: 6px 0;
   font-size: 13px;
 }
+.subtitle {
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+/* ========================= */
+/* TOGGLE */
+/* ========================= */
 
 .toggle-pill {
 position: relative;
@@ -400,16 +405,14 @@ font-size: 14px;
 
 .signup-btn {
 width: 100%;
-margin-top: 14px;
-padding: 12px;
-
+margin-top: 10px;
+padding: 10px;
 border-radius: 10px;
 border: none;
-
 background: linear-gradient(90deg, #C8A97E, #e6c89f);
 color: black;
 font-weight: 600;
-
+font-size: 13px;
 cursor: pointer;
 transition: all 0.25s ease;
 }

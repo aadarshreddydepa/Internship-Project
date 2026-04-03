@@ -3,93 +3,142 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-
+using System.Text.RegularExpressions;
 public class AuthService : IAuthService
 {
     private readonly AppDbContext _context;
     private readonly IConfiguration _config;
+    private readonly IEmailService _emailService;
+    private readonly ICaptchaService _captchaService;
 
-    public AuthService(AppDbContext context, IConfiguration config)
+    public AuthService(
+        AppDbContext context,
+        IConfiguration config,
+        IEmailService emailService,
+        ICaptchaService captchaService)
     {
         _context = context;
         _config = config;
+        _emailService = emailService;
+        _captchaService = captchaService;
     }
 
+    // REGISTER
     public async Task<string> RegisterAsync(RegisterRequest request)
+    {
+        var email = request.Email?.Trim().ToLower();
+
+        if (string.IsNullOrWhiteSpace(email))
+            throw new ArgumentException("Invalid request");
+
+        if (string.IsNullOrWhiteSpace(request.Password) || request.Password.Length < 8)
+            throw new ArgumentException("Invalid request");
+
+        using var transaction = await _context.Database.BeginTransactionAsync();
+
+        User user;
+
+        try
+        {
+            var emailExists = await _context.Users.AnyAsync(u => u.Email == email);
+            if (emailExists)
+                throw new InvalidOperationException("Invalid request");
+
+            var phoneExists = await _context.Users.AnyAsync(u => u.PhoneNumber == request.Phone);
+            if (phoneExists)
+                throw new InvalidOperationException("Invalid request");
+
+            user = new User
+            {
+                AccountType = request.UserType?.Trim().ToLower() ?? "user",
+                FullName = request.Name,
+                Email = email,
+                PhoneNumber = request.Phone,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password, 12),
+                CountryCode = request.CountryCode
+            };
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            var address = new Address
+            {
+                UserId = user.UserId,
+                Country = request.Country,
+                State = request.State,
+                City = request.City,
+                StreetAddress = request.Street,
+                Pincode = request.Pincode
+            };
+
+            _context.Addresses.Add(address);
+            await _context.SaveChangesAsync();
+
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+
+        try
+        {
+            await _emailService.SendWelcomeEmailAsync(user.Email, user.FullName);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Email failed: {ex.Message}");
+        }
+
+        return "User registered successfully";
+    }
+    public async Task<string> VerifyEmailAsync(string email)
 {
-    if (string.IsNullOrWhiteSpace(request.Email))
-        throw new ArgumentException("Email is required");
+    if (string.IsNullOrWhiteSpace(email))
+        throw new ArgumentException("Invalid request");
 
-    if (string.IsNullOrWhiteSpace(request.Password) || request.Password.Length < 6)
-        throw new ArgumentException("Password must be at least 6 characters");
+    var exists = await _context.Users
+        .AnyAsync(u => u.Email == email.Trim().ToLower());
 
-    // Normalize email
+    return exists ? "Email exists" : "Invalid request";
+}
+public async Task<string> ResetPasswordAsync(ForgotPasswordRequest request)
+{
     var email = request.Email.Trim().ToLower();
 
-    // Check duplicate email
-    var emailExists = await _context.Users
-        .AnyAsync(u => u.Email == email);
+    var user = await _context.Users
+        .FirstOrDefaultAsync(u => u.Email == email);
 
-    if (emailExists)
-        throw new InvalidOperationException("Email already exists");
+    if (user == null)
+        throw new UnauthorizedAccessException("Invalid request");
 
-    // Check duplicate phone
-    var phoneExists = await _context.Users
-        .AnyAsync(u => u.PhoneNumber == request.Phone);
+    user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword, 12);
 
-    if (phoneExists)
-        throw new InvalidOperationException("Phone number already exists");
-
-    // Create user
-    var user = new User
-    {
-        AccountType = request.UserType?.Trim().ToLower() ?? "user",
-        FullName = request.Name,
-        Email = email,
-        PhoneNumber = request.Phone,
-        PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password, workFactor: 12),
-        CountryCode = request.CountryCode
-    };
-
-    _context.Users.Add(user);
     await _context.SaveChangesAsync();
 
-    // Create address
-    var address = new Address
-    {
-        UserId = user.UserId,
-        Country = request.Country,
-        State = request.State,
-        City = request.City,
-        StreetAddress = request.Street,
-        Pincode = request.Pincode
-    };
-
-    _context.Addresses.Add(address);
-    await _context.SaveChangesAsync();
-
-    return "User registered successfully";
+    return "Password updated successfully";
 }
 
-    // LOGIN
+    // LOGIN (WITH CAPTCHA)
     public async Task<object> LoginAsync(LoginRequest request)
     {
+        var isCaptchaValid = await _captchaService.VerifyAsync(request.CaptchaToken);
+        if (!isCaptchaValid)
+            throw new UnauthorizedAccessException("Captcha validation failed");
+
         if (string.IsNullOrWhiteSpace(request.UsernameOrEmail) ||
             string.IsNullOrWhiteSpace(request.Password))
-            throw new ArgumentException("Invalid credentials");
+            throw new UnauthorizedAccessException("Invalid credentials");
 
         var email = request.UsernameOrEmail.Trim().ToLower();
 
         var user = await _context.Users
             .FirstOrDefaultAsync(u => u.Email == email);
 
-        if (user == null)
-            throw new UnauthorizedAccessException("User not found");
-
-        var isValid = BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash);
-
-        if (!isValid)
-            throw new UnauthorizedAccessException("Invalid password");
+        if (user == null ||
+            !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+            throw new UnauthorizedAccessException("Invalid credentials");
 
         var token = GenerateJwtToken(user);
 
@@ -101,70 +150,108 @@ public class AuthService : IAuthService
         };
     }
 
-    // VERIFY EMAIL
-    public async Task<string> VerifyEmailAsync(string email)
+    // SEND OTP
+    public async Task<string> SendResetOtpAsync(string email, string captchaToken)
     {
-        if (string.IsNullOrWhiteSpace(email))
-            throw new ArgumentException("Email required");
-
+        var isCaptchaValid = await _captchaService.VerifyAsync(captchaToken);
+        if (!isCaptchaValid)
+            throw new UnauthorizedAccessException("Captcha validation failed");
         var normalizedEmail = email.Trim().ToLower();
 
-        var exists = await _context.Users
-            .AnyAsync(u => u.Email == normalizedEmail);
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Email == normalizedEmail);
 
-        if (!exists)
-            throw new KeyNotFoundException("Email not found");
+        if (user == null)
+            return "If the email exists, an OTP has been sent";
 
-        return "Email exists";
+        if (user.OtpExpiry != null && user.OtpExpiry > DateTime.UtcNow.AddMinutes(-1))
+            throw new InvalidOperationException("Please wait before requesting another OTP");
+
+        var otp = GenerateOtp();
+
+        user.PasswordResetOtp = otp;
+        user.OtpExpiry = DateTime.UtcNow.AddMinutes(1);
+        user.OtpAttempts = 0;
+
+        await _context.SaveChangesAsync();
+
+        try
+        {
+            await _emailService.SendOtpEmailAsync(user.Email, otp);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Email failed: " + ex.Message);
+        }
+
+        return "If the email exists, an OTP has been sent";
     }
 
-    // RESET PASSWORD
-   public async Task<string> ResetPasswordAsync(ForgotPasswordRequest request)
-{
-    var user = await _context.Users
-        .FirstOrDefaultAsync(u => u.Email == request.Email);
+    // VERIFY OTP + RESET PASSWORD
+    public async Task<string> VerifyOtpAndResetPasswordAsync(string email, string otp, string newPassword)
+    {
+        var normalizedEmail = email.Trim().ToLower();
 
-    if (user == null)
-        throw new Exception("User not found");
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Email == normalizedEmail);
 
-    user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword, workFactor: 12);
+        if (user == null)
+            throw new UnauthorizedAccessException("Invalid request");
 
-    await _context.SaveChangesAsync();
+        if (user.OtpAttempts >= 5)
+            throw new UnauthorizedAccessException("Too many attempts. Request new OTP");
 
-    return "Password updated successfully";
-}
+        if (user.PasswordResetOtp != otp)
+        {
+            user.OtpAttempts += 1;
+            await _context.SaveChangesAsync();
+            throw new UnauthorizedAccessException("Invalid OTP");
+        }
 
-    // JWT TOKEN GENERATION
+        if (user.OtpExpiry < DateTime.UtcNow)
+            throw new UnauthorizedAccessException("OTP expired");
+
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword, 12);
+
+        user.OtpAttempts = 0;
+        user.PasswordResetOtp = null;
+        user.OtpExpiry = null;
+
+        await _context.SaveChangesAsync();
+
+        return "Password reset successful";
+    }
+
+
+    private string GenerateOtp()
+    {
+        var bytes = new byte[4];
+        using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
+        rng.GetBytes(bytes);
+
+        int number = BitConverter.ToInt32(bytes, 0) & 0x7fffffff;
+
+        return (number % 900000 + 100000).ToString();
+    }
+
     private string GenerateJwtToken(User user)
     {
-        var keyString = _config["Jwt:Key"];
-
-        if (string.IsNullOrEmpty(keyString))
-            throw new Exception("JWT Key is missing in configuration!");
-
-        var issuer = _config["Jwt:Issuer"];
-        var audience = _config["Jwt:Audience"];
-        var expiryMinutes = _config["Jwt:ExpiryMinutes"];
-
-        if (string.IsNullOrEmpty(issuer) || string.IsNullOrEmpty(audience) || string.IsNullOrEmpty(expiryMinutes))
-            throw new Exception("JWT configuration is incomplete!");
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var claims = new[]
         {
             new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
             new Claim(ClaimTypes.Email, user.Email),
             new Claim(ClaimTypes.Role, user.AccountType ?? "user"),
-            new Claim(ClaimTypes.Name, user.FullName)
+            new Claim(ClaimTypes.Name, user.FullName ?? "")
         };
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyString));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
         var token = new JwtSecurityToken(
-            issuer: issuer,
-            audience: audience,
+            issuer: _config["Jwt:Issuer"],
+            audience: _config["Jwt:Audience"],
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(expiryMinutes)),
+            expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(_config["Jwt:ExpiryMinutes"])),
             signingCredentials: creds
         );
 

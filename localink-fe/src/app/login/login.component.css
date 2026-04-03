@@ -25,7 +25,7 @@ html, body {
   align-items: center;
   justify-content: center;
 }
-
+ 
 /* CENTER BLOCK (Logo + Text together) */
 .left-content {
   display: flex;
@@ -42,12 +42,12 @@ html, body {
   height: 160%;
   top: -30%;
   left: -30%;
-
+ 
   background:
     radial-gradient(circle at 30% 40%, rgba(200,169,126,0.25), transparent 60%),
     radial-gradient(circle at 70% 30%, rgba(255,215,160,0.18), transparent 60%),
     radial-gradient(circle at 50% 80%, rgba(200,169,126,0.15), transparent 60%);
-
+ 
   filter: blur(80px);
   animation: plasmaMove 20s ease-in-out infinite alternate;
 }
@@ -117,11 +117,31 @@ html, body {
   justify-content: center;
   align-items: center;
   overflow: hidden;
-
+ 
   background:
     radial-gradient(circle at 70% 30%, rgba(200,169,126,0.15), transparent),
     radial-gradient(circle at 30% 80%, rgba(255,215,160,0.1), transparent),
     #050505;
+}
+ 
+.captcha-container {
+  display: flex;
+  justify-content: center;
+  margin: 15px 0 10px;
+}
+ 
+.captcha-container > div {
+  padding: 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(200, 169, 126, 0.3);
+  box-shadow: 0 0 15px rgba(200, 169, 126, 0.15);
+  transition: all 0.3s ease;
+}
+ 
+.captcha-container > div:hover {
+  box-shadow: 0 0 25px rgba(200, 169, 126, 0.4);
 }
 /* NOISE */
 .login-right::before {
@@ -150,19 +170,19 @@ html, body {
   width: 400px;
   padding: 45px;
   border-radius: 20px;
-
+ 
   background: linear-gradient(
     145deg,
     rgba(20,20,20,0.95),
     rgba(40,30,20,0.9)
   );
-
+ 
   border: 1px solid rgba(200,169,126,0.25);
-
+ 
   box-shadow:
     0 0 50px rgba(200,169,126,0.2),
     0 40px 100px rgba(0,0,0,0.9);
-
+ 
   overflow: hidden;
 }
 .login-card:hover {
@@ -177,14 +197,14 @@ html, body {
   left: -50%;
   width: 200%;
   height: 200%;
-
+ 
   background: linear-gradient(
     120deg,
     transparent,
     rgba(255,255,255,0.08),
     transparent
   );
-
+ 
   transform: rotate(25deg);
   animation: shimmer 6s infinite;
 }
@@ -200,7 +220,7 @@ html, body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-
+ 
 .subtitle {
   text-align: center;
   color: rgba(255,255,255,0.6);
@@ -221,21 +241,18 @@ input[type="password"]::-ms-reveal,
 input[type="password"]::-ms-clear {
   display: none;
 }
-
-/* ===================================== */
-/* 🔥 FIX: REMOVE DUPLICATE PASSWORD ICON */
-/* ===================================== */
-
+ 
+ 
 input[type="password"] {
   appearance: none;
   -webkit-appearance: none;
 }
-
+ 
 input[type="password"]::-ms-reveal,
 input[type="password"]::-ms-clear {
   display: none;
 }
-
+ 
 input[type="password"]::-webkit-credentials-auto-fill-button,
 input[type="password"]::-webkit-textfield-decoration-container,
 input[type="password"]::-webkit-caps-lock-indicator {
@@ -253,11 +270,11 @@ input[type="password"]::-webkit-caps-lock-indicator {
   width: 100%;
   height: 48px;
   padding: 0 45px 0 12px;
-
+ 
   background: rgba(255,255,255,0.05);
   border: 1px solid rgba(255,255,255,0.15);
   border-radius: 10px;
-
+ 
   color: white;
   outline: none;
 }
@@ -272,14 +289,14 @@ input[type="password"]::-webkit-caps-lock-indicator {
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
-
+ 
   width: 36px;
   height: 100%;
-
+ 
   display: flex;
   align-items: center;
   justify-content: center;
-
+ 
   cursor: pointer;
   color: #c9a66b;
   transition: all 0.2s ease;
@@ -299,7 +316,7 @@ input[type="password"]::-webkit-caps-lock-indicator {
   border: none;
   border-radius: 12px;
   cursor: pointer;
-
+ 
   background: linear-gradient(90deg, #C8A97E, #e6c89f);
   color: black;
   font-weight: 600;
@@ -376,8 +393,9 @@ input.invalid {
   .login-wrapper {
     flex-direction: column;
   }
-
+ 
   .login-left {
     display: none;
   }
 }
+ 
