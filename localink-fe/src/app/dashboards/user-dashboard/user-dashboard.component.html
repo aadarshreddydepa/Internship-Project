@@ -6,7 +6,7 @@
 
     <div class="header-right">
 
-      <h2 class="welcome">Welcome, {{ username || 'User'}}</h2>
+      <h2 class="welcome">{{ 'DASHBOARD.WELCOME' | translate }}, {{ username || 'User'}}</h2>
 
       <div class="profile" (click)="toggleProfile()">
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
@@ -38,16 +38,24 @@
       </span>
       <input
         type="text"
-        placeholder="Search for businesses or services...(Enter atleast 3 characters)"
+        [placeholder]="'DASHBOARD.SEARCH_PLACEHOLDER' | translate"
         [(ngModel)]="searchTerm"
         (ngModelChange)="onSearchChange($event)"
+        [attr.aria-label]="'DASHBOARD.SEARCH_PLACEHOLDER' | translate"
       />
+      <!-- Voice Search Component -->
+      <app-voice-search 
+        *ngIf="isVoiceSearchEnabled"
+        (voiceSearchResult)="onVoiceSearch($event)"
+        (transcriptChange)="onVoiceTranscript($event)"
+        class="voice-search-inline">
+      </app-voice-search>
     </div>
   </div>
  <section class="popular-section" *ngIf="searchTerm && searchResults.length > 0">
 
     <div class="section-header">
-      <h2 class="section-title">Search Results</h2>
+      <h2 class="section-title">{{ 'DASHBOARD.SEARCH_RESULTS' | translate }}</h2>
     </div>
 
     <div class="carousel">
@@ -60,7 +68,7 @@
             [src]="'http://localhost:5138' + business.primaryImage"
             [alt]="business.name"
           />
-          <span *ngIf="!business.primaryImage">No Image</span>
+          <span *ngIf="!business.primaryImage">{{ 'DASHBOARD.NO_IMAGE' | translate }}</span>
         </div>
 
         <div class="card-content">
@@ -91,29 +99,33 @@
 
   </section>
   <div *ngIf="searchTerm.length > 3 && searchResults.length === 0" style="margin-top: 20px;">
-    <p style="color: #B19F91;">No results found</p>
+    <p style="color: #B19F91;">{{ 'DASHBOARD.NO_RESULTS' | translate }}</p>
   </div>
 
   <div class="hero" *ngIf="!searchTerm">
-    <h1>Discover Local Businesses</h1>
-    <p>Find the best services near you</p>
+    <h1>{{ 'DASHBOARD.HERO_TITLE' | translate }}</h1>
+    <p>{{ 'DASHBOARD.HERO_SUBTITLE' | translate }}</p>
   </div>
 
   <section class="categories">
-    <h2>Browse by Category</h2>
+    <h2>{{ 'DASHBOARD.BROWSE_CATEGORY' | translate }}</h2>
 
-    <div class="category-grid">
+    <div class="category-grid" role="list" aria-label="Business categories">
       <div class="category-card"
            *ngFor="let category of filteredCategories"
-           (click)="openCategory(category.id)">
+           (click)="openCategory(category.id)"
+           (keydown)="onCategoryKeydown($event, category.id, category.name)"
+           role="listitem"
+           tabindex="0"
+           [attr.aria-label]="'Browse ' + category.name + ' subcategories'">
 
         <div class="icon">
-          <img [src]="category.iconUrl" width="24" height="24" />
+          <img [src]="category.iconUrl" width="24" height="24" alt="" />
         </div>
 
         <div class="text">
           <h3>{{ category.name | titlecase }}</h3>
-          <p>View subcategories →</p>
+          <p>{{ 'DASHBOARD.VIEW_SUBCATEGORIES' | translate }}</p>
         </div>
 
       </div>

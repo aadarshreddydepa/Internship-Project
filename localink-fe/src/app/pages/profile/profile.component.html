@@ -1,24 +1,24 @@
 <div *ngIf="isLoggedIn && user" class="profile-container">
 
-  <h2 class="title">Account Details</h2>
+  <h2 class="title">{{ 'PROFILE.TITLE' | translate }}</h2>
 
   <div class="info-block">
 
     <div class="info-row">
-      <span>Username</span>
+      <span>{{ 'PROFILE.USERNAME' | translate }}</span>
 
       <p *ngIf="!isEditMode">{{ user.fullName }}</p>
       <input *ngIf="isEditMode" [(ngModel)]="editableUser.fullName" />
     </div>
 
     <div class="info-row">
-      <span>Email</span>
+      <span>{{ 'PROFILE.EMAIL' | translate }}</span>
       <p *ngIf="!isEditMode">{{ user.email }}</p>
       <input *ngIf="isEditMode" [(ngModel)]="editableUser.email" />
     </div>
 
     <div class="info-row">
-      <span>Address</span>
+      <span>{{ 'PROFILE.ADDRESS' | translate }}</span>
 
       <div class="address" *ngIf="!isEditMode">
         <p>{{ user.address?.street }}, {{ user.address?.city }}</p>
@@ -27,16 +27,16 @@
       </div>
 
       <div class="address" *ngIf="isEditMode">
-        <input [(ngModel)]="editableUser.address.street" placeholder="Street" />
-        <input [(ngModel)]="editableUser.address.city" placeholder="City" />
-        <input [(ngModel)]="editableUser.address.state" placeholder="State" />
-        <input [(ngModel)]="editableUser.address.pincode" placeholder="Pincode" />
-        <input [(ngModel)]="editableUser.address.country" placeholder="Country" />
+        <input [(ngModel)]="editableUser.address.street" placeholder="{{ 'PROFILE.STREET' | translate }}" />
+        <input [(ngModel)]="editableUser.address.city" placeholder="{{ 'PROFILE.CITY' | translate }}" />
+        <input [(ngModel)]="editableUser.address.state" placeholder="{{ 'PROFILE.STATE' | translate }}" />
+        <input [(ngModel)]="editableUser.address.pincode" placeholder="{{ 'PROFILE.PINCODE' | translate }}" />
+        <input [(ngModel)]="editableUser.address.country" placeholder="{{ 'PROFILE.COUNTRY' | translate }}" />
       </div>
     </div>
 
     <div class="info-row">
-      <span>Phone</span>
+      <span>{{ 'PROFILE.PHONE' | translate }}</span>
 
       <p *ngIf="!isEditMode">{{ user.phone }}</p>
       <input *ngIf="isEditMode" [(ngModel)]="editableUser.phone" />
@@ -50,15 +50,15 @@
   <div class="left-actions">
 
     <button *ngIf="!isEditMode" class="primary-btn" (click)="enableEdit()">
-      Edit Profile
+      {{ 'PROFILE.EDIT' | translate }}
     </button>
 
     <button *ngIf="isEditMode" class="primary-btn" (click)="saveProfile()">
-      Save
+      {{ 'PROFILE.SAVE' | translate }}
     </button>
 
     <button *ngIf="isEditMode" class="secondary-btn" (click)="cancelEdit()">
-      Cancel
+      {{ 'PROFILE.CANCEL' | translate }}
     </button>
 
   </div>
@@ -66,7 +66,7 @@
   <!-- RIGHT SIDE -->
   <div class="right-actions">
     <button class="logout-btn" (click)="logout()">
-      Logout
+      {{ 'PROFILE.LOGOUT' | translate }}
     </button>
   </div>
 
@@ -75,19 +75,18 @@
 </div>
 
 <div *ngIf="isLoggedIn && isLoading" class="loading">
-  Loading profile...
+  {{ 'PROFILE.LOADING' | translate }}
 </div>
 <div *ngIf="!isLoggedIn" class="not-logged-in">
 
-  <h2>You're not logged in</h2>
+  <h2>{{ 'PROFILE.NOT_LOGGED_IN' | translate }}</h2>
 
   <p>
-    Access your personalized profile, manage your account,
-    and explore premium features by logging in.
+    {{ 'PROFILE.NOT_LOGGED_IN_DESC' | translate }}
   </p>
 
   <button class="login-btn" (click)="goToLogin()">
-    Login to Continue
+    {{ 'PROFILE.LOGIN_CONTINUE' | translate }}
   </button>
 
 </div>

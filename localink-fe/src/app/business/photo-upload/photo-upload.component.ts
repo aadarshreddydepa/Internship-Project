@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { EventEmitter, Output, Input} from '@angular/core';
- 
+import { TranslateModule } from '@ngx-translate/core';
+
 @Component({
   selector: 'app-photo-upload',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './photo-upload.component.html',
   styleUrls: ['./photo-upload.component.css']
 })

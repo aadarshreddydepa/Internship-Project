@@ -1,43 +1,41 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+using localink_be.Services.Interfaces;
 
-[ApiController]
-[Route("api/v1/business/{businessId}/photos")]
-public class PhotoController : ControllerBase
+namespace localink_be.Controllers
 {
-    private readonly IPhotoService _photoService;
-
-    public PhotoController(IPhotoService photoService)
+    [ApiController]
+    [Route("api/v1/business/{businessId}/photos")]
+    public class PhotoController : ControllerBase
     {
-        _photoService = photoService;
-    }
+        private readonly IPhotoService _photoService;
 
-    // POST: api/business/{businessId}/photos
-    [Authorize(Roles = "client")]
-    [HttpPost]
-    public async Task<IActionResult> UploadPhoto(long businessId, IFormFile file)
-    {
-        var result = await _photoService.UploadPhotoAsync(businessId, file);
-        return Ok(result);
-    }
+        public PhotoController(IPhotoService photoService)
+        {
+            _photoService = photoService;
+        }
 
-    // GET: api/business/{businessId}/photos
-    [HttpGet]
-    public async Task<IActionResult> GetPhotos(long businessId)
-    {
-        var photos = await _photoService.GetPhotosAsync(businessId);
-        return Ok(photos);
-    }
+        // POST: api/business/{businessId}/photos
+        [Authorize(Roles = "client")]
+        [HttpPost]
+        public async Task<IActionResult> UploadPhoto(long businessId, IFormFile file)
+        {
+            var result = await _photoService.UploadPhotoAsync(businessId, file);
+            return Ok(result);
+        }
 
-    // DELETE: api/photos/{photoId}
-    [Authorize(Roles = "client")]
-    [HttpDelete("~/api/v1/photos/{photoId}")]
-    public async Task<IActionResult> DeletePhoto(long photoId)
-    {
-        var deleted = await _photoService.DeletePhotoAsync(photoId);
-        if (!deleted)
-            return NotFound();
+        // DELETE: api/photos/{photoId}
+        [Authorize(Roles = "client")]
+        [HttpDelete("~/api/v1/photos/{photoId}")]
+        public async Task<IActionResult> DeletePhoto(long photoId)
+        {
+            var deleted = await _photoService.DeletePhotoAsync(photoId);
+            if (!deleted)
+                return NotFound();
 
-        return NoContent();
+            return NoContent();
+        }
     }
 }

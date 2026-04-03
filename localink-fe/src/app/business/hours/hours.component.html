@@ -1,36 +1,21 @@
 <div class="container">
 
-  <h3>Business Hours</h3>
-  <p class="subtitle">Select days and configure schedule</p>
+  <h3>{{ 'HOURS.TITLE' | translate }}</h3>
+  <p class="subtitle">{{ 'HOURS.SUBTITLE' | translate }}</p>
 
   <!-- STEP 1 -->
 
   <div class="card">
 
     <div class="header">
-      <h3>Select Days</h3>
+      <h3>{{ 'HOURS.SELECT_DAYS' | translate }}</h3>
 
       <div class="actions">
-        <button (click)="selectAll()">Select All</button>
-        <button (click)="clearSelection()">Clear</button>
+        <button (click)="selectAll()">{{ 'HOURS.SELECT_ALL' | translate }}</button>
+        <button (click)="clearSelection()">{{ 'HOURS.CLEAR' | translate }}</button>
       </div>
     </div>
 
-    <!-- <div class="days">
-
-        <div
-            class="day"
-            *ngFor="let d of days"
-            [class.active]="d.selected"
-            (click)="d.selected = !d.selected">
-
-            <span>{{d.name}}</span>
-
-            <span class="check" *ngIf="d.selected">✓</span>
-
-        </div>
-
-    </div> -->
     <div class="days">
 
   <div
@@ -39,7 +24,7 @@
     [class.active]="d.selected"
     (click)="d.selected = !d.selected">
 
-    {{d.name}}
+    {{ 'HOURS.' + d.name | translate }}
 
   </div>
 
@@ -49,7 +34,7 @@
       *ngIf="selectedDays.length"
       (click)="openConfig()">
 
-      Set Hours for {{selectedDays.length}} Day(s)
+      {{ 'HOURS.SET_HOURS' | translate:{count: selectedDays.length} }}
 
     </button>
 
@@ -59,11 +44,11 @@
 
   <div class="card configure" *ngIf="showConfig && selectedDays.length">
 
-    <h3>Configure Hours</h3>
+    <h3>{{ 'HOURS.CONFIGURE' | translate }}</h3>
 
     <p class="selected-days">
       <span *ngFor="let d of selectedDays; let last = last">
-        {{d.name}}{{last ? '' : ', '}}
+        {{ 'HOURS.' + d.name | translate }}{{last ? '' : ', '}}
       </span>
     </p>
 
@@ -74,19 +59,19 @@
       <button
         [class.active]="mode==='custom'"
         (click)="mode='custom'">
-        Custom Hours
+        {{ 'HOURS.CUSTOM_HOURS' | translate }}
       </button>
 
       <button
         [class.active]="mode==='24h'"
         (click)="mode='24h'">
-        24 Hours
+        {{ 'HOURS.24_HOURS' | translate }}
       </button>
 
       <button
         [class.active]="mode==='closed'"
         (click)="mode='closed'">
-        Closed
+        {{ 'HOURS.CLOSED' | translate }}
       </button>
 
     </div>
@@ -101,7 +86,7 @@
 
     <input type="time" [(ngModel)]="slot.open">
 
-    <span class="to">to</span>
+    <span class="to">{{ 'HOURS.TO' | translate }}</span>
 
     <input type="time" [(ngModel)]="slot.close">
 
@@ -112,7 +97,7 @@
       *ngIf="i === 0 && configSlots.length < 2"
       (click)="addSlot()">
 
-      + Add Time Slot
+      {{ 'HOURS.ADD_SLOT' | translate }}
 
     </button>
 
@@ -120,13 +105,13 @@
       class="remove-slot"
       *ngIf="configSlots.length > 1"
       (click)="removeSlot(i)">
-      ✕
+      {{ 'COMMON.CLOSE' | translate }}
     </button>
 
   </div>
 
   <p class="error" *ngIf="hasOverlap()">
-    Time slots cannot overlap
+    {{ 'HOURS.OVERLAP_ERROR' | translate }}
   </p>
 
 </div>
@@ -135,11 +120,11 @@
     <div class="buttons">
 
       <button class="apply-btn" (click)="applyHours()">
-        Apply
+        {{ 'HOURS.APPLY' | translate }}
       </button>
 
       <button class="cancel-btn" (click)="cancelConfig()">
-        Cancel
+        {{ 'COMMON.CANCEL' | translate }}
       </button>
 
     </div>
@@ -150,15 +135,15 @@
 
   <div class="card">
 
-    <h3>Current Schedule</h3>
+    <h3>{{ 'HOURS.CURRENT_SCHEDULE' | translate }}</h3>
 
     <div class="schedule" *ngFor="let d of days">
 
-      <span>{{d.name}}</span>
+      <span>{{ 'HOURS.' + d.name | translate }}</span>
 
-      <span *ngIf="d.mode==='closed'">Closed</span>
+      <span *ngIf="d.mode==='closed'">{{ 'HOURS.CLOSED' | translate }}</span>
 
-      <span *ngIf="d.mode==='24h'">24 Hours</span>
+      <span *ngIf="d.mode==='24h'">{{ 'HOURS.24_HOURS' | translate }}</span>
 
       <span *ngIf="d.mode==='custom' && d.slots.length">
 
@@ -172,7 +157,7 @@
       </span>
 
       <span *ngIf="d.mode==='custom' && !d.slots.length">
-        —
+        {{ 'COMMON.DASH' | translate }}
       </span>
 
     </div>
@@ -191,7 +176,7 @@
     class="save-btn"
     (click)="saveBusinessHours()">
 
-    Save Business Hours
+    {{ 'HOURS.SAVE' | translate }}
 
   </button>
 

@@ -10,12 +10,12 @@ import {
 } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 
 import { AuthService } from '../core/services/auth.service';
 import { TokenService } from '../core/services/token.service';
 import { ForgotPasswordComponent } from '../forgot-password/forgot-password.component';
 import { environment } from '../../environments/environment';
-
 
 // IMPORTANT (global grecaptcha)
 declare var grecaptcha: any;
@@ -23,7 +23,7 @@ declare var grecaptcha: any;
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule,ForgotPasswordComponent ],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, ForgotPasswordComponent, TranslateModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
@@ -34,8 +34,7 @@ export class LoginComponent implements AfterViewInit {
   submitted = false;
   isLoading = false;
   errorMessage = "";
-
-  captchaToken: string = '';
+  captchaToken: string | null = null;
   captchaError = false;
   captchaRendered = false; 
 
@@ -205,11 +204,26 @@ export class LoginComponent implements AfterViewInit {
 
   backToLogin() {
     this.currentView = 'login';
+    this.captchaToken = null;
+    this.renderCaptcha();
+  }
+
+  renderCaptcha() {
+    setTimeout(() => {
+      if (typeof grecaptcha !== 'undefined') {
+        try {
+          grecaptcha.reset();
+        } catch (e) {
+          console.warn('reCAPTCHA reset failed', e);
+        }
+      }
+    }, 300);
   }
 
   ngAfterViewInit() {
     if (!isPlatformBrowser(this.platformId)) return;
 
+    // Single reCAPTCHA render via interval
     const interval = setInterval(() => {
       if (!this.captchaRendered && typeof grecaptcha !== 'undefined') {
         this.captchaRendered = true;
@@ -226,8 +240,7 @@ export class LoginComponent implements AfterViewInit {
       }
     }, 500);
 
-    // 🎨 KEEP YOUR EXISTING UI CODE
-
+    // Cursor glow effect
     const glow = document.querySelector('.cursor-glow') as HTMLElement;
 
     document.addEventListener('mousemove', (e) => {
@@ -237,6 +250,7 @@ export class LoginComponent implements AfterViewInit {
       }
     });
 
+    // Canvas animation
     const canvas = document.querySelector('.lines-canvas') as HTMLCanvasElement;
     if (!canvas) return;
 

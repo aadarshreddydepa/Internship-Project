@@ -1,0 +1,147 @@
+<div class="voice-search-container" [class.expanded]="isExpanded">
+  <!-- Main Voice Button -->
+  <button
+    class="voice-btn"
+    [class.listening]="state === 'listening'"
+    [class.processing]="state === 'processing'"
+    [class.error]="state === 'error'"
+    (click)="toggleVoiceSearch()"
+    [attr.aria-label]="'VOICE.SEARCH_BUTTON' | translate"
+    [attr.aria-pressed]="state === 'listening'"
+    appAccessibilitySound
+    soundType="click"
+    role="button"
+    tabindex="0"
+    (keydown.enter)="toggleVoiceSearch()"
+    (keydown.space)="toggleVoiceSearch()">
+    
+    <!-- Microphone Icon -->
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      width="20" 
+      height="20" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="currentColor" 
+      stroke-width="2"
+      [class.pulse]="state === 'listening'">
+      <path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/>
+      <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+      <path d="M12 19v3"/>
+      <path d="M8 22h8"/>
+    </svg>
+
+    <!-- Listening Wave Animation -->
+    <div class="wave-animation" *ngIf="state === 'listening'">
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+
+    <!-- State Text -->
+    <span class="state-text" *ngIf="showStateText">
+      {{ getStateText() | translate }}
+    </span>
+  </button>
+
+  <!-- Voice Search Modal Overlay -->
+  <div class="voice-modal-overlay" *ngIf="transcript || errorMessage || state === 'listening'" (click)="closeModal()">
+    <!-- Voice Search Modal Panel -->
+    <div class="voice-modal" (click)="$event.stopPropagation()">
+      
+      <!-- Header with Status -->
+      <div class="voice-modal-header">
+        <div class="status-indicator" [class]="state">
+          <span class="status-dot"></span>
+          <span class="status-text">{{ getStateLabel() }}</span>
+        </div>
+        <button class="close-btn" (click)="closeModal()" [attr.aria-label]="'COMMON.CLOSE' | translate">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Main Content Area -->
+      <div class="voice-modal-content">
+        
+        <!-- Listening Animation -->
+        <div class="listening-visual" *ngIf="state === 'listening'">
+          <div class="mic-icon-large">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+              <path d="M12 19v3"/>
+              <path d="M8 22h8"/>
+            </svg>
+          </div>
+          <div class="sound-waves">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <p class="listening-hint">{{ 'VOICE.SPEAK_NOW' | translate }}</p>
+        </div>
+
+        <!-- Transcript Display -->
+        <div class="transcript-section" *ngIf="transcript">
+          <div class="section-title">{{ 'VOICE.HEARD' | translate }}:</div>
+          <div class="transcript-box">
+            <span class="transcript-text">{{ transcript }}</span>
+          </div>
+        </div>
+
+        <!-- Parsed Results -->
+        <div class="parsed-section" *ngIf="parsedResult && showPreview && (parsedResult.category || parsedResult.openNow)">
+          <div class="section-title">{{ 'VOICE.SEARCHING_FOR' | translate }}:</div>
+          <div class="search-params">
+            <div class="param-tag" *ngIf="parsedResult.category">
+              <span class="param-icon">🏷️</span>
+              <span class="param-value">{{ parsedResult.category }}</span>
+            </div>
+            <div class="param-tag" *ngIf="parsedResult.openNow">
+              <span class="param-icon">🕐</span>
+              <span class="param-value">{{ 'VOICE.OPEN_NOW' | translate }}</span>
+            </div>
+            <div class="param-tag">
+              <span class="param-icon">📍</span>
+              <span class="param-value">{{ parsedResult.radius }} {{ 'VOICE.KM_RADIUS' | translate }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Location Status -->
+        <div class="location-status" *ngIf="locationStatus">
+          <span class="location-icon">📍</span>
+          <span class="location-text">{{ locationStatus }}</span>
+        </div>
+
+        <!-- Error Display -->
+        <div class="error-section" *ngIf="errorMessage">
+          <div class="error-box">
+            <span class="error-icon">⚠️</span>
+            <span class="error-text">{{ errorMessage }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer with Actions -->
+      <div class="voice-modal-footer" *ngIf="state !== 'listening'">
+        <button class="action-btn secondary" (click)="retryVoiceSearch()" *ngIf="errorMessage || transcript">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 4 23 10 17 10"/>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+          </svg>
+          {{ 'VOICE.TRY_AGAIN' | translate }}
+        </button>
+        <button class="action-btn primary" (click)="startVoiceSearch()" *ngIf="!errorMessage && !transcript">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          </svg>
+          {{ 'VOICE.START_LISTENING' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

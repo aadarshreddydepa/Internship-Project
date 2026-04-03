@@ -4,12 +4,12 @@
   <div class="page-header">
 
     <a [routerLink]="['/subcategory', categoryId]" class="back">
-    ← Back to Sub-categories
+    {{ 'COMMON.BACK' | translate }} {{ 'SUBCATEGORY.TITLE' | translate }}
   </a>
 
     <div class="title-section">
       <h1>{{ subcategoryName | titlecase }}</h1>
-      <p>{{ businesses.length }} businesses found</p>
+      <p>{{ businesses.length }} {{ 'BUSINESS.FOUND' | translate }}</p>
 
       <div class="breadcrumb">
         {{ categoryName | titlecase }} › {{ subcategoryName | titlecase }}
@@ -36,7 +36,7 @@
     <!--IMAGE LEFT -->
     <div class="image">
       <img *ngIf="b.primaryImage" [src]="b.primaryImage" />
-      <span *ngIf="!b.primaryImage">No Image</span>
+      <span *ngIf="!b.primaryImage">{{ 'COMMON.NO_IMAGE' | translate }}</span>
     </div>
 
     <!--  RIGHT CONTENT -->
@@ -56,7 +56,7 @@
 
       <div class="details">
         <span>📞 {{ b.phoneNumber }}</span>
-        <span>📍 {{ b.city }}, {{ b.state }}</span>
+        <span>{{ 'COMMON.PIN_ICON' | translate }} {{ b.city }}, {{ b.state }}</span>
       </div>
 
     </div>
@@ -71,7 +71,7 @@
   <div class="pagination" *ngIf="totalPages > 1">
 
     <button (click)="changePage(currentPage-1)">
-      Previous
+      {{ 'COMMON.PREVIOUS' | translate }}
     </button>
 
     <button
@@ -83,7 +83,7 @@
     </button>
 
     <button (click)="changePage(currentPage+1)">
-      Next
+      {{ 'COMMON.NEXT' | translate }}
     </button>
 
   </div>

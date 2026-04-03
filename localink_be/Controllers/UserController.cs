@@ -1,7 +1,11 @@
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using System.Threading.Tasks;
+using localink_be.Models.DTOs;
+using localink_be.Services.Interfaces;
 
+namespace localink_be.Controllers
+{
 [ApiController]
 [Route("api/v1/user")]
 public class UserController : ControllerBase
@@ -75,4 +79,5 @@ public class UserController : ControllerBase
 
         return Ok(new { success = true, message = "Profile updated successfully" });
     }
+}
 }

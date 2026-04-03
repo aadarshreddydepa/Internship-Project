@@ -1,12 +1,22 @@
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using localink_be.Data;
+using localink_be.Models.Entities;
+using localink_be.Models.DTOs;
+using localink_be.Services.Interfaces;
 
-public class BusinessService : IBusinessService
+namespace localink_be.Services.Implementations
 {
-    private readonly AppDbContext _db;
-    private readonly IContactService _contactService;
-    private readonly IHoursService _hoursService;
-    private readonly IPhotoService _photoService;
-    private readonly IEmailService _emailService;
+    public class BusinessService : IBusinessService
+    {
+        private readonly AppDbContext _db;
+        private readonly IContactService _contactService;
+        private readonly IHoursService _hoursService;
+        private readonly IPhotoService _photoService;
+        private readonly IEmailService _emailService;
     public BusinessService(AppDbContext db,
                            IContactService contactService,
                            IHoursService hoursService,
@@ -131,163 +141,167 @@ public class BusinessService : IBusinessService
 
     public async Task<long> RegisterBusinessAsync(RegisterBusinessDto dto, long userId)
     {
-        using var transaction = await _db.Database.BeginTransactionAsync();
-
-        try
+        var strategy = _db.Database.CreateExecutionStrategy();
+        
+        return await strategy.ExecuteAsync(async () =>
         {
-            var category = await _db.Categories.FindAsync(dto.CategoryId);
-            if (category == null)
-                throw new Exception("Invalid category");
+            using var transaction = await _db.Database.BeginTransactionAsync();
 
-            var subcategory = await _db.Subcategories
-                .FirstOrDefaultAsync(s => s.SubcategoryId == dto.SubcategoryId &&
-                                        s.CategoryId == dto.CategoryId);
-
-            if (subcategory == null)
-                throw new Exception("Invalid subcategory");
-            var business = new Business
+            try
             {
-                BusinessName = dto.BusinessName,
-                Description = dto.Description,
-                CategoryId = dto.CategoryId,
-                SubcategoryId = dto.SubcategoryId,
-                UserId = userId, 
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
+                var category = await _db.Categories.FindAsync(dto.CategoryId);
+                if (category == null)
+                    throw new Exception("Invalid category");
 
-            _db.Businesses.Add(business);
-            await _db.SaveChangesAsync();
+                var subcategory = await _db.Subcategories
+                    .FirstOrDefaultAsync(s => s.SubcategoryId == dto.SubcategoryId &&
+                                            s.CategoryId == dto.CategoryId);
 
-            // CONTACT
-            await _contactService.AddContactAsync(dto, business.BusinessId);
+                if (subcategory == null)
+                    throw new Exception("Invalid subcategory");
+                var business = new Business
+                {
+                    BusinessName = dto.BusinessName,
+                    Description = dto.Description,
+                    CategoryId = dto.CategoryId,
+                    SubcategoryId = dto.SubcategoryId,
+                    UserId = userId, 
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
 
-            // HOURS
-            await _hoursService.AddHoursAsync(dto.Hours, business.BusinessId);
+                _db.Businesses.Add(business);
+                await _db.SaveChangesAsync();
 
-            // PHOTO
-            if (!string.IsNullOrWhiteSpace(dto.Photo))
-            {
-                if (dto.Photo.Length > 5_000_000)
-                    throw new Exception("Image too large");
+                // CONTACT
+                await _contactService.AddContactAsync(dto, business.BusinessId);
 
-                await _photoService.SavePhotoAsync(dto.Photo, business.BusinessId);
+                // HOURS
+                await _hoursService.AddHoursAsync(dto.Hours, business.BusinessId);
+
+                // PHOTO
+                if (!string.IsNullOrWhiteSpace(dto.Photo))
+                {
+                    if (dto.Photo.Length > 5_000_000)
+                        throw new Exception("Image too large");
+
+                    await _photoService.SavePhotoAsync(dto.Photo, business.BusinessId);
+                }
+
+                // ADMIN DASHBOARD ENTRY
+                await _db.AdminDashboards.AddAsync(new AdminDashboard
+                {
+                    BusinessId = business.BusinessId,
+                    Status = BusinessStatus.Pending,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+
+                await _db.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+                // GET BUSINESS DETAILS FOR EMAIL
+                var contact = await _db.BusinessContacts
+                    .Where(c => c.BusinessId == business.BusinessId)
+                    .FirstOrDefaultAsync();
+
+                var categoryName = await _db.Categories
+                    .Where(c => c.CategoryId == business.CategoryId)
+                    .Select(c => c.CategoryName)
+                    .FirstOrDefaultAsync();
+
+                // ADMIN EMAIL FROM CONFIG
+                var adminEmail = "aadarshreddydepa@gmail.com"; // move to config later
+
+                await _emailService.SendNewBusinessNotificationToAdminAsync(
+                    adminEmail,
+                    business.BusinessName,
+                    categoryName ?? "",
+                    business.Description ?? "",
+                    contact?.City + ", " + contact?.State,
+                    contact?.PhoneCode + contact?.PhoneNumber,
+                    contact?.Email
+                );
+
+                return business.BusinessId;
             }
-
-            // ADMIN DASHBOARD ENTRY
-            await _db.AdminDashboards.AddAsync(new AdminDashboard
+            catch
             {
-                BusinessId = business.BusinessId,
-                Status = BusinessStatus.Pending,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            });
+                await transaction.RollbackAsync();
+                throw;
+            }
+        });
+    }
+        // GET PREVIEW
+        public async Task<object?> GetBusinessPreviewAsync(long businessId)
+        {
+            var business = await _db.Businesses.FirstOrDefaultAsync(b => b.BusinessId == businessId);
+            if (business == null) return null;
 
-            await _db.SaveChangesAsync();
-
-            await transaction.CommitAsync();
-            // GET BUSINESS DETAILS FOR EMAIL
-            var contact = await _db.BusinessContacts
-                .Where(c => c.BusinessId == business.BusinessId)
-                .FirstOrDefaultAsync();
-
-            var categoryName = await _db.Categories
+            var category = await _db.Categories
                 .Where(c => c.CategoryId == business.CategoryId)
                 .Select(c => c.CategoryName)
                 .FirstOrDefaultAsync();
 
-            // ADMIN EMAIL FROM CONFIG
-            var adminEmail = "aadarshreddydepa@gmail.com"; // move to config later
+            var subcategory = await _db.Subcategories
+                .Where(s => s.SubcategoryId == business.SubcategoryId)
+                .Select(s => s.SubcategoryName)
+                .FirstOrDefaultAsync();
 
-            await _emailService.SendNewBusinessNotificationToAdminAsync(
-                adminEmail,
-                business.BusinessName,
-                categoryName ?? "",
-                business.Description ?? "",
-                contact?.City + ", " + contact?.State,
-                contact?.PhoneCode + contact?.PhoneNumber,
-                contact?.Email
-            );
+            var contact = await _db.BusinessContacts
+                .Where(c => c.BusinessId == businessId)
+                .FirstOrDefaultAsync();
 
-            return business.BusinessId;
-        }
-        catch
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }
-    }
-    public async Task<object?> GetBusinessPreviewAsync(long businessId)
-    {
-        var business = await _db.Businesses.FirstOrDefaultAsync(b => b.BusinessId == businessId);
-        if (business == null) return null;
+            var hours = await _db.BusinessHours
+                .Where(h => h.BusinessId == businessId)
+                .Select(h => new
+                {
+                    h.DayOfWeek,
+                    h.Mode,
+                    Slots = _db.BusinessHourSlots
+                        .Where(s => s.BusinessHourId == h.BusinessHourId)
+                        .Select(s => new { s.OpenTime, s.CloseTime })
+                        .ToList()
+                }).ToListAsync();
 
-        var category = await _db.Categories
-            .Where(c => c.CategoryId == business.CategoryId)
-            .Select(c => c.CategoryName)
-            .FirstOrDefaultAsync();
+            var photos = await _db.BusinessPhotos
+                .Where(p => p.BusinessId == businessId)
+                .OrderByDescending(p => p.IsPrimary)
+                .Select(p => new { p.PhotoId, p.ImageUrl, p.IsPrimary })
+                .ToListAsync();
 
-        var subcategory = await _db.Subcategories
-            .Where(s => s.SubcategoryId == business.SubcategoryId)
-            .Select(s => s.SubcategoryName)
-            .FirstOrDefaultAsync();
-
-        var contact = await _db.BusinessContacts
-            .Where(c => c.BusinessId == businessId)
-            .FirstOrDefaultAsync();
-
-        var hours = await _db.BusinessHours
-            .Where(h => h.BusinessId == businessId)
-            .Select(h => new
-            {
-                h.DayOfWeek,
-                h.Mode,
-                Slots = _db.BusinessHourSlots
-                    .Where(s => s.BusinessHourId == h.BusinessHourId)
-                    .Select(s => new { s.OpenTime, s.CloseTime })
-                    .ToList()
-            }).ToListAsync();
-
-        var photos = await _db.BusinessPhotos
-            .Where(p => p.BusinessId == businessId)
-            .OrderByDescending(p => p.IsPrimary)
-            .Select(p => new { p.PhotoId, p.ImageUrl, p.IsPrimary })
-            .ToListAsync();
-
-        return new
-        {
-            BusinessInformation = new
+            return new
             {
                 business.BusinessName,
                 business.Description,
                 Category = category,
-                Subcategory = subcategory
-            },
-            ContactDetails = contact == null ? null : new
-            {
-                contact.PhoneCode,
-                contact.PhoneNumber,
-                contact.Email,
-                contact.Website,
-                contact.StreetAddress,
-                contact.City,
-                contact.State,
-                contact.Country,
-                contact.Pincode
-            },
-            BusinessHours = hours,
-            BusinessPhotos = photos
-        };
-    }
+                Subcategory = subcategory,
+                Contact = contact,
+                Hours = hours,
+                Photos = photos
+            };
+        }
 
-
-    public async Task<List<BusinessDto>> GetBusinessesByUserAsync(long userId)
-    {
-        if (userId <= 0)
-            throw new ArgumentException("UserId must be greater than 0");
-
-        try
+        public async Task<Business?> UpdateBusinessAsync(long id, Business updated)
         {
+            var existing = await _db.Businesses.FindAsync(id);
+            if (existing == null) return null;
+
+            existing.BusinessName = updated.BusinessName;
+            existing.Description = updated.Description;
+            existing.CategoryId = updated.CategoryId;
+            existing.SubcategoryId = updated.SubcategoryId;
+            existing.UpdatedAt = DateTime.UtcNow;
+
+            await _db.SaveChangesAsync();
+            return existing;
+        }
+
+        public async Task<List<BusinessDto>> GetBusinessesByUserAsync(long userId)
+        {
+            if (userId <= 0)
+                throw new ArgumentException("UserId must be greater than 0");
+
             return await _db.Businesses
                 .Where(b => b.UserId == userId)
                 .Include(b => b.Category)
@@ -316,10 +330,6 @@ public class BusinessService : IBusinessService
                         .Select(c => c.City)
                         .FirstOrDefault(),
 
-                    Status = _db.AdminDashboards
-                        .Where(a => a.BusinessId == b.BusinessId)
-                        .Select(a => a.Status.ToString())
-                        .FirstOrDefault(),
                     State = _db.BusinessContacts
                         .Where(c => c.BusinessId == b.BusinessId)
                         .Select(c => c.State)
@@ -335,172 +345,103 @@ public class BusinessService : IBusinessService
                         .Select(c => c.Pincode)
                         .FirstOrDefault(),
 
-                    StreetAddress = _db.BusinessContacts
+                    Latitude = _db.BusinessContacts
                         .Where(c => c.BusinessId == b.BusinessId)
-                        .Select(c => c.StreetAddress)
+                        .Select(c => c.Latitude)
                         .FirstOrDefault(),
+                    Longitude = _db.BusinessContacts
+                        .Where(c => c.BusinessId == b.BusinessId)
+                        .Select(c => c.Longitude)
+                        .FirstOrDefault(),
+                    Status = _db.AdminDashboards
+                        .Where(a => a.BusinessId == b.BusinessId)
+                        .Select(a => a.Status.ToString())
+                        .FirstOrDefault(),
+                    PrimaryImage = _db.BusinessPhotos
+                        .Where(p => p.BusinessId == b.BusinessId && p.IsPrimary)
+                        .Select(p => p.ImageUrl)
+                        .FirstOrDefault()
                 })
                 .ToListAsync();
         }
-        catch (Exception ex)
-        {
-            throw new Exception($"Error fetching businesses for userId {userId}", ex);
-        }
-    }
 
-    public async Task<List<BusinessDto>> GetBySubcategoryAsync(int subcategoryId)
-    {
-        if (subcategoryId <= 0)
-            throw new ArgumentException("SubcategoryId must be greater than 0");
-
-        try
+        public async Task<List<BusinessDto>> GetBySubcategoryAsync(int subcategoryId)
         {
             return await _db.Businesses
                 .Where(b => b.SubcategoryId == subcategoryId)
                 .Select(b => new BusinessDto
                 {
                     Id = b.BusinessId,
-                    Name = b.BusinessName,
-                    Description = b.Description,
-                    CategoryName = b.Category.CategoryName,
-                    SubcategoryId = b.SubcategoryId,
-                    SubcategoryName = b.Subcategory.SubcategoryName,
-
-                    PhoneNumber = _db.BusinessContacts
-                        .Where(c => c.BusinessId == b.BusinessId)
-                        .Select(c => c.PhoneNumber)
-                        .FirstOrDefault(),
-
-                    Email = _db.BusinessContacts
-                        .Where(c => c.BusinessId == b.BusinessId)
-                        .Select(c => c.Email)
-                        .FirstOrDefault(),
-
-                    City = _db.BusinessContacts
-                        .Where(c => c.BusinessId == b.BusinessId)
-                        .Select(c => c.City)
-                        .FirstOrDefault(),
-
-                    State = _db.BusinessContacts
-                        .Where(c => c.BusinessId == b.BusinessId)
-                        .Select(c => c.State)
-                        .FirstOrDefault(),
-
-                    PrimaryImage = _db.BusinessPhotos
-                        .Where(p => p.BusinessId == b.BusinessId && p.IsPrimary)
-                        .Select(p => p.ImageUrl)
-                        .FirstOrDefault()
+                    Name = b.BusinessName
                 })
                 .ToListAsync();
         }
-        catch (Exception ex)
-        {
-            throw new Exception($"Error fetching businesses for subcategoryId {subcategoryId}", ex);
-        }
-    }
 
-    public async Task<BusinessDto?> GetByIdAsync(long id)
-    {
-        if (id <= 0)
-            throw new ArgumentException("Business Id must be greater than 0");
-
-        try
+        public async Task<BusinessDto?> GetByIdAsync(long id)
         {
-            var business = await _db.Businesses
+            return await _db.Businesses
                 .Where(b => b.BusinessId == id)
                 .Select(b => new BusinessDto
                 {
                     Id = b.BusinessId,
                     Name = b.BusinessName,
                     Description = b.Description,
-                    CategoryName = b.Category.CategoryName,
-                    SubcategoryId = b.SubcategoryId,
-                    SubcategoryName = b.Subcategory.SubcategoryName,
-
-                    PhoneNumber = _db.BusinessContacts
-                        .Where(c => c.BusinessId == b.BusinessId)
-                        .Select(c => c.PhoneNumber)
-                        .FirstOrDefault(),
-
-                    Email = _db.BusinessContacts
-                        .Where(c => c.BusinessId == b.BusinessId)
-                        .Select(c => c.Email)
-                        .FirstOrDefault(),
-
-                    City = _db.BusinessContacts
-                        .Where(c => c.BusinessId == b.BusinessId)
-                        .Select(c => c.City)
-                        .FirstOrDefault(),
-
-                    State = _db.BusinessContacts
-                        .Where(c => c.BusinessId == b.BusinessId)
-                        .Select(c => c.State)
-                        .FirstOrDefault(),
-
-                    PrimaryImage = _db.BusinessPhotos
-                        .Where(p => p.BusinessId == b.BusinessId && p.IsPrimary)
-                        .Select(p => p.ImageUrl)
-                        .FirstOrDefault()
+                    CategoryName = b.Category != null ? b.Category.CategoryName : "",
+                    SubcategoryName = b.Subcategory != null ? b.Subcategory.SubcategoryName : ""
                 })
                 .FirstOrDefaultAsync();
-
-            if (business == null)
-                throw new KeyNotFoundException($"Business with Id {id} not found");
-
-            return business;
         }
-        catch (Exception ex)
+
+        public async Task<List<BusinessDto>> SearchBusinessesAsync(string query, double? userLat = null, double? userLng = null)
         {
-            throw new Exception($"Error fetching business with Id {id}", ex);
-        }
-    }
-    
-    public async Task<List<BusinessDto>> SearchBusinessesAsync(string query)
-    {
-        if (string.IsNullOrWhiteSpace(query))
-            return new List<BusinessDto>();
+            if (string.IsNullOrWhiteSpace(query))
+                return new List<BusinessDto>();
 
-        query = query.Trim();
+            query = query.Trim();
 
-        var businesses = await _db.Businesses
-            .AsNoTracking()
-            .Where(b =>
-                (
-                     EF.Functions.Like(b.BusinessName, $"%{query}%") ||
-                    (b.Description != null && EF.Functions.Like(b.Description, $"%{query}%")) ||
-                    (b.Category != null && EF.Functions.Like(b.Category.CategoryName, $"%{query}%")) ||
-                    (b.Subcategory != null && EF.Functions.Like(b.Subcategory.SubcategoryName, $"%{query}%"))
-                )
-            )
+            var businessesQuery = _db.Businesses
+                .AsNoTracking()
+                .Where(b =>
+                    (
+                         EF.Functions.Like(b.BusinessName, $"%{query}%") ||
+                        (b.Description != null && EF.Functions.Like(b.Description, $"%{query}%")) ||
+                        (b.Category != null && EF.Functions.Like(b.Category.CategoryName, $"%{query}%")) ||
+                        (b.Subcategory != null && EF.Functions.Like(b.Subcategory.SubcategoryName, $"%{query}%"))
+                    )
+                );
 
-            .Select(b => new BusinessDto
+            // Project to DTO with distance calculation
+            var projectedQuery = businessesQuery.Select(b => new BusinessDto
             {
                 Id = b.BusinessId,
                 Name = b.BusinessName,
                 Description = b.Description,
-
                 CategoryName = b.Category != null ? b.Category.CategoryName : "",
                 SubcategoryName = b.Subcategory != null ? b.Subcategory.SubcategoryName : "",
-
                 SubcategoryId = b.SubcategoryId,
                 PhoneNumber = _db.BusinessContacts
                     .Where(c => c.BusinessId == b.BusinessId)
                     .Select(c => c.PhoneNumber)
                     .FirstOrDefault(),
-
                 Email = _db.BusinessContacts
                     .Where(c => c.BusinessId == b.BusinessId)
                     .Select(c => c.Email)
                     .FirstOrDefault(),
-
                 City = _db.BusinessContacts
                     .Where(c => c.BusinessId == b.BusinessId)
                     .Select(c => c.City)
                     .FirstOrDefault(),
-
                 State = _db.BusinessContacts
                     .Where(c => c.BusinessId == b.BusinessId)
                     .Select(c => c.State)
+                    .FirstOrDefault(),
+                Latitude = _db.BusinessContacts
+                    .Where(c => c.BusinessId == b.BusinessId)
+                    .Select(c => c.Latitude)
+                    .FirstOrDefault(),
+                Longitude = _db.BusinessContacts
+                    .Where(c => c.BusinessId == b.BusinessId)
+                    .Select(c => c.Longitude)
                     .FirstOrDefault(),
                 Status = _db.AdminDashboards
                     .Where(a => a.BusinessId == b.BusinessId)
@@ -509,11 +450,196 @@ public class BusinessService : IBusinessService
                 PrimaryImage = _db.BusinessPhotos
                     .Where(p => p.BusinessId == b.BusinessId && p.IsPrimary)
                     .Select(p => p.ImageUrl)
-                    .FirstOrDefault()
-            })
-            .Take(10)
-            .ToListAsync();
+                    .FirstOrDefault(),
+                // Calculate distance using Haversine formula approximation
+                Distance = userLat.HasValue && userLng.HasValue
+                    ? _db.BusinessContacts
+                        .Where(c => c.BusinessId == b.BusinessId && c.Latitude.HasValue && c.Longitude.HasValue)
+                        .Select(c => (double?)(111.0 * Math.Sqrt(
+                            Math.Pow(c.Latitude.Value - userLat.Value, 2) +
+                            Math.Pow(c.Longitude.Value - userLng.Value, 2) * Math.Cos(userLat.Value * Math.PI / 180.0)
+                        )))
+                        .FirstOrDefault()
+                    : null
+            });
 
-        return businesses;
+            // Sort by distance if location provided, otherwise by name
+            var results = await (userLat.HasValue && userLng.HasValue
+                ? projectedQuery.OrderBy(b => b.Distance ?? double.MaxValue)
+                : projectedQuery.OrderBy(b => b.Name))
+                .Take(10)
+                .ToListAsync();
+
+            return results;
+        }
+
+        public async Task<VoiceSearchResponse> VoiceSearchAsync(VoiceSearchRequest request, double? userLat = null, double? userLng = null)
+        {
+            try
+            {
+                // Validate request
+                if (request == null)
+                {
+                    return new VoiceSearchResponse
+                    {
+                        Success = false,
+                        Message = "Invalid request",
+                        Results = new List<BusinessDto>()
+                    };
+                }
+
+                var query = request.Query?.Trim() ?? string.Empty;
+
+                // Start with base query
+                var businessesQuery = _db.Businesses
+                    .AsNoTracking()
+                    .AsQueryable();
+
+                // Apply text search if query provided
+                if (!string.IsNullOrWhiteSpace(query))
+                {
+                    businessesQuery = businessesQuery.Where(b =>
+                        EF.Functions.Like(b.BusinessName, $"%{query}%") ||
+                        (b.Description != null && EF.Functions.Like(b.Description, $"%{query}%")) ||
+                        (b.Category != null && EF.Functions.Like(b.Category.CategoryName, $"%{query}%")) ||
+                        (b.Subcategory != null && EF.Functions.Like(b.Subcategory.SubcategoryName, $"%{query}%"))
+                    );
+                }
+
+                // Apply category filter if provided
+                if (!string.IsNullOrWhiteSpace(request.Category))
+                {
+                    var categoryLower = request.Category.ToLower();
+                    businessesQuery = businessesQuery.Where(b =>
+                        (b.Category != null && EF.Functions.Like(b.Category.CategoryName, $"%{categoryLower}%")) ||
+                        (b.Subcategory != null && EF.Functions.Like(b.Subcategory.SubcategoryName, $"%{categoryLower}%"))
+                    );
+                }
+
+                // Apply "open now" filter if requested
+                if (request.OpenNow)
+                {
+                    var currentDay = (int)DateTime.UtcNow.DayOfWeek;
+                    var currentTime = DateTime.UtcNow.TimeOfDay;
+
+                    businessesQuery = businessesQuery.Where(b =>
+                        _db.BusinessHours.Any(h =>
+                            h.BusinessId == b.BusinessId &&
+                            h.DayOfWeek == currentDay.ToString() &&
+                            h.Mode == "open" &&
+                            _db.BusinessHourSlots.Any(s =>
+                                s.BusinessHourId == h.BusinessHourId &&
+                                s.OpenTime <= currentTime &&
+                                s.CloseTime >= currentTime
+                            )
+                        )
+                    );
+                }
+
+                // Apply radius filter if user location provided
+                if (userLat.HasValue && userLng.HasValue && request.Radius > 0)
+                {
+                    // Note: This is a simplified distance calculation
+                    // For production, consider using SQL Server geography types
+                    var radiusDegrees = request.Radius / 111.0; // Rough conversion km to degrees
+
+                    businessesQuery = businessesQuery.Where(b =>
+                        _db.BusinessContacts.Any(c =>
+                            c.BusinessId == b.BusinessId &&
+                            c.Latitude.HasValue &&
+                            c.Longitude.HasValue &&
+                            Math.Abs(c.Latitude.Value - userLat.Value) <= radiusDegrees &&
+                            Math.Abs(c.Longitude.Value - userLng.Value) <= radiusDegrees
+                        )
+                    );
+                }
+
+                // Project to DTO with distance calculation
+                var projectedQuery = businessesQuery.Select(b => new BusinessDto
+                {
+                    Id = b.BusinessId,
+                    Name = b.BusinessName,
+                    Description = b.Description,
+                    CategoryName = b.Category != null ? b.Category.CategoryName : "",
+                    SubcategoryName = b.Subcategory != null ? b.Subcategory.SubcategoryName : "",
+                    SubcategoryId = b.SubcategoryId,
+                    PhoneNumber = _db.BusinessContacts
+                        .Where(c => c.BusinessId == b.BusinessId)
+                        .Select(c => c.PhoneNumber)
+                        .FirstOrDefault(),
+                    Email = _db.BusinessContacts
+                        .Where(c => c.BusinessId == b.BusinessId)
+                        .Select(c => c.Email)
+                        .FirstOrDefault(),
+                    City = _db.BusinessContacts
+                        .Where(c => c.BusinessId == b.BusinessId)
+                        .Select(c => c.City)
+                        .FirstOrDefault(),
+                    State = _db.BusinessContacts
+                        .Where(c => c.BusinessId == b.BusinessId)
+                        .Select(c => c.State)
+                        .FirstOrDefault(),
+                    Latitude = _db.BusinessContacts
+                        .Where(c => c.BusinessId == b.BusinessId)
+                        .Select(c => c.Latitude)
+                        .FirstOrDefault(),
+                    Longitude = _db.BusinessContacts
+                        .Where(c => c.BusinessId == b.BusinessId)
+                        .Select(c => c.Longitude)
+                        .FirstOrDefault(),
+                    Status = _db.AdminDashboards
+                        .Where(a => a.BusinessId == b.BusinessId)
+                        .Select(a => a.Status.ToString())
+                        .FirstOrDefault(),
+                    PrimaryImage = _db.BusinessPhotos
+                        .Where(p => p.BusinessId == b.BusinessId && p.IsPrimary)
+                        .Select(p => p.ImageUrl)
+                        .FirstOrDefault(),
+                    // Calculate distance using Haversine formula approximation
+                    Distance = userLat.HasValue && userLng.HasValue
+                        ? _db.BusinessContacts
+                            .Where(c => c.BusinessId == b.BusinessId && c.Latitude.HasValue && c.Longitude.HasValue)
+                            .Select(c => (double?)(111.0 * Math.Sqrt(
+                                Math.Pow(c.Latitude.Value - userLat.Value, 2) +
+                                Math.Pow(c.Longitude.Value - userLng.Value, 2) * Math.Cos(userLat.Value * Math.PI / 180.0)
+                            )))
+                            .FirstOrDefault()
+                        : null
+                });
+
+                // Sort by distance if location provided, otherwise by name
+                var results = await (userLat.HasValue && userLng.HasValue
+                    ? projectedQuery.OrderBy(b => b.Distance ?? double.MaxValue)
+                    : projectedQuery.OrderBy(b => b.Name))
+                    .Take(20)
+                    .ToListAsync();
+
+                return new VoiceSearchResponse
+                {
+                    Success = true,
+                    Message = $"Found {results.Count} businesses",
+                    Results = results,
+                    TotalCount = results.Count,
+                    AppliedFilters = new VoiceSearchFilters
+                    {
+                        Query = query,
+                        OpenNow = request.OpenNow,
+                        RadiusKm = request.Radius,
+                        Category = request.Category
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                // Log the error
+                return new VoiceSearchResponse
+                {
+                    Success = false,
+                    Message = "An error occurred while processing your voice search",
+                    Results = new List<BusinessDto>(),
+                    TotalCount = 0
+                };
+            }
+        }
     }
 }

@@ -1,37 +1,44 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
+using System.Linq;
+using localink_be.Data;
+using localink_be.Services.Interfaces;
 
-[ApiController]
-[Route("api/v1/categories")]
-public class CategoryController : ControllerBase
+namespace localink_be.Controllers
 {
-    private readonly AppDbContext _db;
-    private readonly ICategoryService _service;
-
-    public CategoryController(AppDbContext db, ICategoryService service)
+    [ApiController]
+    [Route("api/v1/categories")]
+    public class CategoryController : ControllerBase
     {
-        _db = db;
-        _service = service;
-    }
+        private readonly AppDbContext _db;
+        private readonly ICategoryService _service;
 
-    [HttpGet("{categoryId}/subcategories-db")]
-    
-    public async Task<IActionResult> GetSubcategories(int categoryId)
-    {
-        var subcategories = await _db.Subcategories
-            .Where(s => s.CategoryId == categoryId)
-            .ToListAsync();
+        public CategoryController(AppDbContext db, ICategoryService service)
+        {
+            _db = db;
+            _service = service;
+        }
 
-        if (!subcategories.Any())
-            return NotFound();
+        // GET: api/categories/{categoryId}/subcategories
+        [HttpGet("{categoryId}/subcategories-db")]
+        public async Task<IActionResult> GetSubcategories(int categoryId)
+        {
+            var subcategories = await _db.Subcategories
+                .Where(s => s.CategoryId == categoryId)
+                .ToListAsync();
 
-        return Ok(subcategories);
-    }
+            if (!subcategories.Any())
+                return NotFound();
+                
+            return Ok(subcategories);
+        }
 
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
-    {
-        var result = await _service.GetCategoriesAsync();
-        return Ok(result);
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var result = await _service.GetCategoriesAsync();
+            return Ok(result);
+        }
     }
 }

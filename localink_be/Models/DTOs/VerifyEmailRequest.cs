@@ -1,8 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 
-public class VerifyEmailRequest
+namespace localink_be.Models.DTOs
 {
-    [Required]
-    [EmailAddress]
-    public string Email { get; set; } = string.Empty;
+    public class VerifyEmailRequest
+    {
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = string.Empty;
+}
 }

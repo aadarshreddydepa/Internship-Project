@@ -7,7 +7,7 @@ import { Subject } from 'rxjs';
   providedIn: 'root'
 })
 export class NotificationService {
-  private hubConnection: signalR.HubConnection | undefined;
+  private hubConnection: InstanceType<typeof signalR.HubConnection> | undefined;
   public notification$ = new Subject<string>();
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
@@ -28,9 +28,9 @@ export class NotificationService {
       .then(() => {
         console.log('SignalR connection started for user:', userId);
         this.hubConnection?.invoke('JoinGroup', `client_${userId}`)
-          .catch(err => console.error('Error joining group: ', err));
+          .catch((err: any) => console.error('Error joining group: ', err));
       })
-      .catch(err => console.log('Error while starting connection: ' + err));
+      .catch((err: any) => console.log('Error while starting connection: ' + err));
 
     this.hubConnection.on('ReceiveNotification', (message: string) => {
       console.log('New notification received:', message);

@@ -72,6 +72,8 @@ margin-bottom:30px;
 .search-input-wrapper {
 position: relative;
 width: 100%;
+display: flex;
+align-items: center;
 }
 
 .search-input-wrapper input {
@@ -83,6 +85,25 @@ border:none;
 outline:none;
 color:#F8F4F0;
 font-size:15px;
+flex: 1;
+}
+
+.voice-search-inline {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+}
+
+.voice-search-inline ::ng-deep .voice-btn {
+  padding: 8px 12px;
+  min-height: 36px;
+  min-width: 36px;
+}
+
+.voice-search-inline ::ng-deep .state-text {
+  display: none;
 }
 
 .search-icon {
@@ -217,6 +238,7 @@ line-height: 1.4;
 display: -webkit-box;
 -webkit-line-clamp: 2;
 -webkit-box-orient: vertical;
+line-clamp: 2;
 overflow: hidden;
 }
 

@@ -1,46 +1,51 @@
 using System.Text.Json;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using localink_be.Services.Interfaces;
 
-public class CaptchaService : ICaptchaService
+namespace localink_be.Services.Implementations
 {
-    private readonly IConfiguration _config;
-    private readonly HttpClient _httpClient;
-
-    public CaptchaService(IConfiguration config, HttpClient httpClient)
+    public class CaptchaService : ICaptchaService
     {
-        _config = config;
-        _httpClient = httpClient;
-    }
+        private readonly IConfiguration _config;
+        private readonly HttpClient _httpClient;
 
-    public async Task<bool> VerifyAsync(string token)
-    {
-        
-        if (string.IsNullOrWhiteSpace(token))
-            return false;
-
-        var secret = _config["Captcha:SecretKey"];
-
-        if (string.IsNullOrWhiteSpace(secret))
-            return false;
-
-        try
+        public CaptchaService(IConfiguration config, HttpClient httpClient)
         {
-            var response = await _httpClient.PostAsync(
-                $"https://www.google.com/recaptcha/api/siteverify?secret={secret}&response={token}",
-                null
-            );
+            _config = config;
+            _httpClient = httpClient;
+        }
 
-            if (!response.IsSuccessStatusCode)
+        public async Task<bool> VerifyAsync(string token)
+        {
+            if (string.IsNullOrWhiteSpace(token))
                 return false;
 
-            var json = await response.Content.ReadAsStringAsync();
+            var secret = _config["Captcha:SecretKey"];
 
-            using var doc = JsonDocument.Parse(json);
+            if (string.IsNullOrWhiteSpace(secret))
+                return false;
 
-            return doc.RootElement.GetProperty("success").GetBoolean();
-        }
-        catch
-        {
-            return false; // fail safe
+            try
+            {
+                var response = await _httpClient.PostAsync(
+                    $"https://www.google.com/recaptcha/api/siteverify?secret={secret}&response={token}",
+                    null
+                );
+
+                if (!response.IsSuccessStatusCode)
+                    return false;
+
+                var json = await response.Content.ReadAsStringAsync();
+
+                using var doc = JsonDocument.Parse(json);
+                return doc.RootElement.GetProperty("success").GetBoolean();
+            }
+            catch
+            {
+                return false; // fail safe
+            }
         }
     }
 }

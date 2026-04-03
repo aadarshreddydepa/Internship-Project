@@ -1,5 +1,13 @@
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Threading.Tasks;
+using localink_be.Data;
+using localink_be.Models.Entities;
+using localink_be.Models.DTOs;
+using localink_be.Services.Interfaces;
 
+namespace localink_be.Services.Implementations
+{
 public class AddressService : IAddressService
 {
     private readonly AppDbContext _db;
@@ -23,4 +31,5 @@ public class AddressService : IAddressService
             })
             .FirstOrDefaultAsync();
     }
+}
 }

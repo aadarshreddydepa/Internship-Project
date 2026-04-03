@@ -1,4 +1,7 @@
-public interface ICaptchaService
+namespace localink_be.Services.Interfaces
 {
-    Task<bool> VerifyAsync(string token);
+    public interface ICaptchaService
+    {
+        Task<bool> VerifyAsync(string token);
+    }
 }

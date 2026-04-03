@@ -1,88 +1,110 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using System.Threading.Tasks;
+using localink_be.Models.DTOs;
+using localink_be.Services.Interfaces;
 
-[ApiController]
-[Route("api/v1/business")]
-public class BusinessController : ControllerBase
+namespace localink_be.Controllers
 {
-    private readonly IBusinessService _service;
 
-    public BusinessController(IBusinessService service)
+    [ApiController]
+    [Route("api/v1/business")]
+    public class BusinessController : ControllerBase
     {
-        _service = service;
-    }
+        private readonly IBusinessService _service;
 
-    [HttpGet]
-    public async Task<IActionResult> GetAllBusinesses()
-    {
-        return Ok(await _service.GetAllBusinessesAsync());
-    }
-
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetBusinessById(long id)
-    {
-        var business = await _service.GetBusinessByIdAsync(id);
-        if (business == null) return NotFound();
-        return Ok(business);
-    }
-
-    [Authorize(Roles = "client")]
-    [HttpPost("register")]
-    public async Task<IActionResult> RegisterBusiness([FromBody] RegisterBusinessDto dto)
-    {
-        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-
-        var businessId = await _service.RegisterBusinessAsync(dto, long.Parse(userId));
-
-        return Ok(new
+        public BusinessController(IBusinessService service)
         {
-            success = true,
-            businessId
-        });
-    }
+            _service = service;
+        }
 
-    [Authorize(Roles = "client")]
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateBusiness(long id, [FromBody] UpdateBusinessDto dto)
-    {
-        var result = await _service.UpdateBusinessFullAsync(id, dto);
-        return result == null ? NotFound() : Ok(result);
-    }
+        [HttpGet]
+        public async Task<IActionResult> GetAllBusinesses()
+        {
+            return Ok(await _service.GetAllBusinessesAsync());
+        }
 
-    [Authorize(Roles = "client")]
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteBusiness(long id)
-    {
-        var deleted = await _service.DeleteBusinessAsync(id);
-        return deleted ? NoContent() : NotFound();
-    }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetBusinessById(long id)
+        {
+            var business = await _service.GetBusinessByIdAsync(id);
+            if (business == null) return NotFound();
+            return Ok(business);
+        }
 
-    [Authorize]
-    [HttpGet("my-businesses")]
-    public async Task<IActionResult> GetMyBusinesses()
-    {
-        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        [Authorize(Roles = "client")]
+        [HttpPost("register")]
+        public async Task<IActionResult> RegisterBusiness([FromBody] RegisterBusinessDto dto)
+        {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
-        var data = await _service.GetBusinessesByUserAsync(long.Parse(userId));
-        return Ok(data);
-    }
-    [HttpGet("subcategories/{subcategoryId}/businesses")]
-    public async Task<IActionResult> GetBySubcategory(int subcategoryId)
-    {
-        var result = await _service.GetBySubcategoryAsync(subcategoryId);
-        return Ok(result);
-    }
+            var businessId = await _service.RegisterBusinessAsync(dto, long.Parse(userId));
 
-    [HttpGet("v1/businesses/{id}")]
-    public async Task<IActionResult> GetById(long id)
-    {
-        var result = await _service.GetByIdAsync(id);
-        return Ok(result);
-    }
+            return Ok(new
+            {
+                success = true,
+                businessId
+            });
+        }
 
-    [HttpGet("search")]
-    public async Task<IActionResult> SearchBusinesses([FromQuery] string query)
-    {
-        return Ok(await _service.SearchBusinessesAsync(query));
+        [Authorize(Roles = "client")]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateBusiness(long id, [FromBody] UpdateBusinessDto dto)
+        {
+            var result = await _service.UpdateBusinessFullAsync(id, dto);
+            return result == null ? NotFound() : Ok(result);
+        }
+
+        [Authorize(Roles = "client")]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteBusiness(long id)
+        {
+            var deleted = await _service.DeleteBusinessAsync(id);
+            return deleted ? NoContent() : NotFound();
+        }
+
+        [Authorize]
+        [HttpGet("my-businesses")]
+        public async Task<IActionResult> GetMyBusinesses()
+        {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            var data = await _service.GetBusinessesByUserAsync(long.Parse(userId));
+            return Ok(data);
+        }
+        [HttpGet("subcategories/{subcategoryId}/businesses")]
+        public async Task<IActionResult> GetBySubcategory(int subcategoryId)
+        {
+            var result = await _service.GetBySubcategoryAsync(subcategoryId);
+            return Ok(result);
+        }
+
+        [HttpGet("v1/businesses/{id}")]
+        public async Task<IActionResult> GetById(long id)
+        {
+            var result = await _service.GetByIdAsync(id);
+            return Ok(result);
+        }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchBusinesses([FromQuery] string query)
+        {
+            // Get user location from headers if available
+            double? userLat = null;
+            double? userLng = null;
+
+            if (Request.Headers.ContainsKey("X-User-Latitude") && 
+                Request.Headers.ContainsKey("X-User-Longitude"))
+            {
+                if (double.TryParse(Request.Headers["X-User-Latitude"], out var lat) &&
+                    double.TryParse(Request.Headers["X-User-Longitude"], out var lng))
+                {
+                    userLat = lat;
+                    userLng = lng;
+                }
+            }
+
+            return Ok(await _service.SearchBusinessesAsync(query, userLat, userLng));
+        }
     }
 }

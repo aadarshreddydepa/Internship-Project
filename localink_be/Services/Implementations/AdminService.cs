@@ -1,5 +1,16 @@
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using localink_be.Data;
+using localink_be.Models.Entities;
+using localink_be.Models.DTOs;
+using localink_be.Services.Interfaces;
+
+namespace localink_be.Services.Implementations
+{
 public class AdminService : IAdminService
 {
     private readonly AppDbContext _db;
@@ -161,4 +172,5 @@ public class AdminService : IAdminService
 
         return package.GetAsByteArray();
     }
+}
 }

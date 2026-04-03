@@ -1,14 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { BusinessListService } from '../../services/business-list.service';
 import { ReviewService } from '../../services/review.service';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-business-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, TranslateModule],
   templateUrl: './business-detail.component.html',
   styleUrls:['./business-detail.component.css']
 })
@@ -30,7 +31,8 @@ export class BusinessDetailComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private businessService: BusinessListService,
-    private reviewService: ReviewService
+    private reviewService: ReviewService,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
 subcategoryId!: number;
@@ -57,6 +59,25 @@ subcategoryId!: number;
               ? 'http://localhost:5138' + primaryPhoto.imageUrl
               : null
           };
+          // Fallback: Use category/subcategory from business data if query params were empty
+          if (!this.categoryName && data.categoryName) {
+            this.categoryName = data.categoryName;
+          }
+          if (!this.categoryName && data.category?.categoryName) {
+            this.categoryName = data.category.categoryName;
+          }
+          if (!this.subcategoryName && data.subcategoryName) {
+            this.subcategoryName = data.subcategoryName;
+          }
+          if (!this.subcategoryName && data.subcategory?.subcategoryName) {
+            this.subcategoryName = data.subcategory.subcategoryName;
+          }
+          if ((!this.categoryId || this.categoryId === 0) && data.categoryId) {
+            this.categoryId = data.categoryId;
+          }
+          if ((!this.subcategoryId || this.subcategoryId === 0) && data.subcategoryId) {
+            this.subcategoryId = data.subcategoryId;
+          }
         }
       });
     }
@@ -116,5 +137,49 @@ subcategoryId!: number;
 
   toggleViewMore() {
     this.showAllReviews = !this.showAllReviews;
+  }
+
+  getDirections() {
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    const lat = this.business?.contact?.latitude;
+    const lng = this.business?.contact?.longitude;
+
+    if (lat && lng) {
+      // Open Google Maps directions from user's current location to business
+      const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+      window.open(url, '_blank');
+    } else {
+      // Fallback: use address text if no coordinates
+      const addr = [
+        this.business?.contact?.streetAddress,
+        this.business?.contact?.city,
+        this.business?.contact?.state,
+        this.business?.contact?.country
+      ].filter(Boolean).join(', ');
+
+      if (addr) {
+        const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(addr)}`;
+        window.open(url, '_blank');
+      } else {
+        alert('Location data is not available for this business.');
+      }
+    }
+  }
+
+  contactBusiness() {
+    if (!this.business?.contact) {
+      alert('Contact information not available.');
+      return;
+    }
+    const phone = this.business.contact.phoneNumber;
+    if (phone) {
+      window.open(`tel:${phone}`, '_self');
+    } else {
+      const email = this.business.contact.email;
+      if (email) {
+        window.open(`mailto:${email}`, '_self');
+      }
+    }
   }
 }

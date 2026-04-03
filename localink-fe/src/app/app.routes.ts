@@ -16,7 +16,7 @@ import { BusinessDetailComponent } from './pages/business-detail/business-detail
 import { AdminDashboardComponent } from './dashboards/admin-dashboard/admin-dashboard.component';
 import { AuthGuard } from './guards/auth.guard';
 import { NoAuthGuard } from './guards/no-auth.guard';
-
+import { ErrorPageComponent } from './pages/error-page/error-page.component';
 
 export const routes: Routes = [
 
@@ -124,10 +124,19 @@ export const routes: Routes = [
   },
 
   // ═══════════════════════════════════════════
-  //  FALLBACK
+  //  ERROR PAGE
+  // ═══════════════════════════════════════════
+  {
+    path: 'error',
+    component: ErrorPageComponent
+  },
+
+  // ═══════════════════════════════════════════
+  //  FALLBACK - 404 Not Found
   // ═══════════════════════════════════════════
   {
     path: '**',
-    redirectTo: '',
+    component: ErrorPageComponent,
+    data: { errorCode: '404' }
   }
 ];

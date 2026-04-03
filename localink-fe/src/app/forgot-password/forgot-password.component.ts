@@ -15,19 +15,21 @@ import {
   ReactiveFormsModule
 } from '@angular/forms';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../core/services/auth.service';
 import { Subject, takeUntil } from 'rxjs';
 import { environment } from '../../environments/environment';
 
-declare var grecaptcha: any;
+// Declare global grecaptcha so TypeScript doesn't complain
+declare const grecaptcha: any;
 
 @Component({
   selector: 'app-forgot-password',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslateModule],
   templateUrl: './forgot-password.component.html',
   styleUrls: ['./forgot-password.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush // ✅ PERFORMANCE BOOST
+  changeDetection: ChangeDetectionStrategy.OnPush // PERFORMANCE BOOST
 })
 export class ForgotPasswordComponent implements AfterViewInit, OnDestroy {
 
@@ -48,11 +50,11 @@ export class ForgotPasswordComponent implements AfterViewInit, OnDestroy {
   emailSubmitted = false;
   resetSubmitted = false;
 
-  captchaToken: string = '';
+  captchaToken: string | null = null;
   captchaError = false;
   captchaRendered = false;
 
-  private destroy$ = new Subject<void>(); // ✅ memory leak fix
+  private destroy$ = new Subject<void>(); // memory leak fix
   private countdownInterval: any;
 
   constructor(
@@ -72,7 +74,7 @@ export class ForgotPasswordComponent implements AfterViewInit, OnDestroy {
     this.resetForm = this.fb.group({
       otp: ['', [
         Validators.required,
-        Validators.pattern('^[0-9]{6}$') // ✅ STRICT OTP VALIDATION
+        Validators.pattern('^[0-9]{6}$') // STRICT OTP VALIDATION
       ]],
       password: ['', [
         Validators.required,
@@ -84,7 +86,7 @@ export class ForgotPasswordComponent implements AfterViewInit, OnDestroy {
       confirmPassword: ['', Validators.required]
     }, { validators: this.passwordMatchValidator });
 
-    // ✅ Clear message on input change
+    // Clear message on input change
     this.emailForm.valueChanges.pipe(takeUntil(this.destroy$))
       .subscribe(() => this.message = '');
 
@@ -108,7 +110,7 @@ export class ForgotPasswordComponent implements AfterViewInit, OnDestroy {
     this.showConfirmPassword = !this.showConfirmPassword;
   }
 
-  // ✅ STEP 1 → SEND OTP
+  // STEP 1 → SEND OTP
   verifyEmail() {
     this.emailSubmitted = true;
 
@@ -149,7 +151,7 @@ export class ForgotPasswordComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  // ✅ STEP 2 → RESET PASSWORD
+  // STEP 2 → RESET PASSWORD
   resetPassword() {
     this.resetSubmitted = true;
 
@@ -183,7 +185,7 @@ export class ForgotPasswordComponent implements AfterViewInit, OnDestroy {
     this.captchaError = false;
   }
 
-  // ✅ SAFE COUNTDOWN (NO MEMORY LEAK)
+  // SAFE COUNTDOWN (NO MEMORY LEAK)
   startCountdown() {
     this.countdown = 3;
 
@@ -203,7 +205,36 @@ export class ForgotPasswordComponent implements AfterViewInit, OnDestroy {
     } else {
       this.step = 1;
       this.message = "";
+      this.captchaToken = null;
+      this.renderCaptcha();
     }
+  }
+
+  renderCaptcha() {
+    setTimeout(() => {
+      const captchaEl = document.getElementById('forgot-captcha');
+      if (captchaEl && typeof grecaptcha !== 'undefined') {
+        try {
+          grecaptcha.render(captchaEl, {
+            sitekey: '6LeWsJ0sAAAAAKwBUTRqFvX9qufIJVUrrId14onY',
+            theme: 'dark',
+            callback: (token: string) => {
+              this.captchaToken = token;
+              this.message = '';
+            },
+            'expired-callback': () => {
+              this.captchaToken = null;
+            },
+            'error-callback': () => {
+              this.captchaToken = null;
+            }
+          });
+        } catch (e) {
+          // If already rendered, this might throw, which we can safely ignore
+          console.warn('Captcha render failed or already rendered', e);
+        }
+      }
+    }, 100);
   }
 
   ngAfterViewInit() {

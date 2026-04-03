@@ -1,20 +1,25 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
+using localink_be.Services.Interfaces;
 
-[ApiController]
-[Route("api/v1/categories/{categoryId}/subcategories")]
-public class SubcategoryController : ControllerBase
+namespace localink_be.Controllers
 {
-    private readonly ISubcategoryService _service;
-
-    public SubcategoryController(ISubcategoryService service)
+    [ApiController]
+    [Route("api/v1/categories/{categoryId}/subcategories")]
+    public class SubcategoryController : ControllerBase
     {
-        _service = service;
-    }
+        private readonly ISubcategoryService _service;
 
-    [HttpGet]
-    public async Task<IActionResult> GetByCategory(int categoryId)
-    {
-        var result = await _service.GetByCategoryIdAsync(categoryId);
-        return Ok(result);
+        public SubcategoryController(ISubcategoryService service)
+        {
+            _service = service;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetByCategory(int categoryId)
+        {
+            var result = await _service.GetByCategoryIdAsync(categoryId);
+            return Ok(result);
+        }
     }
 }

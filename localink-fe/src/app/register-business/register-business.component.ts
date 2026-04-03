@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { CommonModule } from '@angular/common';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { HttpClient } from '@angular/common/http';
+import { TranslateModule } from '@ngx-translate/core';
 
 import { BusinessService } from '../services/register-business.service';
 
@@ -22,7 +23,8 @@ import { Router } from '@angular/router';
     ContactDetailsComponent,
     HoursComponent,
     PhotoUploadComponent,
-    PreviewComponent
+    PreviewComponent,
+    TranslateModule
   ],
   templateUrl: './register-business.component.html',
   styleUrls: ['./register-business.component.css']
@@ -50,11 +52,17 @@ export class RegisterBusinessComponent {
     private router: Router
   ) {
     this.businessForm = this.fb.group({
-      businessName: ['', [Validators.required, Validators.pattern(/^[A-Za-z\s&'-]+$/)]],
+      businessName: ['', [
+        Validators.required, 
+        Validators.minLength(3),
+        Validators.maxLength(100),
+        Validators.pattern(/^[A-Za-z\s&'-]+$/)
+      ]],
       description: ['', [
         Validators.required,
         Validators.minLength(10),
-        Validators.pattern(/^(?=.*[A-Za-z])[A-Za-z0-9\s.,'()%!#\$%\*-]*$/)
+        Validators.maxLength(500),
+        Validators.pattern(/^[A-Za-z][A-Za-z0-9\s.,'()%!-]*$/)
       ]],
       category: ['', Validators.required],
       subcategory: ['', Validators.required]
@@ -83,21 +91,7 @@ export class RegisterBusinessComponent {
   goToNext() {
     if (this.currentStep === 1) {
       if (this.businessForm.valid) {
-        const formValue = this.businessForm.value;
-
-      const selectedCategory = this.categories.find(
-        c => c.id == formValue.category
-      );
-
-      const selectedSubcategory = this.subcategories.find(
-        s => s.id == formValue.subcategory
-      );
-
-        this.businessData = {
-          ...formValue,
-          categoryName: selectedCategory?.name,
-          subcategoryName: selectedSubcategory?.name
-        };
+        this.businessData = this.businessForm.value;
         this.currentStep = 2;
       } else {
         this.businessForm.markAllAsTouched();

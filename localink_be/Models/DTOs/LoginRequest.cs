@@ -1,13 +1,16 @@
 using System.ComponentModel.DataAnnotations;
 
-public class LoginRequest
+namespace localink_be.Models.DTOs
 {
-    [Required]
-    public string UsernameOrEmail { get; set; } = string.Empty;
+    public class LoginRequest
+    {
+        [Required]
+        public string UsernameOrEmail { get; set; } = string.Empty;
 
-    [Required]
-    public string Password { get; set; } = string.Empty;
-    [Required]
-    public string CaptchaToken { get; set; } = string.Empty;
+        [Required]
+        public string Password { get; set; } = string.Empty;
+        [Required]
+        public string CaptchaToken { get; set; } = string.Empty;
 
+    }
 }

@@ -4,7 +4,9 @@ using Microsoft.IdentityModel.Tokens;
 using localink_be.Hubs;
 using System.Text;
 using DotNetEnv;
-
+using localink_be.Data;
+using localink_be.Services.Interfaces;
+using localink_be.Services.Implementations;
 Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,8 +14,16 @@ builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddHttpClient();
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        sql => sql.EnableRetryOnFailure()
+    )
+);
 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<ISubcategoryService, SubcategoryService>();
@@ -21,10 +31,14 @@ builder.Services.AddScoped<IBusinessService, BusinessService>();
 builder.Services.AddScoped<IContactService, ContactService>();
 builder.Services.AddScoped<IHoursService, HoursService>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
-builder.Services.AddHttpClient<BusinessLocationService>();
-builder.Services.AddMemoryCache();
-builder.Services.AddHttpClient();
 
+// CACHING SERVICES
+builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<ICacheService, CacheService>();
+
+// HTTP CLIENTS WITH CACHE
+builder.Services.AddHttpClient<BusinessLocationService>();
+builder.Services.AddScoped<IBusinessLocationService, BusinessLocationService>();
 builder.Services.AddScoped<IBusinessPincodeService, BusinessPincodeService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAdminService, AdminService>();

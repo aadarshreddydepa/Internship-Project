@@ -1,5 +1,15 @@
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using localink_be.Data;
+using localink_be.Models.Entities;
+using localink_be.Models.DTOs;
+using localink_be.Services.Interfaces;
 
+namespace localink_be.Services.Implementations
+{
 public class UserService : IUserService
 {
     private readonly AppDbContext _db;
@@ -77,4 +87,5 @@ public class UserService : IUserService
         await _db.SaveChangesAsync();
         return true;
     }
+}
 }

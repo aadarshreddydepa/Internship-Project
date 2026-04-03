@@ -5,32 +5,36 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
 import { HttpClient } from '@angular/common/http';
+import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { LanguageSwitcherComponent } from '../components/language-switcher/language-switcher.component';
 import { BusinessLocationService } from '../services/business-location.service';
 import { BusinessPincodeService } from '../services/business-pincode.service';
 
+// Declare global grecaptcha so TypeScript doesn't complain
+declare const grecaptcha: any;
+
 import { environment } from '../../environments/environment';
 
-declare var grecaptcha: any; 
 @Component({
   selector: 'app-signup',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, NgSelectModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, NgSelectModule, RouterModule, TranslateModule, LanguageSwitcherComponent],
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.css']
 })
 export class SignupComponent implements OnInit, AfterViewInit {
 
   signupForm: FormGroup;
-  captchaToken: string = '';
   showPassword = false;
   showConfirmPassword = false;
   showSuccessPopup = false;
+  errorMessage = '';
   isPincodeFocused = false;
   captchaError = false;
   captchaRendered = false;
 
-  // // JSON DATA
-  // locationData: any[] = [];
+  // JSON DATA
+  locationData: any[] = [];
   countries: any[] = [];
   phoneCountries: any[] = [];
   states: any[] = [];
@@ -38,6 +42,14 @@ export class SignupComponent implements OnInit, AfterViewInit {
 
   selectedType: 'user' | 'client' = 'user';
   currentStep = 1;
+  captchaToken: string | null = null;
+  currentLang = 'en';
+  availableLanguages = [
+    { code: 'en', label: 'English' },
+    { code: 'hi', label: 'हिन्दी' },
+    { code: 'es', label: 'Español' },
+    { code: 'te', label: 'తెలుగు' }
+  ];
 
   stepFields: any = {
     1: ['name', 'phone', 'email'],
@@ -53,8 +65,13 @@ export class SignupComponent implements OnInit, AfterViewInit {
     private locationService: BusinessLocationService,
     private ngZone: NgZone,
     private pincodeService: BusinessPincodeService,
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private translate: TranslateService
   ) {
+    if (isPlatformBrowser(this.platformId)) {
+      this.currentLang = localStorage.getItem('localink_lang') || 'en';
+    }
+    this.translate.use(this.currentLang);
     this.signupForm = this.fb.group({
       userType: ['', Validators.required],
 
@@ -323,11 +340,26 @@ export class SignupComponent implements OnInit, AfterViewInit {
     }
     if (this.signupForm.valid && !this.isSubmitting) {
       this.isSubmitting = true;
-      const { confirmPassword, ...payload } = this.signupForm.value;
+      this.errorMessage = '';
+      const { confirmPassword, ...raw } = this.signupForm.value;
+
+      // Extract names from location objects for backend compatibility
+      const countryValue = raw.country?.name || raw.country;
+      const stateValue = raw.state?.name || raw.state;
+      const cityValue = raw.city?.name || raw.city;
+
       const formData = {
-        ...payload,
+        ...raw,
+        email: raw.email.trim().toLowerCase(),
+        name: raw.name.trim(),
         userType: this.selectedType,
-        captchaToken: this.captchaToken
+        captchaToken: this.captchaToken,
+        // Send strings instead of objects
+        country: countryValue,
+        state: stateValue,
+        city: cityValue,
+        // Map phoneCode to CountryCode for backend
+        countryCode: raw.phoneCode
       };
 
       this.authService.register(formData).subscribe({
@@ -338,7 +370,8 @@ export class SignupComponent implements OnInit, AfterViewInit {
           }, 2000);
         },
         error: (err: any) => {
-          alert(err.error?.message || 'Signup failed');
+          this.errorMessage = err.error?.message || 'Signup failed';
+          alert(this.errorMessage);
           this.isSubmitting = false;
           // Reset captcha
           if (typeof grecaptcha !== 'undefined') {
@@ -405,9 +438,38 @@ customSearch = (term: string, item: any) => {
     }, 500);
   }
 
+  switchLanguage(langCode: string) {
+    this.currentLang = langCode;
+    this.translate.use(langCode);
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem('localink_lang', langCode);
+    }
+  }
+
   // CANVAS ANIMATION (UNCHANGED)
   ngAfterViewInit() {
     if (!isPlatformBrowser(this.platformId)) return;
+
+    /* RECAPTCHA */
+    setTimeout(() => {
+      const captchaEl = document.getElementById('signup-captcha');
+      if (captchaEl && typeof grecaptcha !== 'undefined') {
+        grecaptcha.render(captchaEl, {
+          sitekey: '6LeWsJ0sAAAAAKwBUTRqFvX9qufIJVUrrId14onY',
+          theme: 'dark',
+          callback: (token: string) => {
+            this.captchaToken = token;
+          },
+          'expired-callback': () => {
+            this.captchaToken = null;
+          },
+          'error-callback': () => {
+            this.captchaToken = null;
+          }
+        });
+      }
+    }, 300);
+
     const glow = document.querySelector('.cursor-glow') as HTMLElement;
 
     document.addEventListener('mousemove', (e) => {
@@ -467,6 +529,5 @@ customSearch = (term: string, item: any) => {
     };
 
     draw();
-    this.renderCaptcha();
   }
 }
