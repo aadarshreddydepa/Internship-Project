@@ -424,9 +424,10 @@ textarea {
 }
 
 /* REAL-TIME TOAST NOTIFICATION */
+
 .toast-notification {
   position: fixed;
-  bottom: 30px;
+  top: 80px; /* Switched from bottom to top! Adjust if it overlaps header */
   right: 30px;
   background: var(--bg-card);
   color: var(--text-main);
@@ -435,33 +436,35 @@ textarea {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
   border-left: 4px solid var(--accent);
   z-index: 9999;
-  animation: slideInUp 0.4s ease-out forwards, fadeOut 0.4s ease-in 5.6s forwards;
+  /* Updated animation name */
+  animation: slideInDown 0.4s ease-out forwards, fadeOutUp 0.4s ease-in 5.6s forwards;
 }
-
+ 
 .toast-content {
-  display: flex;
+  display: flex;  
   align-items: center;
   gap: 12px;
 }
-
+ 
 .toast-content p {
   margin: 0;
   font-weight: 500;
   font-size: 15px;
 }
-
+ 
 .toast-content svg {
   color: var(--accent);
 }
+ 
+/* New Animation: Slides DOWN from the ceiling */
 
-@keyframes slideInUp {
-  from { transform: translateY(100px); opacity: 0; }
+@keyframes slideInDown {
+  from { transform: translateY(-100px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
 
-@keyframes fadeOut {
+/* New Animation: Fades UP into the ceiling */
+@keyframes fadeOutUp {
   from { transform: translateY(0); opacity: 1; }
-  to { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(-20px); opacity: 0; }
 }
- 
- 
