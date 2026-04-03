@@ -80,6 +80,18 @@ transition: left 0.08s ease, top 0.08s ease;
 flex: 1.1 !important;
 }
 
+.logo-container {
+position: absolute;
+top: 40px;
+left: 40px;
+z-index: 20;
+}
+
+.logo-container img {
+width: 140px;
+filter: drop-shadow(0 0 15px rgba(200,169,126,0.3));
+}
+
 .left-content {
 position: absolute;
 bottom: 60px;
