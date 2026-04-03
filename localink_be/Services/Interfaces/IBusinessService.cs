@@ -3,7 +3,7 @@ public interface IBusinessService
 
     Task<List<object>> GetAllBusinessesAsync();
     Task<object?> GetBusinessByIdAsync(long id);
-    Task<Business?> UpdateBusinessAsync(long id, Business updated);
+    Task<object?> UpdateBusinessAsync(long id, UpdateBusinessDto dto);
     Task<bool> DeleteBusinessAsync(long id);
     Task<Business> CreateBusinessAsync(Business dto);
     Task<long> RegisterBusinessAsync(RegisterBusinessDto dto);

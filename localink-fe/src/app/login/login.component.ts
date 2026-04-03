@@ -107,7 +107,7 @@ togglePassword() {
     };
 
     this.authService.login(payload).subscribe({
-      next: (res) => {
+      next: (res:any) => {
         try {
           this.tokenService.setToken(res.token);
 
@@ -122,7 +122,7 @@ togglePassword() {
           this.errorMessage = 'Something went wrong after login';
         }
       },
-      error: (err) => {
+      error: (err:any) => {
         this.handleError(err);
       },
       complete: () => {

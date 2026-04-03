@@ -21,7 +21,7 @@ export class SignupComponent implements OnInit, AfterViewInit {
   showConfirmPassword = false;
   showSuccessPopup = false;
 
-  // ✅ JSON DATA
+  // JSON DATA
   locationData: any[] = [];
   countries: string[] = [];
   states: string[] = [];
@@ -34,8 +34,6 @@ export class SignupComponent implements OnInit, AfterViewInit {
     2: ['country', 'state', 'city', 'pincode', 'street'],
     3: ['password', 'confirmPassword']
   };
-
-  isTypeLocked = false;
 
   constructor(
     private fb: FormBuilder,
@@ -85,20 +83,20 @@ export class SignupComponent implements OnInit, AfterViewInit {
     }, { validators: this.passwordMatchValidator });
   }
 
-  // ✅ LOAD JSON
+  // LOAD JSON
   ngOnInit() {
     this.signupForm.patchValue({ userType: 'user' });
 
     this.http.get<any[]>('assets/countries.json').subscribe(data => {
   this.locationData = data;
-  this.countries = data; // full objects for ng-select
+  this.countries = data.map(c => c.name); // full objects for ng-select
 });
   }
 
-  // ✅ COUNTRY CHANGE
+  // COUNTRY CHANGE
  onCountryChange(event: any) {
 
-  // 🔥 handle both string and object
+  //handle both string and object
   const countryName = typeof event === 'string' ? event : event?.name;
 
   const country = this.locationData.find(
@@ -108,7 +106,7 @@ export class SignupComponent implements OnInit, AfterViewInit {
   console.log('Selected country:', countryName);
   console.log('Matched object:', country);
 
-  this.states = country?.states || [];
+  this.states = (country?.states || []).map((s: any) => s.name);
 
   this.signupForm.patchValue({
     state: ''
@@ -142,13 +140,9 @@ export class SignupComponent implements OnInit, AfterViewInit {
 
   // TYPE SWITCH
   selectType(type: 'user' | 'client') {
-    if (this.isTypeLocked) return;
-
-    this.selectedType = type;
-    this.signupForm.patchValue({ userType: type });
-
-    if (type === 'client') this.isTypeLocked = true;
-  }
+  this.selectedType = type;
+  this.signupForm.patchValue({ userType: type });
+}
 
   // PASSWORD VALIDATION
   passwordMatchValidator(form: AbstractControl): ValidationErrors | null {
@@ -158,49 +152,57 @@ export class SignupComponent implements OnInit, AfterViewInit {
   }
 
   // SUBMIT
+  isSubmitting = false;
   onSubmit() {
-    if (this.signupForm.valid) {
+  if (this.signupForm.valid && !this.isSubmitting) {
 
-      const { countryCode, ...rest } = this.signupForm.value;
+    this.isSubmitting = true;
 
-      const formData = {
-        ...rest,
-        country_code: countryCode
-      };
+    const { confirmPassword, ...payload } = this.signupForm.value;
 
-      this.authService.register(formData).subscribe({
-        next: () => {
-          this.showSuccessPopup = true;
-          setTimeout(() => {
-            this.router.navigate(['/login']);
-          }, 1500);
-        },
-        error: (err) => {
-          console.error(err);
-          alert(err.error?.message || 'Signup failed');
-        }
-      });
-    }
+    const formData = {
+      ...payload,
+      userType: this.selectedType
+    };
+
+    this.authService.register(formData).subscribe({
+      next: () => {
+        this.showSuccessPopup = true;
+
+        //smooth delay before redirect
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 2000);
+      },
+      error: (err:any) => {
+        alert(err.error?.message || 'Signup failed');
+        this.isSubmitting = false;
+      }
+    });
   }
+}
 
   // PASSWORD TOGGLE
   togglePassword() {
     this.showPassword = !this.showPassword;
   }
-
   toggleConfirmPassword() {
     this.showConfirmPassword = !this.showConfirmPassword;
   }
-
   get f() {
     return this.signupForm.controls;
   }
-
   closePopup() {
   this.showSuccessPopup = false;
 }
+allowOnlyNumbers(event: KeyboardEvent) {
+  const charCode = event.key.charCodeAt(0);
+  if (charCode < 48 || charCode > 57) {
+    event.preventDefault();
+  }
+}
 
-  // 🎨 CANVAS ANIMATION (UNCHANGED)
+  // CANVAS ANIMATION (UNCHANGED)
   ngAfterViewInit() {
     const glow = document.querySelector('.cursor-glow') as HTMLElement;
 

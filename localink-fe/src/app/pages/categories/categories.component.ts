@@ -19,18 +19,37 @@ export class CategoriesComponent {
     private categoryService: CategoryService,
     private router: Router
   ) {
+    this.loadCategories(); 
+  }
+
+  loadCategories() {
     this.categoryService.getCategories().subscribe({
-      next: (data) => {
-        this.categories = data;
+      next: (data: any[]) => {
+        this.categories = data.map((cat: any) => ({
+          ...cat,
+          iconUrl: this.fixIconPath(cat.iconUrl)
+        }));
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Error fetching categories', err);
       }
     });
   }
 
-  openCategory(category: Category) {
-  this.router.navigate(['/subcategory', category.id]);
-}
+  fixIconPath(path: string): string {
+    if (!path) return '';
 
+    if (path.startsWith('/assets')) return path;
+
+    if (path.startsWith('/images')) {
+      return '/assets' + path;
+    }
+
+    // fallback safety
+    return '/assets/images/icons/default.svg';
+  }
+
+  openCategory(category: Category) {
+    this.router.navigate(['/subcategory', category.id]);
+  }
 }

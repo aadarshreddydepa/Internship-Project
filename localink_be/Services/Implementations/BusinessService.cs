@@ -87,27 +87,48 @@ public async Task<Business?> UpdateBusinessAsync(long id, Business updated)
     var existing = await _db.Businesses.FindAsync(id);
     if (existing == null) return null;
 
-    // Update only non-null / non-default fields
-    if (!string.IsNullOrWhiteSpace(updated.BusinessName))
-        existing.BusinessName = updated.BusinessName;
+    public async Task<object?> UpdateBusinessAsync(long id, UpdateBusinessDto dto)
+{
+    using var transaction = await _db.Database.BeginTransactionAsync();
 
-    if (!string.IsNullOrWhiteSpace(updated.Description))
-        existing.Description = updated.Description;
+    try
+    {
+        var business = await _db.Businesses.FindAsync(id);
+        if (business == null) return null;
 
-    if (updated.CategoryId > 0)
-        existing.CategoryId = updated.CategoryId;
+        // 🔹 Update Business Table
+        business.BusinessName = dto.BusinessName;
+        business.Description = dto.Description;
+        business.CategoryId = dto.CategoryId;
+        business.SubcategoryId = dto.SubcategoryId;
+        business.UpdatedAt = DateTime.UtcNow;
 
-    if (updated.SubcategoryId > 0)
-        existing.SubcategoryId = updated.SubcategoryId;
+        // 🔹 Update Contact Table
+        var contact = await _db.BusinessContacts
+            .FirstOrDefaultAsync(c => c.BusinessId == id);
 
-    // Always update timestamp
-    existing.UpdatedAt = DateTime.UtcNow;
+        if (contact != null)
+        {
+            contact.PhoneNumber = dto.PhoneNumber;
+            contact.Email = dto.Email;
+            contact.City = dto.City;
+        }
 
-    await _db.SaveChangesAsync();
-    return existing;
+        await _db.SaveChangesAsync();
+        await transaction.CommitAsync();
+
+        return new
+        {
+            success = true,
+            message = "Business updated successfully"
+        };
+    }
+    catch (Exception ex)
+    {
+        await transaction.RollbackAsync();
+        throw new Exception("Update failed", ex);
+    }
 }
-
-
     public async Task<bool> DeleteBusinessAsync(long id)
     {
         var business = await _db.Businesses.FindAsync(id);

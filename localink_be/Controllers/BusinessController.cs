@@ -62,9 +62,13 @@ public class BusinessController : ControllerBase
 
     // PUT: api/business/{id}
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateBusiness(long id, [FromBody] Business updated)
+    public async Task<IActionResult> UpdateBusiness(long id, [FromBody] UpdateBusinessDto dto)
     {
-        var result = await _service.UpdateBusinessAsync(id, updated);
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var result = await _service.UpdateBusinessAsync(id, dto);
+
         if (result == null)
             return NotFound();
 
@@ -92,7 +96,7 @@ public class BusinessController : ControllerBase
     }
 
     // GET: api/business/v1/subcategories/{subcategoryId}/businesses
-    [HttpGet("v1/subcategories/{subcategoryId}/businesses")]
+    [HttpGet("subcategories/{subcategoryId}/businesses")]
     public async Task<IActionResult> GetBySubcategory(int subcategoryId)
     {
         var result = await _service.GetBySubcategoryAsync(subcategoryId);

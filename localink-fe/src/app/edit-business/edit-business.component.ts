@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { CommonModule } from '@angular/common';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { ActivatedRoute, Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 
 import { ContactDetailsComponent } from '../contact-details/contact-details.component';
 import { HoursComponent } from '../business/hours/hours.component';
@@ -29,12 +30,13 @@ export class EditBusinessBusinessComponent implements OnInit {
   currentStep = 1;
   businessForm!: FormGroup;
 
+  businessId!: number;
+
   businessData: any;
   contactData: any;
   hoursData: any = [];
   photoData: string | null = null;
 
-  finalRegistrationData: any = null;
   submitSuccessMessage = '';
   hoursErrorMessage = '';
 
@@ -49,16 +51,16 @@ export class EditBusinessBusinessComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private http: HttpClient
   ) {
     this.businessForm = this.fb.group({
       businessName: ['', [Validators.required, Validators.pattern(/^[A-Za-z\s&'-]+$/)]],
-      description: ['', [Validators.required, Validators.minLength(10), Validators.pattern(/^[A-Za-z][A-Za-z\s.,'()%!]*$/)]],
+      description: ['', [Validators.required, Validators.minLength(10)]],
       category: ['', Validators.required],
       subcategory: ['', Validators.required]
     });
 
-    //  Keep data synced always
     this.businessForm.valueChanges.subscribe(val => {
       this.businessData = val;
     });
@@ -68,47 +70,31 @@ export class EditBusinessBusinessComponent implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
 
     if (id) {
-      this.loadBusinessData(+id);
+      this.businessId = +id;
+      this.loadBusinessData(this.businessId);
     }
   }
 
-  // ✅ LOAD EXISTING DATA
+  // ✅ LOAD FROM BACKEND
   loadBusinessData(id: number) {
+    this.http.get<any>(`http://localhost:5173/api/business/${id}`)
+      .subscribe(res => {
 
-    // 🔥 Replace with API later
-    const mockData = {
-      businessName: 'My Restaurant',
-      description: 'Best food in town',
-      category: 'Food',
-      subcategory: 'Restaurant',
+        this.businessForm.patchValue({
+          businessName: res.businessName,
+          description: res.description,
+          category: res.category,
+          subcategory: res.subcategory
+        });
 
-      contact: {
-        phone: '+91 9876543210',
-        email: 'test@gmail.com',
-        website: 'www.test.com',
-        address: 'Street 1',
-        city: 'Chennai',
-        state: 'Tamil Nadu',
-        country: 'India',
-        pincode: '600001'
-      },
+        this.onCategoryChange();
 
-      hours: [],
-      photo: null
-    };
-
-    this.businessForm.patchValue({
-      businessName: mockData.businessName,
-      description: mockData.description,
-      category: mockData.category,
-      subcategory: mockData.subcategory
-    });
-
-    this.onCategoryChange();
-
-    this.contactData = mockData.contact;
-    this.hoursData = mockData.hours;
-    this.photoData = mockData.photo;
+        this.contactData = {
+          email: res.email,
+          city: res.city,
+          phone: res.phone
+        };
+      });
   }
 
   onCategoryChange() {
@@ -128,7 +114,7 @@ export class EditBusinessBusinessComponent implements OnInit {
     }
     else if (this.currentStep === 3) {
       if (!this.validateBusinessHours()) {
-        this.hoursErrorMessage = "Please configure business hours for all days";
+        this.hoursErrorMessage = "Please configure business hours";
         return;
       }
       this.hoursErrorMessage = '';
@@ -157,36 +143,27 @@ export class EditBusinessBusinessComponent implements OnInit {
   }
 
   validateBusinessHours(): boolean {
-    if (!this.hoursData || this.hoursData.length === 0) return false;
-
-    for (let day of this.hoursData) {
-      if (day.mode === 'custom') {
-        if (!day.slots || day.slots.length === 0) return false;
-        for (let slot of day.slots) {
-          if (!slot.open || !slot.close) return false;
-        }
-      }
-    }
+    if (!this.hoursData || this.hoursData.length === 0) return true; // relaxed
     return true;
   }
 
-  // ✅ FINAL SAVE
+  // ✅ FINAL UPDATE API CALL
   submitRegistration() {
 
-    this.finalRegistrationData = {
+    const payload = {
       ...this.businessData,
-      ...this.contactData,
-      hours: this.hoursData,
-      photo: this.photoData
+      ...this.contactData
     };
 
-    console.log("Updated Business Payload:", this.finalRegistrationData);
+    this.http.put(`http://localhost:5173/api/business/${this.businessId}`, payload)
+      .subscribe(() => {
 
-    this.submitSuccessMessage = "Business details updated successfully!";
+        this.submitSuccessMessage = "Business updated successfully!";
 
-    setTimeout(() => {
-      this.submitSuccessMessage = '';
-      this.router.navigate(['/client-dashboard']);
-    }, 3000);
+        setTimeout(() => {
+          this.router.navigate(['/client-dashboard']);
+        }, 1500);
+
+      });
   }
 }
