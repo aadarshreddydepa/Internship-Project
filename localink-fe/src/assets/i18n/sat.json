@@ -67,7 +67,10 @@
     "CLIENT": "ᱠᱞᱟᱭᱮᱸᱱᱴ",
     "SELECT_LANGUAGE": "ᱯᱟᱹᱨᱥᱤ",
     "SUCCESS_TITLE": "ᱮᱠᱟᱣᱩᱱᱴ ᱛᱮᱭᱟᱨ ᱦᱩᱭᱩᱜᱼᱟ",
-    "SUCCESS_MSG": "ᱞᱚᱜᱤᱱ ᱛᱮ ᱨᱤᱰᱟᱭᱨᱮᱠᱴ ᱦᱩᱭᱩᱜᱼᱟ..."
+    "SUCCESS_MSG": "ᱞᱚᱜᱤᱱ ᱛᱮ ᱨᱤᱰᱟᱭᱨᱮᱠᱴ ᱦᱩᱭᱩᱜᱼᱟ...",
+    "CREATE_ACCOUNT": "ᱠᱷᱟᱛᱟ ᱛᱮᱭᱟᱨ",
+    "HAVE_ACCOUNT": "ᱢᱟᱲᱟᱝ ᱠᱷᱟᱛᱟ ᱢᱮᱱᱟᱜ ᱜᱮᱭᱟ?",
+    "SIGN_IN": "ᱥᱤᱱ ᱤᱱ"
   },
   "DASHBOARD": {
     "WELCOME": "ᱟᱭᱩᱵᱚᱱ",

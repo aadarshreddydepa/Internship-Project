@@ -69,8 +69,11 @@
     "USER": "Usuario",
     "CLIENT": "Cliente",
     "SELECT_LANGUAGE": "Idioma",
+    "CREATE_ACCOUNT": "Crear una cuenta",
     "SUCCESS_TITLE": "Cuenta creada",
-    "SUCCESS_MSG": "Redirigiendo al inicio de sesión..."
+    "SUCCESS_MSG": "Redirigiendo al inicio de sesión...",
+    "HAVE_ACCOUNT": "¿Ya tienes una cuenta?",
+    "SIGN_IN": "Iniciar sesión"
   },
   "DASHBOARD": {
     "WELCOME": "Bienvenido",

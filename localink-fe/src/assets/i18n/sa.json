@@ -67,7 +67,10 @@
     "CLIENT": "क्लाइन्ट्",
     "SELECT_LANGUAGE": "भाषा",
     "SUCCESS_TITLE": "खाता निर्मितम्",
-    "SUCCESS_MSG": "लगइन् प्रति पुनर्निर्देश्यते..."
+    "SUCCESS_MSG": "लगइन् प्रति पुनर्निर्देश्यते...",
+    "CREATE_ACCOUNT": "खाता निर्मातु",
+    "HAVE_ACCOUNT": "पूर्वमेव खाता अस्ति?",
+    "SIGN_IN": "प्रवेशं कुरु"
   },
   "DASHBOARD": {
     "WELCOME": "स्वागतम्",

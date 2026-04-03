@@ -66,8 +66,11 @@
     "USER": "वापरपी",
     "CLIENT": "क्लाएंट",
     "SELECT_LANGUAGE": "भास",
+    "CREATE_ACCOUNT": "खाते तयार करात",
     "SUCCESS_TITLE": "खाते तयार जाले",
-    "SUCCESS_MSG": "लॉगिनाक परत पाठयता..."
+    "SUCCESS_MSG": "लॉगिनाक परत वचता...",
+    "HAVE_ACCOUNT": "पयली खाते आसा?",
+    "SIGN_IN": "साइन इन"
   },
   "DASHBOARD": {
     "WELCOME": "स्वागत",

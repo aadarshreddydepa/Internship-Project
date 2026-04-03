@@ -67,7 +67,10 @@
     "CLIENT": "क्लाइन्ट",
     "SELECT_LANGUAGE": "राव",
     "SUCCESS_TITLE": "एकाउन्ट सिरज जाबाय",
-    "SUCCESS_MSG": "लोगइनाव रिडाइरेक्ट खालामगासिन..."
+    "SUCCESS_MSG": "लोगइनाव रिडाइरेक्ट खालामगासिन...",
+    "CREATE_ACCOUNT": "बेखेनि खालाम",
+    "HAVE_ACCOUNT": "सानजबबेखेनि मोनै?",
+    "SIGN_IN": "साइन इन"
   },
   "DASHBOARD": {
     "WELCOME": "सोलिबाइ",

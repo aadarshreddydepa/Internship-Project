@@ -67,7 +67,10 @@
     "CLIENT": "क्लाइंट",
     "SELECT_LANGUAGE": "भाखा",
     "SUCCESS_TITLE": "खाता बणाया गया",
-    "SUCCESS_MSG": "लगइन उत्ते रीडायरेक्ट हो रहा है..."
+    "SUCCESS_MSG": "लगइन उत्ते रीडायरेक्ट हो रहा है...",
+    "CREATE_ACCOUNT": "खाता बनाओ",
+    "HAVE_ACCOUNT": "पैह्लें खाता है?",
+    "SIGN_IN": "साइन इन"
   },
   "DASHBOARD": {
     "WELCOME": "स्वागत",

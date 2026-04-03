@@ -145,6 +145,11 @@ export class SignupComponent implements OnInit, AfterViewInit {
     // disable initially
     this.signupForm.get('pincode')?.disable();
 
+    // Subscribe to language changes
+    this.translate.onLangChange.subscribe((event) => {
+      this.currentLang = event.lang;
+    });
+
     if (isPlatformBrowser(this.platformId)) {
       this.locationService.getCountries()
       .subscribe((data: any[]) => {

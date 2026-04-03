@@ -68,8 +68,11 @@
     "USER": "사용자",
     "CLIENT": "클라이언트",
     "SELECT_LANGUAGE": "언어",
-    "SUCCESS_TITLE": "계정이 생성되었습니다",
-    "SUCCESS_MSG": "로그인으로 리디렉션됩니다..."
+    "CREATE_ACCOUNT": "계정 만들기",
+    "SUCCESS_TITLE": "계정 생성됨",
+    "SUCCESS_MSG": "로그인 페이지로 이동 중...",
+    "HAVE_ACCOUNT": "이미 계정이 있으신가요?",
+    "SIGN_IN": "로그인"
   },
   "DASHBOARD": {
     "WELCOME": "환영합니다",
@@ -288,6 +291,10 @@
     "UR": "اردو (Urdu)"
   },
   "RTL": {
-    "LANGUAGES": ["ar", "sd", "ur"]
+    "LANGUAGES": [
+      "ar",
+      "sd",
+      "ur"
+    ]
   }
 }

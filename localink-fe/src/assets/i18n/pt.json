@@ -69,7 +69,10 @@
     "CLIENT": "Cliente",
     "SELECT_LANGUAGE": "Idioma",
     "SUCCESS_TITLE": "Conta criada",
-    "SUCCESS_MSG": "Redirecionando para o login..."
+    "SUCCESS_MSG": "Redirecionando para o login...",
+    "CREATE_ACCOUNT": "Criar uma conta",
+    "HAVE_ACCOUNT": "Já tem uma conta?",
+    "SIGN_IN": "Entrar"
   },
   "DASHBOARD": {
     "WELCOME": "Bem-vindo",
@@ -288,6 +291,10 @@
     "UR": "اردو (Urdu)"
   },
   "RTL": {
-    "LANGUAGES": ["ar", "sd", "ur"]
+    "LANGUAGES": [
+      "ar",
+      "sd",
+      "ur"
+    ]
   }
 }

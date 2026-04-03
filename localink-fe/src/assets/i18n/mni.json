@@ -66,8 +66,11 @@
     "USER": "ꯌꯨꯓꯔ",
     "CLIENT": "ꯀ꯭ꯂꯥꯏꯟꯠ",
     "SELECT_LANGUAGE": "ꯂꯦꯡꯒ꯭ꯕꯒꯦꯁ",
-    "SUCCESS_TITLE": "ꯑꯦꯀꯥꯎꯟꯠ ꯁꯔꯥꯒꯦ",
-    "SUCCESS_MSG": "ꯂꯣꯒꯥꯏꯟꯇ ꯇꯧꯒꯅꯤ..."
+    "CREATE_ACCOUNT": "ꯑꯦꯀꯥꯎꯟꯠ ꯁ꯭ꯔꯤꯁ꯭ꯇꯤ ꯇꯧ",
+    "SUCCESS_TITLE": "ꯑꯦꯀꯥꯎꯟꯠ ꯁ꯭ꯔꯤꯁ꯭ꯇꯤ ꯇꯧꯕ ꯇꯧꯔꯦ",
+    "SUCCESS_MSG": "ꯂꯣꯒꯤꯅꯇ ꯂꯣꯌꯅꯅꯥ ꯅꯥꯎ...",
+    "HAVE_ACCOUNT": "ꯃꯁꯥꯒꯤ ꯑꯦꯀꯥꯎꯟꯠ ꯂꯩꯕꯥ?",
+    "SIGN_IN": "ꯁꯥꯏꯟ ꯏꯟ"
   },
   "DASHBOARD": {
     "WELCOME": "ꯂꯩꯕ",

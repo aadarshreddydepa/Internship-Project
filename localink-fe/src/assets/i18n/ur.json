@@ -67,7 +67,10 @@
     "CLIENT": "کلائنٹ",
     "SELECT_LANGUAGE": "زبان",
     "SUCCESS_TITLE": "اکاؤنٹ بنا دیا گیا",
-    "SUCCESS_MSG": "لاگ ان پر ری ڈائریکٹ کیا جا رہا ہے..."
+    "SUCCESS_MSG": "لاگ ان پر ری ڈائریکٹ کیا جا رہا ہے...",
+    "CREATE_ACCOUNT": "اکاؤنٹ بنائیں",
+    "HAVE_ACCOUNT": "پہلے سے اکاؤنٹ ہے؟",
+    "SIGN_IN": "سائن ان"
   },
   "DASHBOARD": {
     "WELCOME": "خوش آمدید",

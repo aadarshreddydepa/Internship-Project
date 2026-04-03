@@ -67,7 +67,10 @@
     "CLIENT": "ક્લાઇન્ટ",
     "SELECT_LANGUAGE": "ભાષા",
     "SUCCESS_TITLE": "ખાતું બનાવવામાં આવ્યું",
-    "SUCCESS_MSG": "લોગિન પર પુનઃનિર્દેશિત કરી રહ્યું છે..."
+    "SUCCESS_MSG": "લોગિન પર પુનઃનિર્દેશિત કરી રહ્યું છે...",
+    "CREATE_ACCOUNT": "ખાતું બનાવો",
+    "HAVE_ACCOUNT": "પહેલેથી ખાતું છે?",
+    "SIGN_IN": "સાઇન ઇન"
   },
   "DASHBOARD": {
     "WELCOME": "સ્વાગત છે",
