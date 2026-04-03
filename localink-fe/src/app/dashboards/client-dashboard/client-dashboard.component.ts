@@ -80,8 +80,13 @@ export class ClientDashboardComponent implements OnInit {
       .then(data => this.countries = data);
   }
 
-  fetchBusinesses() {
-    const userId = 2;
+  loadCategories() {
+    this.dashboardService.getCategories().subscribe({
+      next: (data: any) => {
+        this.categories = data;
+      }
+    });
+  }
 
   fetchBusinesses() {
     this.dashboardService.getBusinessesByUser()
@@ -229,7 +234,7 @@ export class ClientDashboardComponent implements OnInit {
 
     this.dashboardService.uploadPhoto(
       this.editingBusiness.id,
-      this.selectedFile
+      this.selectedFile!
     )
     .subscribe(() => {
       this.dashboardService.getPhotos(this.editingBusiness!.id)
@@ -259,21 +264,21 @@ export class ClientDashboardComponent implements OnInit {
     );
 
     const payload = {
-      businessName: this.editingBusiness.businessName,
-      description: this.editingBusiness.description,
+      businessName: this.editingBusiness!.businessName,
+      description: this.editingBusiness!.description,
       categoryId: categoryObj?.id,
       subcategoryId: subcategoryObj?.id,
       phoneCode: this.selectedCountry?.code || '',
-      phoneNumber: this.editingBusiness.contact.phone,
-      email: this.editingBusiness.contact.email,
-      city: this.editingBusiness.contact.city,
-      streetAddress: this.editingBusiness.contact.streetAddress,
-      state: this.editingBusiness.contact.state,
-      country: this.editingBusiness.contact.country,
-      pincode: this.editingBusiness.contact.pincode
+      phoneNumber: this.editingBusiness!.contact.phone,
+      email: this.editingBusiness!.contact.email,
+      city: this.editingBusiness!.contact.city,
+      streetAddress: this.editingBusiness!.contact.streetAddress,
+      state: this.editingBusiness!.contact.state,
+      country: this.editingBusiness!.contact.country,
+      pincode: this.editingBusiness!.contact.pincode
     };
 
-    this.dashboardService.updateBusiness(this.editingBusiness.id, payload)
+    this.dashboardService.updateBusiness(this.editingBusiness!.id, payload)
       .subscribe({
         next: () => {
           this.fetchBusinesses();
