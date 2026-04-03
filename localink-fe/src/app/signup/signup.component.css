@@ -212,13 +212,22 @@ margin-bottom: 6px;
 }
 
 .form-grid {
-display: grid;
-grid-template-columns: 1fr 1fr;
-gap: 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 500px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-grid .form-group {
+    grid-column: span 1 !important;
+  }
 }
 
 .form-grid .full-width {
-grid-column: span 2;
+  grid-column: span 2;
 }
 
 .input-title {
@@ -229,16 +238,48 @@ margin-bottom: 2px;
 
 .form-group input,
 .form-group select,
-::ng-deep .ng-select-container {
-height: 30px !important;
-padding: 4px 6px;
-width: 100%;
-background: rgba(255,255,255,0.05);
-border: 1px solid rgba(255,255,255,0.12);
-border-radius: 8px;
-color: white;
-font-size: 11px;
-transition: all 0.25s ease;
+::ng-deep .ng-select .ng-select-container {
+  height: 34px !important;
+  width: 100% !important;
+  background: rgba(255,255,255,0.05) !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+  border-radius: 8px !important;
+  color: white !important;
+  font-size: 11px !important;
+  transition: all 0.25s ease !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+::ng-deep .ng-select.ng-select-focused .ng-select-container {
+  border-color: #C8A97E !important;
+  box-shadow: 0 0 10px rgba(200,169,126,0.2) !important;
+}
+
+::ng-deep .ng-select .ng-value-container .ng-input > input {
+  color: white !important;
+}
+
+::ng-deep .ng-select .ng-arrow-wrapper .ng-arrow {
+  border-color: #C8A97E transparent transparent !important;
+}
+
+::ng-deep .ng-dropdown-panel {
+  background: #1a1a1a !important;
+  border: 1px solid rgba(200,169,126,0.3) !important;
+  border-radius: 8px !important;
+}
+
+::ng-deep .ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+  background: #1a1a1a !important;
+  color: #ccc !important;
+  font-size: 11px !important;
+}
+
+::ng-deep .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-selected,
+::ng-deep .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
+  background: rgba(200,169,126,0.2) !important;
+  color: white !important;
 }
 
 .form-group label {
@@ -256,12 +297,20 @@ width: 100%;
 }
 
 .code-box {
-width: 70px;
+width: 100px;
 flex-shrink: 0;
 }
 
 .number-box {
 flex: 1;
+}
+
+::ng-deep .phone-code .ng-select-container {
+  padding: 0 !important;
+}
+
+::ng-deep .phone-code .ng-value-container {
+  padding-left: 8px !important;
 }
 
 /* ========================= */
@@ -274,7 +323,8 @@ position: relative;
 
 .password-wrapper input {
 padding: 6px 36px 6px 8px;
-height: 30px;
+height: 34px !important;
+width: 100%;
 }
 
 .eye-icon {
@@ -323,6 +373,66 @@ input[type="password"]::-webkit-credentials-auto-fill-button,
 input[type="password"]::-webkit-textfield-decoration-container,
 input[type="password"]::-webkit-caps-lock-indicator {
 display: none !important;
+}
+
+/* ========================= */
+/* CAPTCHA & REDIRECT */
+/* ========================= */
+
+.captcha-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 15px 0;
+  width: 100%;
+}
+
+#recaptcha-container {
+  display: inline-block;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.05); /* very subtle dark border */
+}
+
+/* Fix for reCAPTCHA's inherent white border in the dark theme */
+::ng-deep .grecaptcha-badge {
+  box-shadow: none !important;
+}
+
+::ng-deep iframe[title="reCAPTCHA"],
+::ng-deep #recaptcha-container > div {
+  border: none !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
+}
+
+/* More specifically targeting the inner container of reCAPTCHA */
+::ng-deep .rc-anchor-dark {
+  border: none !important;
+  background: #222 !important; /* matches dark theme */
+}
+
+.login-redirect {
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 5px;
+  font-size: 12px;
+  color: #888;
+}
+
+.redirect-link {
+  color: #C8A97E;
+  text-decoration: none;
+  font-weight: 600;
+  margin-left: 4px;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.redirect-link:hover {
+  color: #e6c89f;
+  text-decoration: underline;
+  text-shadow: 0 0 8px rgba(200,169,126,0.3);
 }
 
 /* ========================= */

@@ -1,6 +1,6 @@
 import { Component, AfterViewInit } from '@angular/core';
 import { Inject, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+
 import {
   FormBuilder,
   Validators,
@@ -9,7 +9,7 @@ import {
   AbstractControl
 } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 
 import { AuthService } from '../core/services/auth.service';
 import { TokenService } from '../core/services/token.service';
@@ -216,6 +216,7 @@ export class LoginComponent implements AfterViewInit {
 
         grecaptcha.render('loginCaptcha', {
           sitekey: environment.recaptchaSiteKey,
+          theme: 'dark',
           callback: (token: string) => {
             this.onCaptchaResolved(token);
           }
