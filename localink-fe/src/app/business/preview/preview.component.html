@@ -48,9 +48,9 @@
       <div class="info-row">
         <span class="label">Address</span>
         <span class="value">
-          {{contactData?.address}}, {{contactData?.city}},
-          {{contactData?.state}}, {{contactData?.pincode}},
-          {{contactData?.country}}
+          {{contactData?.address}}, {{contactData?.city?.name || contactData?.city}},
+          {{contactData?.state?.name || contactData?.state}}, {{contactData?.pincode}},
+          {{contactData?.country?.name || contactData?.country}}
         </span>
       </div>
     </div>

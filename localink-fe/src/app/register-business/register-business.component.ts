@@ -200,21 +200,16 @@ export class RegisterBusinessComponent {
     this.finalRegistrationData = {
       businessName: this.businessData.businessName,
       description: this.businessData.description,
-
-      //  FIXED
       categoryId: this.businessData.category,
       subcategoryId: this.businessData.subcategory,
-
-      userId: 2, // ⚠️ TEMP (replace with logged-in user)
-
       phoneCode: this.contactData.phoneCode,
       phoneNumber: this.contactData.phone.replace(this.contactData.phoneCode, ''),
       email: this.contactData.email,
       website: this.contactData.website,
       address: this.contactData.address,
-      city: this.contactData.city,
-      state: this.contactData.state,
-      country: this.contactData.country,
+      city: this.contactData.city?.name || this.contactData.city,
+      state: this.contactData.state?.name || this.contactData.state,
+      country: this.contactData.country?.name || this.contactData.country,
       pincode: this.contactData.pincode,
 
       hours: formattedHours,
