@@ -46,11 +46,13 @@
       <!-- STEP 1 : BASIC INFO -->
  
       <!-- STEP 1 : BASIC INFO -->
+
+      <!-- STEP 1 : BASIC INFO -->
       <div *ngIf="currentStep === 1">
         <h3>Basic Information</h3>
  
         <form [formGroup]="businessForm">
- 
+
         <!-- CATEGORY + SUBCATEGORY FIRST -->
       <div class="two-column">
         <!-- CATEGORY -->
@@ -68,7 +70,7 @@
             Category is required
           </div>
         </div>
- 
+
         <!-- SUBCATEGORY (only shown if category selected) -->
         <div class="form-group" *ngIf="businessForm.get('category')?.value">
           <label>Subcategory *</label>
@@ -83,7 +85,7 @@
           </div>
         </div>
       </div> <!-- END two-column -->
- 
+
       <!-- BUSINESS NAME BELOW -->
       <div class="form-group" *ngIf="businessForm.get('subcategory')?.value">
         <label>Business Name *</label>
@@ -100,7 +102,7 @@
           </span>
         </div>
       </div>
- 
+
       <!-- BUSINESS DESCRIPTION BELOW -->
       <div class="form-group" *ngIf="businessForm.get('subcategory')?.value">
         <label>Business Description *</label>
@@ -117,22 +119,22 @@
             Description must be at least 10 characters
           </span>
           <span *ngIf="businessForm.get('description')?.errors?.['pattern']">
-            Description must start with a letter
+            Start of Description must contain only letters
           </span>
         </div>
       </div>
- 
+
     <!-- BUTTON -->
     <div class="button-container">
       <button type="button" (click)="goToNext()">
         Next Step
       </button>
     </div>
- 
+
   </form>
 </div>
- 
- 
+
+
       <!-- STEP 2 : CONTACT DETAILS -->
  
       <div *ngIf="currentStep === 2">

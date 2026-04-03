@@ -25,9 +25,9 @@ interface DaySchedule {
   styleUrls: ['./hours.component.css']
 })
 export class HoursComponent {
- 
- 
-  @Input() initialHours: any[] = [];                  
+
+  
+  @Input() initialHours: any[] = [];                     
   @Output() hoursSaved = new EventEmitter<any[]>();
   ngOnInit() {
  

@@ -80,13 +80,8 @@ export class ClientDashboardComponent implements OnInit {
       .then(data => this.countries = data);
   }
 
-  loadCategories() {
-    this.dashboardService.getCategories().subscribe({
-      next: (data) => {
-        this.categories = data;
-      }
-    });
-  }
+  fetchBusinesses() {
+    const userId = 2;
 
   fetchBusinesses() {
     this.dashboardService.getBusinessesByUser()
