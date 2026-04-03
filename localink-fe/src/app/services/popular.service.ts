@@ -9,6 +9,7 @@ export interface PopularBusiness {
   description: string;
   image: string | null;
   rating: number;
+  isFavorite?: boolean;
 }
 
 @Injectable({

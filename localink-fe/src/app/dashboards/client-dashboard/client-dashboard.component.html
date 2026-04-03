@@ -169,7 +169,7 @@
             <label>{{ 'CONTACT.STATE' | translate }}</label>
             <select [(ngModel)]="editingBusiness.contact.state"
         name="state"
-        (change)="onStateChange(editingBusiness?.contact?.state || '')" required>
+        (change)="onStateChange(editingBusiness.contact.state || '')" required>
               <option value="">{{ 'COMMON.SELECT' | translate }}</option>
               <option *ngFor="let s of states" [value]="s.name">
   {{ s.name }}

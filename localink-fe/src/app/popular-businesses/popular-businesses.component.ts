@@ -1,6 +1,7 @@
 import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { PopularService, PopularBusiness } from '../services/popular.service';
+import { FavoritesService } from '../services/favorites.service';
 
 @Component({
   selector: 'app-popular-businesses',
@@ -12,23 +13,71 @@ import { PopularService, PopularBusiness } from '../services/popular.service';
 export class PopularBusinessesComponent implements OnInit {
 
   businesses: PopularBusiness[] = [];
+  favoriteIds: number[] = [];
+  userId: number = 2;
 
   constructor(
     private popularService: PopularService,
+    private favoritesService: FavoritesService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;
-    
+
     this.popularService.getTopBusinesses().subscribe({
       next: (data) => {
         this.businesses = data;
+        this.loadFavorites();
       },
       error: (err) => {
         console.error('Error fetching popular businesses', err);
       }
     });
+  }
+
+  loadFavorites(): void {
+    this.favoritesService.getFavorites(this.userId).subscribe({
+      next: (data) => {
+        this.favoriteIds = data;
+        this.mapFavorites();
+      },
+      error: (err) => console.error('Error loading favorites', err)
+    });
+  }
+
+  mapFavorites(): void {
+    this.businesses.forEach(b => {
+      b.isFavorite = this.favoriteIds.includes(b.id);
+    });
+  }
+
+  toggleFavorite(business: PopularBusiness): void {
+    if (business.isFavorite) {
+      this.removeFavorite(business);
+    } else {
+      this.addFavorite(business);
+    }
+  }
+
+  addFavorite(business: PopularBusiness): void {
+    this.favoritesService.addFavorite(this.userId, business.id)
+      .subscribe({
+        next: () => {
+          business.isFavorite = true;
+        },
+        error: (err) => console.error('Error adding favorite', err)
+      });
+  }
+
+  removeFavorite(business: PopularBusiness): void {
+    this.favoritesService.removeFavorite(this.userId, business.id)
+      .subscribe({
+        next: () => {
+          business.isFavorite = false;
+        },
+        error: (err) => console.error('Error removing favorite', err)
+      });
   }
 
   getStars(rating: number): string {

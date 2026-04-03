@@ -149,20 +149,27 @@ export class ContactDetailsComponent implements OnInit, AfterViewInit, OnDestroy
         this.phoneCountries = data.map((c: any) => ({
           name: c.name,
           code: c.code,
-          flag: c.flag
+          flag: c.flag,
+          searchLabel: `${c.name} ${c.code}`
         }));
 
         if (this.initialData) {
-          if (this.initialData.phone) {
-            const [code, number] = this.initialData.phone.split(' ');
-            this.contactForm.patchValue({
-              ...this.initialData,
-              phoneCode: code,
-              phone: number
-            });
-          } else {
-            this.contactForm.patchValue(this.initialData);
+          // Handle phone data - support both combined and separate formats
+          let phoneCode = this.initialData.phoneCode || '';
+          let phoneNumber = this.initialData.phone || '';
+          
+          // If phone contains code+number combined (e.g., "+91 9876543210")
+          if (this.initialData.phone && this.initialData.phone.includes(' ')) {
+            const [code, ...numberParts] = this.initialData.phone.split(' ');
+            phoneCode = code;
+            phoneNumber = numberParts.join(' ');
           }
+
+          this.contactForm.patchValue({
+            ...this.initialData,
+            phoneCode: phoneCode,
+            phone: phoneNumber
+          });
 
           const countryObj = this.countries.find(
             c => c.name === this.initialData.country
@@ -482,6 +489,16 @@ export class ContactDetailsComponent implements OnInit, AfterViewInit, OnDestroy
     const countryObj = this.countries.find(c => c.name === countryName);
     this.states = countryObj ? countryObj.states.map((s: any) => s.name) : [];
     this.contactForm.get('state')?.reset();
+    this.cities = []; // Reset cities when country changes
+  }
+
+  onStateChange(event: any) {
+    const countryName = this.contactForm.get('country')?.value;
+    const stateName = this.contactForm.get('state')?.value;
+    const countryObj = this.countries.find(c => c.name === countryName);
+    const stateObj = countryObj?.states.find((s: any) => s.name === stateName);
+    this.cities = stateObj?.cities || [];
+    this.contactForm.get('city')?.reset();
   }
 
   validatePincode() {
