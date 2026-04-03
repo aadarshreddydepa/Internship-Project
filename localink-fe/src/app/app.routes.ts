@@ -17,6 +17,7 @@ import { AdminDashboardComponent } from './dashboards/admin-dashboard/admin-dash
 import { AuthGuard } from './guards/auth.guard';
 import { NoAuthGuard } from './guards/no-auth.guard';
 import { ErrorPageComponent } from './pages/error-page/error-page.component';
+import { ContactUsComponent } from './contact-us/contact-us.component';
 
 export const routes: Routes = [
 
@@ -129,6 +130,14 @@ export const routes: Routes = [
   {
     path: 'error',
     component: ErrorPageComponent
+  },
+
+  // ═══════════════════════════════════════════
+  //  CONTACT US PAGE (Public)
+  // ═══════════════════════════════════════════
+  {
+    path: 'contact-us',
+    component: ContactUsComponent
   },
 
   // ═══════════════════════════════════════════

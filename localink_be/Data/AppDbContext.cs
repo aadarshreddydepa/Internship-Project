@@ -1,4 +1,3 @@
-
 using Microsoft.EntityFrameworkCore;
 using localink_be.Models.Entities;
 
@@ -23,6 +22,7 @@ namespace localink_be.Data
         public DbSet<Address> Addresses { get; set; }
         public DbSet<AdminDashboard> AdminDashboards { get; set; }
         public DbSet<BusinessReview> BusinessReviews { get; set; }
+        public DbSet<Feedback> Feedbacks { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -162,7 +162,7 @@ namespace localink_be.Data
                 entity.HasOne(r => r.User)
                     .WithMany()
                     .HasForeignKey(r => r.UserId)
-                    .OnDelete(DeleteBehavior.NoAction); // Avoid cascade conflict
+                    .OnDelete(DeleteBehavior.NoAction);
             });
         }
     }

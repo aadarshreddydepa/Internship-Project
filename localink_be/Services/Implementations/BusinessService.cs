@@ -128,7 +128,6 @@ namespace localink_be.Services.Implementations
         await _db.SaveChangesAsync();
         return true;
     }
-
     public async Task<bool> DeleteBusinessAsync(long id)
     {
         var business = await _db.Businesses.FindAsync(id);

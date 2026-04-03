@@ -9,11 +9,12 @@ import { CommonModule } from '@angular/common';
 import { ScreenReaderService } from './services/screen-reader.service';
 import { GlobalAccessibilitySoundService } from './services/global-accessibility-sound.service';
 import { UniversalAccessibilitySoundDirective } from './directives/universal-accessibility-sound.directive';
+import { FooterComponent } from './shared/footer/footer.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, LanguageSwitcherComponent, CommonModule, UniversalAccessibilitySoundDirective],
+  imports: [RouterOutlet, RouterLink, LanguageSwitcherComponent, CommonModule, UniversalAccessibilitySoundDirective, FooterComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })

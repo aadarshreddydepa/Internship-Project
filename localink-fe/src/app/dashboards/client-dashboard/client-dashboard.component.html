@@ -80,7 +80,7 @@
     <p><strong>{{ 'CONTACT.PINCODE' | translate }}:</strong> {{ selectedBusiness.contact.pincode || ('COMMON.NA' | translate) }}</p>
     <p><strong>{{ 'CONTACT.STREET' | translate }}:</strong> {{ selectedBusiness.contact.streetAddress || ('COMMON.NA' | translate) }}</p>
 
-    <p><strong>{{ 'CONTACT.PHONE' | translate }}:</strong> {{ selectedCountry.code }} {{ selectedBusiness.contact.phone || ('COMMON.NA' | translate) }}</p>
+    <p><strong>{{ 'CONTACT.PHONE' | translate }}:</strong> {{ selectedBusiness.contact.phoneCode || '' }} {{ selectedBusiness.contact.phone || ('COMMON.NA' | translate) }}</p>
     <p><strong>{{ 'CONTACT.EMAIL' | translate }}:</strong> {{ selectedBusiness.contact.email || ('COMMON.NA' | translate) }}</p>
   </div>
  
@@ -167,11 +167,13 @@
  
           <div class="form-group">
             <label>{{ 'CONTACT.STATE' | translate }}</label>
-            <select [(ngModel)]="editingBusiness.contact.state" name="state" required>
+            <select [(ngModel)]="editingBusiness.contact.state"
+        name="state"
+        (change)="onStateChange(editingBusiness?.contact?.state || '')" required>
               <option value="">{{ 'COMMON.SELECT' | translate }}</option>
-              <option *ngFor="let s of states" [value]="s">
-                {{ s }}
-              </option>
+              <option *ngFor="let s of states" [value]="s.name">
+  {{ s.name }}
+</option>
             </select>
           </div>
         </div>
@@ -185,8 +187,17 @@
         <div class="form-row">
           <div class="form-group">
             <label>{{ 'CONTACT.CITY' | translate }}</label>
-            <input [(ngModel)]="editingBusiness.contact.city"
-              name="city" required pattern="^[a-zA-Z ]+$" #city="ngModel" />
+            <select [(ngModel)]="editingBusiness.contact.city"
+        name="city"
+        required>
+
+  <option value="">{{ 'COMMON.SELECT' | translate }}</option>
+
+  <option *ngFor="let c of cities" [value]="c.name">
+    {{ c.name }}
+  </option>
+
+</select>
           </div>
  
           <div class="form-group">
@@ -194,10 +205,13 @@
             <input [(ngModel)]="editingBusiness.contact.pincode"
               name="pin"
               required
-              [pattern]="getPincodePattern()"
+              (blur)="onPincodeChange()"
               #pin="ngModel" />
-            <small class="error" *ngIf="pin.invalid && pin.touched">
+            <small class="error" *ngIf="pin.invalid && pin.touched && !pincodeError">
               {{ 'VALIDATION.INVALID_PINCODE' | translate }}
+            </small>
+            <small class="error" *ngIf="pincodeError">
+              {{ pincodeError }}
             </small>
           </div>
         </div>
@@ -207,11 +221,10 @@
           <div class="form-group" style="max-width:120px;">
             <label>{{ 'CONTACT.PHONE_CODE' | translate }}</label>
             <input [(ngModel)]="editingBusiness.contact.phoneCode"
-              name="phoneCode"
-              placeholder="+91"
-              required
-              pattern="^\+[0-9]{1,4}$"
-              #code="ngModel" />
+  name="phoneCode"
+  placeholder="+91"
+  required
+  #code="ngModel" />
 
         <small class="error" *ngIf="code.invalid && code.touched">
           {{ 'VALIDATION.INVALID_COUNTRY_CODE' | translate }}
@@ -221,10 +234,10 @@
           <div class="form-group">
             <label>{{ 'CONTACT.PHONE' | translate }}</label>
             <input [(ngModel)]="editingBusiness.contact.phone"
-              name="phone"
-              required
-              [pattern]="getPhonePattern()"
-              #phone="ngModel" />
+  name="phone"
+  required
+  [pattern]="getPhonePattern()"
+  #phone="ngModel" />
             <small class="error" *ngIf="phone.invalid && phone.touched">
               {{ 'VALIDATION.INVALID_PHONE' | translate }}
             </small>
@@ -233,10 +246,10 @@
           <div class="form-group">
             <label>{{ 'CONTACT.EMAIL' | translate }}</label>
             <input [(ngModel)]="editingBusiness.contact.email"
-              name="email"
-              required
-              pattern="^[a-zA-Z0-9][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-              #email="ngModel" />
+  name="email"
+  required
+  pattern="^[a-zA-Z0-9][a-zA-Z0-9._%+\-]*@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
+  #email="ngModel" />
             <small class="error" *ngIf="email.invalid && email.touched">
               {{ 'VALIDATION.INVALID_EMAIL' | translate }}
             </small>
