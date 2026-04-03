@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
 namespace localink_be.Models.DTOs
 {
     public class RegisterRequest
@@ -24,7 +23,9 @@ namespace localink_be.Models.DTOs
         public string CountryCode { get; set; } = string.Empty;
 
         [Required]
-        [MinLength(6)]
+        [MinLength(8)]
+        [RegularExpression(@"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).+$",
+        ErrorMessage = "Password must contain uppercase, lowercase and number")]
         public string Password { get; set; } = string.Empty;
 
         [Required]
@@ -39,7 +40,5 @@ namespace localink_be.Models.DTOs
         public string Street { get; set; } = string.Empty;
 
         public string Pincode { get; set; } = string.Empty;
-
-        public string? CaptchaToken { get; set; }
-    }
+}
 }

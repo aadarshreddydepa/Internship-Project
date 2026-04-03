@@ -1,52 +1,52 @@
 <div class="preview-wrapper">
-  <h2 class="preview-title">Review Your Details</h2>
+  <h2 class="preview-title">{{ 'PREVIEW.TITLE' | translate }}</h2>
   <div class="preview-card">
     <!-- BUSINESS INFO -->
     <div class="section">
-      <h3>Business Information</h3>
-
+      <h3>{{ 'PREVIEW.BUSINESS_INFO' | translate }}</h3>
+ 
       <div class="info-row">
-        <span class="label">Business Name</span>
+        <span class="label">{{ 'BUSINESS.NAME' | translate }}</span>
         <span class="value">{{businessData?.businessName}}</span>
       </div>
-
+ 
       <div class="info-row">
-        <span class="label">Description</span>
+        <span class="label">{{ 'BUSINESS.DESCRIPTION' | translate }}</span>
         <span class="value">{{businessData?.description}}</span>
       </div>
-
+ 
       <div class="info-row">
-        <span class="label">Category</span>
-        <span class="value">{{businessData?.category}}</span>
+        <span class="label">{{ 'BUSINESS.CATEGORY' | translate }}</span>
+        <span class="value">{{businessData?.categoryName | titlecase}}</span>
       </div>
-
+ 
       <div class="info-row">
-        <span class="label">Subcategory</span>
-        <span class="value">{{businessData?.subcategory}}</span>
+        <span class="label">{{ 'BUSINESS.SUBCATEGORY' | translate }}</span>
+        <span class="value">{{businessData?.subcategoryName | titlecase}}</span>
       </div>
     </div>
-
+ 
     <!-- CONTACT DETAILS -->
     <div class="section">
-      <h3>Contact Details</h3>
-
+      <h3>{{ 'PREVIEW.CONTACT_DETAILS' | translate }}</h3>
+ 
       <div class="info-row">
-        <span class="label">Phone</span>
+        <span class="label">{{ 'CONTACT.PHONE' | translate }}</span>
         <span class="value">{{contactData?.phone}}</span>
       </div>
-
+ 
       <div class="info-row">
-        <span class="label">Email</span>
+        <span class="label">{{ 'CONTACT.EMAIL' | translate }}</span>
         <span class="value">{{contactData?.email}}</span>
       </div>
-
+ 
       <div class="info-row">
-        <span class="label">Website</span>
-        <span class="value">{{contactData?.website || '—'}}</span>
+        <span class="label">{{ 'CONTACT.WEBSITE' | translate }}</span>
+        <span class="value">{{contactData?.website || ('COMMON.DASH' | translate)}}</span>
       </div>
-
+ 
       <div class="info-row">
-        <span class="label">Address</span>
+        <span class="label">{{ 'CONTACT.ADDRESS' | translate }}</span>
         <span class="value">
           {{contactData?.address}}, {{contactData?.city}},
           {{contactData?.state}}, {{contactData?.pincode}},
@@ -54,21 +54,21 @@
         </span>
       </div>
     </div>
-
+ 
     <!-- BUSINESS HOURS -->
     <div class="section">
-      <h3>Business Hours</h3>
+      <h3>{{ 'HOURS.TITLE' | translate }}</h3>
       <div class="hours-row" *ngFor="let day of hoursData">
-        <span class="day">{{day.day}}</span>
-
+        <span class="day">{{ 'HOURS.' + day.dayOfWeek | translate }}</span>
+ 
         <span class="time" *ngIf="day.mode === 'closed'">
-          Closed
+          {{ 'HOURS.CLOSED' | translate }}
         </span>
-
+ 
         <span class="time" *ngIf="day.mode === '24h'">
-          24 Hours
+          {{ 'HOURS.24_HOURS' | translate }}
         </span>
-        
+       
         <span class="time" *ngIf="day.mode === 'custom'">
           <span *ngFor="let s of day.slots; let last = last">
             {{s.open}} - {{s.close}}
@@ -77,12 +77,13 @@
         </span>
       </div>
     </div>
-
+ 
     <!-- BUSINESS PHOTO -->
     <div class="section" *ngIf="photoData">
-      <h3>Business Photo</h3>
+      <h3>{{ 'BUSINESS.PHOTO' | translate }}</h3>
       <div class="photo-box">
-        <img [src]="photoData" alt="Business Photo">
+        <img [src]="photoData ? 'data:image/png;base64,' + photoData : ''" alt="{{ 'BUSINESS.PHOTO' | translate }}">
+ 
       </div>
     </div>
   </div>

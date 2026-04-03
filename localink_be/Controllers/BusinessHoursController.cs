@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using localink_be.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using localink_be.Models.DTOs;
+using localink_be.Services.Interfaces;
+using System.Threading.Tasks;
 
 namespace localink_be.Controllers
 {
@@ -10,16 +11,17 @@ namespace localink_be.Controllers
     public class BusinessHoursController : ControllerBase
     {
         private readonly IHoursService _hoursService;
-
         public BusinessHoursController(IHoursService hoursService)
         {
             _hoursService = hoursService;
         }
-
+    
+        [Authorize(Roles = "client")]
         [HttpPost]
-        public async Task<IActionResult> CreateOrReplaceBusinessHours(long businessId, [FromBody] BusinessHoursDto dto)
+        public async Task<IActionResult> CreateOrReplaceBusinessHours(long businessId, [FromBody] System.Collections.Generic.List<DayHoursDto> dto)
         {
-            var result = await _hoursService.CreateOrReplaceBusinessHoursAsync(businessId, dto);
+            var hoursDto = new BusinessHoursDto { Days = dto };
+            var result = await _hoursService.CreateOrReplaceBusinessHoursAsync(businessId, hoursDto);
             return Ok(result);
         }
 

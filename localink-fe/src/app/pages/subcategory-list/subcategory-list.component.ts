@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { SubcategoryService, Subcategory } from '../../services/subcategory.service';
 import { CategoryService } from '../../services/category.service';
 
 @Component({
   selector: 'app-subcategory-list',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, TranslateModule],
   templateUrl: './subcategory-list.component.html',
   styleUrls: ['./subcategory-list.component.css']
 })

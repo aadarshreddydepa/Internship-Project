@@ -2,218 +2,105 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
+
+import { UserService } from '../../services/user.service';
+import { TokenService } from '../../core/services/token.service';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
 
-  constructor(private router: Router) {}
+  user: any | null = null;
+  editableUser: any = null;
 
-  editMode = false;
+  isLoading = false;
+  isLoggedIn = false;
+  isEditMode = false;
 
-  countries = [
-    'India',
-    'United States',
-    'United Kingdom',
-    'Canada',
-    'Australia',
-    'Germany',
-    'France',
-    'Singapore',
-    'Japan'
-  ];
+  errorMessage = '';
 
-  statesByCountry: any = {
-    India: ['Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh','Goa','Gujarat',
-      'Haryana','Himachal Pradesh','Jharkhand','Karnataka','Kerala','Madhya Pradesh',
-      'Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha','Punjab',
-      'Rajasthan','Sikkim','Tamil Nadu','Telangana','Tripura','Uttar Pradesh',
-      'Uttarakhand','West Bengal'
-    ],
-    'United States': ['California','Texas','Florida','New York'],
-    'United Kingdom': ['England','Scotland','Wales','Northern Ireland'],
-    Canada: ['Ontario','Quebec'],
-    Australia: ['New South Wales','Victoria'],
-    Germany: ['Bavaria','Berlin'],
-    France: ['Île-de-France'],
-    Singapore: ['Central Region'],
-    Japan: ['Tokyo','Osaka']
-  };
+  constructor(
+    private userService: UserService,
+    private tokenService: TokenService,
+    private router: Router
+  ) {}
 
-  states: string[] = [];
+  ngOnInit(): void {
+    const token = this.tokenService.getToken();
+    this.isLoggedIn = !!token;
 
-  countryPhoneConfig:any = {
-    'India': { code: '+91', digits: 10 },
-    'United States': { code: '+1', digits: 10 },
-    'Canada': { code: '+1', digits: 10 },
-    'United Kingdom': { code: '+44', digits: 10 },
-    'Australia': { code: '+61', digits: 9 },
-    'Germany': { code: '+49', digits: 11 },
-    'France': { code: '+33', digits: 9 },
-    'Singapore': { code: '+65', digits: 8 },
-    'Japan': { code: '+81', digits: 10 }
-  };
-
-  //  PINCODE CONFIG
-  pincodeConfig:any = {
-    'India': { length: 6 },
-    'United States': { length: 5 },
-    'Canada': { length: 6 },
-    'United Kingdom': { length: 6 },
-    'Australia': { length: 4 },
-    'Germany': { length: 5 },
-    'France': { length: 5 },
-    'Singapore': { length: 6 },
-    'Japan': { length: 7 }
-  };
-
-  phoneCode = '+91';
-  phoneMaxLength = 10;
-
-  user = {
-    username: 'sekhar',
-    email: 'rsaichandrasekhar@gmail.com',
-    phone: '9100314277',
-    address: {
-      country: 'India',
-      state: 'Karnataka',
-      street: 'Sarakki market, JP Nagar',
-      city: 'Bengaluru',
-      pincode: '560078'
-    }
-  };
-
-  phoneInvalid = false;
-  emailInvalid = false;
-  pincodeInvalid = false;
-  fieldsInvalid = false;
-
-  ngOnInit(){
-    this.states = this.statesByCountry[this.user.address.country];
-  }
-
-  enableEdit(){
-    this.editMode = true;
-  }
-
-  saveProfile() {
-    this.validatePhone();
-    this.validateEmail();
-    this.validatePincode();
-
-    const requiredValid = this.validateRequiredFields();
-
-    if (this.phoneInvalid || this.emailInvalid || this.pincodeInvalid || !requiredValid) {
-      return;
-    }
-
-    this.editMode = false;
-  }
-
-  validatePhone(){
-    if(!this.user.phone){
-      this.phoneInvalid = false;
-      return;
-    }
-
-    if(!/^[0-9]+$/.test(this.user.phone) ||
-       this.user.phone.length !== this.phoneMaxLength){
-      this.phoneInvalid = true;
-      return;
-    }
-
-    this.phoneInvalid = false;
-  }
-
-  validateEmail(){
-    const regex = /^[a-zA-Z0-9][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    this.emailInvalid = !regex.test(this.user.email);
-  }
-
-  validatePincode(){
-    const pin = this.user.address.pincode;
-    const country = this.user.address.country;
-
-    if(!pin){
-      this.pincodeInvalid = false;
-      return;
-    }
-
-    if(!/^[0-9]+$/.test(pin)){
-      this.pincodeInvalid = true;
-      return;
-    }
-
-    const requiredLength = this.pincodeConfig[country]?.length;
-
-    if(requiredLength && pin.length !== requiredLength){
-      this.pincodeInvalid = true;
-      return;
-    }
-
-    this.pincodeInvalid = false;
-  }
-
-  validateRequiredFields() {
-    const addr = this.user.address;
-
-    if (
-      !this.user.username?.trim() ||
-      !this.user.email?.trim() ||
-      !this.user.phone?.trim() ||
-      !addr.country?.trim() ||
-      !addr.state?.trim() ||
-      !addr.street?.trim() ||
-      !addr.city?.trim() ||
-      !addr.pincode?.trim()
-    ) {
-      this.fieldsInvalid = true;
-      return false;
-    }
-
-    this.fieldsInvalid = false;
-    return true;
-  }
-
-  allowOnlyNumbers(event:any){
-    if(!/[0-9]/.test(event.key)){
-      event.preventDefault();
+    if (this.isLoggedIn) {
+      this.loadUser();
     }
   }
 
-  preventPaste(event:any){
-    const data = event.clipboardData.getData('text');
-    if(!/^[0-9]+$/.test(data)){
-      event.preventDefault();
-    }
-  }
+  loadUser() {
+    this.isLoading = true;
+    this.errorMessage = '';
 
-  onCountryChange(){
-    this.states = this.statesByCountry[this.user.address.country] || [];
-
-    this.user.address.state = '';
-    this.user.address.street = '';
-    this.user.address.city = '';
-    this.user.address.pincode = '';
-
-    const config = this.countryPhoneConfig[this.user.address.country];
-
-    this.phoneCode = config.code;
-    this.phoneMaxLength = config.digits;
-
-    setTimeout(() => {
-      this.validatePhone();
-      this.validatePincode();
+    this.userService.getUserProfile().subscribe({
+      next: (data) => {
+        this.user = data?.data || data;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        if (err.status === 401) {
+          this.errorMessage = 'Session expired. Please login again.';
+          this.logout();
+        } else {
+          this.errorMessage = 'Failed to load profile';
+        }
+        this.isLoading = false;
+      }
     });
   }
 
-  openPasswordForm(){
-    this.router.navigate(['/change-password']);
+  enableEdit() {
+    this.isEditMode = true;
+
+    // Deep clone (prevents live mutation)
+    this.editableUser = JSON.parse(JSON.stringify(this.user));
   }
 
+  cancelEdit() {
+    this.isEditMode = false;
+    this.editableUser = null;
+    this.errorMessage = '';
+  }
+
+  saveProfile() {
+    this.errorMessage = '';
+
+    this.userService.updateUserProfile(this.editableUser).subscribe({
+      next: () => {
+        this.user = { ...this.editableUser };
+        this.isEditMode = false;
+        this.editableUser = null;
+      },
+      error: (err) => {
+        if (err.error?.errors) {
+          this.errorMessage = Object.values(err.error.errors).flat().join(', ');
+        } else {
+          this.errorMessage = 'Failed to update profile';
+        }
+      }
+    });
+  }
+
+  logout() {
+    this.tokenService.logout();
+    this.user = null;
+    this.isLoggedIn = false;
+    this.router.navigate(['/']);
+  }
+
+  goToLogin() {
+    this.router.navigate(['/']);
+  }
 }

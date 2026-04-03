@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
-
-import { ClientDashboardService, BusinessDto } from '../../services/client-dashboard.service';
+import { FormsModule } from '@angular/forms';
+import { ProfileComponent } from '../../pages/profile/profile.component';
+import { ClientDashboardService } from '../../services/client-dashboard.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 interface Business {
   id: number;
@@ -10,15 +12,23 @@ interface Business {
   category: string;
   subcategory: string;
   status: string;
-
   description?: string;
-  contact?: any;
+  contact: {
+    phone: string;
+    email: string;
+    city: string;
+    streetAddress?: string;
+    state?: string;
+    country?: string;
+    pincode?: string;
+    phoneCode?: string;
+  };
 }
 
 @Component({
   selector: 'app-client-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule, ProfileComponent, TranslateModule],
   templateUrl: './client-dashboard.component.html',
   styleUrls: ['./client-dashboard.component.css']
 })
@@ -26,58 +36,96 @@ export class ClientDashboardComponent implements OnInit {
 
   businesses: Business[] = [];
   selectedBusiness: Business | null = null;
-  isLoading = true;
+  editingBusiness: Business | null = null;
+  showProfile = false;
+  categories: any[] = [];
+  filteredSubcategories: any[] = [];
 
+  selectedPhotos: any[] = [];
+  selectedFile: File | null = null;
+
+  isLoading = true;
   fullName: string = '';
+
+  countries: any[] = [];
+  states: string[] = []; 
+  selectedCountry: any = null;
 
   constructor(
     private router: Router,
-    private dashboardService: ClientDashboardService
+    private dashboardService: ClientDashboardService,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {}
+  toggleProfile(): void {
+    this.showProfile = true;
+  }
 
-  ngOnInit(): void {
+  closeProfile(): void {
+    this.showProfile = false;
+  }
+
+  scrollToTop(): void {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  ngOnInit() {
+    if (!isPlatformBrowser(this.platformId)) return;
+
     this.fetchBusinesses();
+    this.loadCategories();
+
+    fetch('assets/countries.json')
+      .then(res => res.json())
+      .then(data => this.countries = data);
+  }
+
+  loadCategories() {
+    this.dashboardService.getCategories().subscribe({
+      next: (data) => {
+        this.categories = data;
+      }
+    });
   }
 
   fetchBusinesses() {
-    const userId = 1;
-
-    this.dashboardService.getBusinessesByUser(userId)
+    this.dashboardService.getBusinessesByUser()
       .subscribe({
-        next: (res) => {
+        next: (res: any[]) => {
 
-          this.setUserName(userId);
-          this.businesses = res.map(b => ({
+          this.setUserName();
+
+          this.businesses = res.map((b: any) => ({
             id: b.id,
             businessName: b.name,
-            category: b.categoryName,
+            category: b.categoryName?.toLowerCase(),
             subcategory: b.subcategoryName,
             status: b.status ?? 'Pending',
             description: b.description,
             contact: {
-              phone: b.phoneNumber,
-              email: b.email,
-              city: b.city
+              phone: (b.phoneNumber || '').replace(/^\+\d+\s*/, ''),
+              email: b.email || '',
+              city: b.city || '',
+              state: b.state || '',
+              streetAddress: b.streetAddress || '',
+              country: b.country || '',
+              pincode: b.pincode || ''
             }
           }));
 
           this.isLoading = false;
         },
-        error: (err) => {
-          console.error('Error fetching businesses:', err);
-          this.isLoading = false;
-        }
+        error: () => this.isLoading = false
       });
   }
 
-  setUserName(userId: number) {
-    if (userId === 1) {
-      this.fullName = 'Sai Chandrasekhar';
-    } else if (userId === 2) {
-      this.fullName = 'Test User 2';
-    } else {
-      this.fullName = 'User';
-    }
+  setUserName() {
+    this.dashboardService.getUserProfile().subscribe({
+      next: (res) => {
+        this.fullName = res.fullName;
+      },
+      error: () => {
+        this.fullName = 'User';
+      }
+    });
   }
 
   trackById(index: number, item: Business) {
@@ -89,11 +137,157 @@ export class ClientDashboardComponent implements OnInit {
   }
 
   editBusiness(id: number) {
-    this.router.navigate(['/edit-business', id]);
+    const business = this.businesses.find(b => b.id === id);
+    if (!business) return;
+
+    this.editingBusiness = JSON.parse(JSON.stringify(business));
+
+    this.dashboardService.getPhotos(id)
+      .subscribe((res: any[]) => {
+        this.selectedPhotos = res;
+      });
+
+    const categoryObj = this.categories.find(
+      c => c.name.toLowerCase() === this.editingBusiness?.category
+    );
+
+    if (categoryObj) {
+      this.loadSubcategories(categoryObj.id);
+    }
+
+    if (this.editingBusiness?.contact.country) {
+      this.selectedCountry = this.countries.find(
+        c => c.name === this.editingBusiness!.contact.country
+      );
+
+      if (this.selectedCountry) {
+        this.states = this.selectedCountry.states.map((s: any) => s.name);
+      }
+    }
+  }
+
+  loadSubcategories(categoryId: number) {
+    this.dashboardService.getSubcategories(categoryId)
+      .subscribe((res: any[]) => {
+        this.filteredSubcategories = res;
+      });
+  }
+
+  onCategoryChange(category: string) {
+    const categoryObj = this.categories.find(
+      c => c.name.toLowerCase() === category
+    );
+
+    if (categoryObj) {
+      this.loadSubcategories(categoryObj.id);
+    }
+  }
+
+  onCountryChange(countryName: string) {
+    this.selectedCountry = this.countries.find(c => c.name === countryName);
+
+    this.states = this.selectedCountry
+      ? this.selectedCountry.states.map((s: any) => s.name)
+      : [];
+
+       if (this.editingBusiness && this.selectedCountry) {
+          this.editingBusiness.contact.phoneCode = this.selectedCountry.code;
+        }
+    if (this.editingBusiness) {
+      this.editingBusiness.contact.state = '';
+    }
+  }
+
+  getPhonePattern(): string {
+    if (!this.selectedCountry) return '^[0-9]{6,12}$';
+
+    if (this.selectedCountry.code === '+91') return '^[6-9][0-9]{9}$';
+    if (this.selectedCountry.code === '+1') return '^[0-9]{10}$';
+
+    return '^[0-9]{6,12}$';
+  }
+
+  getPincodePattern(): string {
+    if (!this.selectedCountry) return '^[0-9]{4,10}$';
+    return `^[0-9]{${this.selectedCountry.pincodeLength}}$`;
+  }
+
+  onFileSelected(event: any) {
+    this.selectedFile = event.target.files[0];
+  }
+
+  uploadImage() {
+    if (!this.selectedFile || !this.editingBusiness) return;
+
+    this.dashboardService.uploadPhoto(
+      this.editingBusiness.id,
+      this.selectedFile
+    )
+    .subscribe(() => {
+      this.dashboardService.getPhotos(this.editingBusiness!.id)
+        .subscribe((res: any[]) => {
+          this.selectedPhotos = res;
+        });
+
+      this.selectedFile = null;
+    });
+  }
+
+  deleteImage(photoId: number) {
+    this.dashboardService.deletePhoto(photoId).subscribe(() => {
+      this.selectedPhotos = this.selectedPhotos.filter(p => p.photoId !== photoId);
+    });
+  }
+
+  saveEdits() {
+    if (!this.editingBusiness) return;
+
+    const categoryObj = this.categories.find(
+      c => c.name.toLowerCase() === this.editingBusiness!.category
+    );
+
+    const subcategoryObj = this.filteredSubcategories.find(
+      s => s.name === this.editingBusiness!.subcategory
+    );
+
+    const payload = {
+      businessName: this.editingBusiness.businessName,
+      description: this.editingBusiness.description,
+      categoryId: categoryObj?.id,
+      subcategoryId: subcategoryObj?.id,
+      phoneCode: this.selectedCountry?.code || '',
+      phoneNumber: this.editingBusiness.contact.phone,
+      email: this.editingBusiness.contact.email,
+      city: this.editingBusiness.contact.city,
+      streetAddress: this.editingBusiness.contact.streetAddress,
+      state: this.editingBusiness.contact.state,
+      country: this.editingBusiness.contact.country,
+      pincode: this.editingBusiness.contact.pincode
+    };
+
+    this.dashboardService.updateBusiness(this.editingBusiness.id, payload)
+      .subscribe({
+        next: () => {
+          this.fetchBusinesses();
+          this.editingBusiness = null;
+        },
+        error: (err) => {
+          console.error(err);
+        }
+      });
+  }
+
+  cancelEdit() {
+    this.editingBusiness = null;
   }
 
   viewBusiness(id: number) {
     this.selectedBusiness = this.businesses.find(b => b.id === id) || null;
+
+    this.dashboardService.getPhotos(id)
+      .subscribe((res: any[]) => {
+        this.selectedPhotos = res;
+      });
   }
 
   closeView() {

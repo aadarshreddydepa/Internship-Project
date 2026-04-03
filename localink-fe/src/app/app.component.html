@@ -1,1 +1,13 @@
+<!-- Skip to main content link for keyboard users -->
+<a href="javascript:void(0)" class="skip-link" (click)="skipToMainContent()" (keydown.enter)="skipToMainContent()">
+  Skip to main content
+</a>
+
+<!-- Floating Language Switcher - Fixed Right Side -->
+<app-language-switcher class="floating-language-switcher"></app-language-switcher>
+
+<!-- Screen Reader Announcements - Visually Hidden -->
+<div class="sr-only" aria-live="polite" aria-atomic="true" id="sr-announcements"></div>
+<div class="sr-only" aria-live="assertive" aria-atomic="true" id="sr-alerts"></div>
+
 <router-outlet></router-outlet>

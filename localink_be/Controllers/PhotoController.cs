@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using localink_be.Services.Interfaces;
@@ -16,6 +17,8 @@ namespace localink_be.Controllers
             _photoService = photoService;
         }
 
+        // POST: api/business/{businessId}/photos
+        [Authorize(Roles = "client")]
         [HttpPost]
         public async Task<IActionResult> UploadPhoto(long businessId, IFormFile file)
         {
@@ -23,13 +26,8 @@ namespace localink_be.Controllers
             return Ok(result);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetPhotos(long businessId)
-        {
-            var photos = await _photoService.GetPhotosAsync(businessId);
-            return Ok(photos);
-        }
-
+        // DELETE: api/photos/{photoId}
+        [Authorize(Roles = "client")]
         [HttpDelete("~/api/v1/photos/{photoId}")]
         public async Task<IActionResult> DeletePhoto(long photoId)
         {

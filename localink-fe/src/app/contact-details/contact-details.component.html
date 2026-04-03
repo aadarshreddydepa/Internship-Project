@@ -1,9 +1,9 @@
 <div class="container">
 
-  <h2>Contact Details</h2>
+  <h2>{{ 'CONTACT.TITLE' | translate }}</h2>
 
   <form [formGroup]="contactForm">
-    <label>Phone Number *</label>
+    <label>{{ 'CONTACT.PHONE' | translate }} *</label>
 
     <div class="phone-wrapper">
 
@@ -30,7 +30,7 @@
       <input
         type="text"
         formControlName="phone"
-        placeholder="Enter phone number"
+        placeholder="{{ 'CONTACT.PLACEHOLDER_PHONE' | translate }}"
         (input)="allowOnlyNumbers($event)"
         [attr.maxlength]="contactForm.get('phoneCode')?.value === '+91' ? 10 : 15">
 
@@ -41,33 +41,33 @@
                 (contactForm.get('phone')?.dirty || contactForm.get('phone')?.touched)">
 
       <span *ngIf="contactForm.get('phone')?.errors?.['required']">
-        Phone number is required
+        {{ 'ERRORS.REQUIRED' | translate }}
       </span>
 
       <span *ngIf="contactForm.get('phone')?.errors?.['pattern']">
-        Phone must be 10 digits, start with 3-9, and cannot be all zeros
+        {{ 'VALIDATION.PHONE_PATTERN' | translate }}
       </span>
 
       <span *ngIf="contactForm.get('phone')?.errors?.['countryMismatch']">
-        Country code does not match selected country
+        {{ 'VALIDATION.COUNTRY_MISMATCH' | translate }}
       </span>
 
     </div>
 
-    <label>Email *</label>
-    <input type="email" formControlName="email" placeholder="Enter email">
+    <label>{{ 'CONTACT.EMAIL' | translate }} *</label>
+    <input type="email" formControlName="email" placeholder="{{ 'CONTACT.PLACEHOLDER_EMAIL' | translate }}">
 
     <div class="error" *ngIf="contactForm.get('email')?.touched && contactForm.get('email')?.invalid">
-      <div *ngIf="contactForm.get('email')?.errors?.['required']">Email is required</div>
-      <div *ngIf="contactForm.get('email')?.errors?.['pattern']">Enter a valid email address</div>
+      <div *ngIf="contactForm.get('email')?.errors?.['required']">{{ 'ERRORS.EMAIL_REQUIRED' | translate }}</div>
+      <div *ngIf="contactForm.get('email')?.errors?.['pattern']">{{ 'ERRORS.INVALID_EMAIL' | translate }}</div>
     </div>
 
 
-    <label>Website(Optional)</label>
-    <input type="text" formControlName="website" placeholder="Enter website">
+    <label>{{ 'CONTACT.WEBSITE_OPTIONAL' | translate }}</label>
+    <input type="text" formControlName="website" placeholder="{{ 'CONTACT.PLACEHOLDER_WEBSITE' | translate }}">
 
     <div class="error" *ngIf="contactForm.get('website')?.touched && contactForm.get('website')?.invalid">
-    Enter a valid website URL
+    {{ 'VALIDATION.WEBSITE_INVALID' | translate }}
     </div>
 
     <!-- LOCATION ROW -->
@@ -77,13 +77,13 @@
     <!-- COUNTRY -->
     <div class="location-field">
 
-    <label>Country *</label>
+    <label>{{ 'CONTACT.COUNTRY' | translate }} *</label>
     
     <ng-select
       [items]="countries"
       bindLabel="name"
       bindValue="name"
-      placeholder="Select Country"
+      placeholder="{{ 'CONTACT.SELECT_COUNTRY' | translate }}"
       formControlName="country"
       [searchable]="true"
       [clearable]="false"
@@ -92,7 +92,7 @@
     </ng-select>
 
     <div class="error" *ngIf="contactForm.get('country')?.touched && contactForm.get('country')?.invalid">
-    Country is required
+    {{ 'ERRORS.REQUIRED' | translate }}
     </div>
 
     </div>
@@ -101,11 +101,11 @@
     <!-- STATE -->
     <div class="location-field">
 
-    <label>State *</label>
+    <label>{{ 'CONTACT.STATE' | translate }} *</label>
 
     <ng-select
       [items]="states"
-      placeholder="Select State"
+      placeholder="{{ 'CONTACT.SELECT_STATE' | translate }}"
       formControlName="state"
       [searchable]="true"
       [clearable]="false"
@@ -113,7 +113,7 @@
     </ng-select>
 
     <div class="error" *ngIf="contactForm.get('state')?.touched && contactForm.get('state')?.invalid">
-    State is required
+    {{ 'ERRORS.REQUIRED' | translate }}
     </div>
 
     </div>
@@ -122,15 +122,15 @@
     <!-- CITY -->
     <div class="location-field">
 
-    <label>City *</label>
+    <label>{{ 'CONTACT.CITY' | translate }} *</label>
 
-    <input type="text" formControlName="city" placeholder="City">
+    <input type="text" formControlName="city" placeholder="{{ 'CONTACT.PLACEHOLDER_CITY' | translate }}">
 
     <div class="error" *ngIf="contactForm.get('city')?.touched && contactForm.get('city')?.invalid">
-      <div *ngIf="contactForm.get('city')?.errors?.['required']">City is required</div>
-      <div *ngIf="contactForm.get('city')?.errors?.['minlength']">City must be at least 2 characters</div>
-      <div *ngIf="contactForm.get('city')?.errors?.['maxlength']">City cannot exceed 50 characters</div>
-      <div *ngIf="contactForm.get('city')?.errors?.['pattern']">City can only contain letters, spaces, dots, and hyphens</div>
+      <div *ngIf="contactForm.get('city')?.errors?.['required']">{{ 'ERRORS.REQUIRED' | translate }}</div>
+      <div *ngIf="contactForm.get('city')?.errors?.['minlength']">{{ 'VALIDATION.CITY_MIN' | translate }}</div>
+      <div *ngIf="contactForm.get('city')?.errors?.['maxlength']">{{ 'VALIDATION.CITY_MAX' | translate }}</div>
+      <div *ngIf="contactForm.get('city')?.errors?.['pattern']">{{ 'VALIDATION.CITY_PATTERN' | translate }}</div>
     </div>
 
     </div>  
@@ -139,26 +139,26 @@
     <!-- PINCODE -->
     <div class="location-field">
 
-    <label>Pincode *</label>
+    <label>{{ 'CONTACT.PINCODE' | translate }} *</label>
 
-    <input type="text" formControlName="pincode" placeholder="Pincode">
+    <input type="text" formControlName="pincode" placeholder="{{ 'CONTACT.PLACEHOLDER_PINCODE' | translate }}">
 
     <div class="error" *ngIf="contactForm.get('pincode')?.touched && contactForm.get('pincode')?.invalid">
-      <div *ngIf="contactForm.get('pincode')?.errors?.['required']">Pincode is required</div>
-      <div *ngIf="contactForm.get('pincode')?.errors?.['pattern']">Enter a valid 6-digit pincode starting with 1-9</div>
+      <div *ngIf="contactForm.get('pincode')?.errors?.['required']">{{ 'ERRORS.REQUIRED' | translate }}</div>
+      <div *ngIf="contactForm.get('pincode')?.errors?.['pattern']">{{ 'VALIDATION.PINCODE_PATTERN' | translate }}</div>
     </div>
 
     </div>
 
     </div>
 
-    <label>Street Address *</label>
-    <input type="text" formControlName="address" placeholder="Enter business address">
+    <label>{{ 'CONTACT.STREET' | translate }} *</label>
+    <input type="text" formControlName="address" placeholder="{{ 'CONTACT.PLACEHOLDER_ADDRESS' | translate }}">
 
     <div class="error" *ngIf="contactForm.get('address')?.touched && contactForm.get('address')?.invalid">
-      <div *ngIf="contactForm.get('address')?.errors?.['required']">Address is required</div>
-      <div *ngIf="contactForm.get('address')?.errors?.['minlength']">Address must be at least 5 characters</div>
-      <div *ngIf="contactForm.get('address')?.errors?.['maxlength']">Address cannot exceed 200 characters</div>
+      <div *ngIf="contactForm.get('address')?.errors?.['required']">{{ 'ERRORS.REQUIRED' | translate }}</div>
+      <div *ngIf="contactForm.get('address')?.errors?.['minlength']">{{ 'VALIDATION.ADDRESS_MIN' | translate }}</div>
+      <div *ngIf="contactForm.get('address')?.errors?.['maxlength']">{{ 'VALIDATION.ADDRESS_MAX' | translate }}</div>
     </div>
 
     <!-- ======== MAP SECTION ======== -->
@@ -166,7 +166,7 @@
     <div class="map-section">
 
       <!-- SEARCH BAR -->
-      <label><i class="fa fa-map-marker" aria-hidden="true" style="margin-right: 5px;"></i>Search Location</label>
+      <label><i class="fa fa-map-marker" aria-hidden="true" style="margin-right: 5px;"></i>{{ 'CONTACT.SEARCH_LOCATION' | translate }}</label>
       <div class="search-bar-container">
         <div class="search-bar">
           <input
@@ -175,12 +175,12 @@
             [(ngModel)]="searchQuery"
             (ngModelChange)="onSearchQueryChange($event)"
             [ngModelOptions]="{standalone: true}"
-            placeholder="Search for a place, city or address..."
+            placeholder="{{ 'CONTACT.PLACEHOLDER_SEARCH' | translate }}"
             (keydown)="onSearchKeydown($event)"
             (blur)="closeDropdown()">
           <button type="button" class="search-btn" (click)="searchLocation()">
             <i class="fa fa-search"></i>
-            Search
+            {{ 'CONTACT.SEARCH' | translate }}
           </button>
         </div>
 
@@ -195,13 +195,13 @@
         </div>
         <div class="autocomplete-dropdown" *ngIf="isSearching">
           <div class="autocomplete-loading">
-            <span class="spinner" style="width: 12px; height: 12px; margin-right: 8px;"></span> Searching...
+            <span class="spinner" style="width: 12px; height: 12px; margin-right: 8px;"></span> {{ 'COMMON.SEARCHING' | translate }}
           </div>
         </div>
       </div>
 
       <!-- CURRENT LOCATION BUTTON -->
-      <label><i class="fa fa-map" aria-hidden="true" style="margin-right: 5px;"></i>Select Business Location *</label>
+      <label><i class="fa fa-map" aria-hidden="true" style="margin-right: 5px;"></i>{{ 'CONTACT.SELECT_LOCATION' | translate }} *</label>
       <button
         type="button"
         class="location-btn"
@@ -209,11 +209,11 @@
         (click)="useCurrentLocation()">
         <span *ngIf="!isLoadingLocation">
           <i class="fa fa-crosshairs"></i>
-          Use My Current Location
+          {{ 'CONTACT.USE_CURRENT' | translate }}
         </span>
         <span *ngIf="isLoadingLocation" class="btn-loading">
           <span class="spinner"></span>
-          Detecting location...
+          {{ 'CONTACT.DETECTING' | translate }}
         </span>
       </button>
 
@@ -227,7 +227,7 @@
       <div class="map-wrapper">
         <div *ngIf="isGeocodingAddress" class="geocoding-overlay">
           <span class="spinner"></span>
-          <span>Fetching address...</span>
+          <span>{{ 'CONTACT.FETCHING' | translate }}</span>
         </div>
         <div id="leaflet-map"></div>
       </div>
@@ -240,7 +240,7 @@
 
       <div class="map-tip" *ngIf="!selectedLat">
         <i class="fa fa-info-circle"></i>
-        Click on the map, drag the marker, or use "Use My Current Location" to pin your business location.
+        {{ 'CONTACT.MAP_TIP' | translate }}
       </div>
 
     </div>
@@ -249,11 +249,11 @@
     <div class="button-container">
 
     <button type="button" class="previous-btn" (click)="previousStep()">
-    Previous
+    {{ 'BUSINESS.PREVIOUS' | translate }}
     </button>
 
     <button type="button" (click)="submit()">
-    Next Step
+    {{ 'BUSINESS.NEXT' | translate }}
     </button>
 
     </div>

@@ -61,6 +61,12 @@ namespace localink_be.Models.Entities
         [Column("updated_at")]
         public DateTime UpdatedAt { get; set; }
 
+        [Column("latitude")]
+        public double? Latitude { get; set; }
+
+        [Column("longitude")]
+        public double? Longitude { get; set; }
+
         public Business Business { get; set; } = null!;
     }
 }

@@ -200,7 +200,7 @@
 
         <h3>Additional Information</h3>
         <app-hours [initialHours]="hoursData" (hoursSaved)="saveHours($event)"></app-hours>
-        <app-photo-upload [initialPhoto]="photoData" (photoSelected)="savePhoto($event)"></app-photo-upload>
+        <!-- <app-photo-upload [initialPhoto]="photoData" (photoSelected)="savePhoto($event)"></app-photo-upload> -->
 
         <div class="error" *ngIf="hoursErrorMessage">
           {{ hoursErrorMessage }}

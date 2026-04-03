@@ -14,16 +14,14 @@ namespace localink_be.Models.Entities
         [Column("business_id")]
         public long BusinessId { get; set; }
 
-        [Required]
-        [MaxLength(50)]
-        [Column("status")]
-        public string Status { get; set; } = null!;
+    [Required]
+    public BusinessStatus Status { get; set; } = BusinessStatus.Pending;
 
         [Column("rejection_reason")]
         public string? RejectionReason { get; set; }
 
-        [Column("action_by")]
-        public string? ActionBy { get; set; }
+    [Column("action_by")]
+    public long? ActionBy { get; set; }
 
         [Column("created_at")]
         public DateTime CreatedAt { get; set; }

@@ -20,14 +20,6 @@ namespace localink_be.Controllers
             _service = service;
         }
 
-        // GET: api/categories/db
-        [HttpGet("db")]
-        public async Task<IActionResult> GetCategoriesFromDb()
-        {
-            var categories = await _db.Categories.ToListAsync();
-            return Ok(categories);
-        }
-
         // GET: api/categories/{categoryId}/subcategories
         [HttpGet("{categoryId}/subcategories-db")]
         public async Task<IActionResult> GetSubcategories(int categoryId)
@@ -38,11 +30,10 @@ namespace localink_be.Controllers
 
             if (!subcategories.Any())
                 return NotFound();
-
+                
             return Ok(subcategories);
         }
 
-        // GET: api/categories
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {

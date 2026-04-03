@@ -1,6 +1,6 @@
 <div class="photo-upload-container">
 
-  <h3>Upload Business Photos (Optional)</h3>
+  <h3>{{ 'PHOTO.TITLE' | translate }}</h3>
 
   <div
     class="upload-box"
@@ -13,11 +13,11 @@
     <!-- Upload Area -->
     <div *ngIf="!selectedImage" class="upload-placeholder">
 
-      <div class="upload-icon">⬆</div>
+      <div class="upload-icon">{{ 'PHOTO.UPLOAD_ICON' | translate }}</div>
 
-      <p>Click to upload or drag and drop</p>
+      <p>{{ 'PHOTO.DRAG_DROP' | translate }}</p>
 
-      <span>PNG, JPG up to 5MB</span>
+      <span>{{ 'PHOTO.FORMAT' | translate }}</span>
 
     </div>
     <!-- Image Preview -->
@@ -25,7 +25,7 @@
 
       <img
         [src]="selectedImage"
-        alt="Uploaded Business Photo"
+        alt="{{ 'PHOTO.ALT' | translate }}"
         class="preview-image"
       />
 
@@ -33,7 +33,7 @@
         class="remove-btn"
         (click)="removeImage($event)"
       >
-        Remove
+        {{ 'PHOTO.REMOVE' | translate }}
       </button>
 
     </div>

@@ -12,7 +12,7 @@ namespace localink_be.Controllers
     public class BusinessPreviewController : ControllerBase
     {
         private readonly AppDbContext _db;
-
+        
         public BusinessPreviewController(AppDbContext db)
         {
             _db = db;

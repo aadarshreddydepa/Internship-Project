@@ -1,9 +1,7 @@
-using System.Threading.Tasks;
-
 namespace localink_be.Services.Interfaces
 {
     public interface ICaptchaService
     {
-        Task<bool> VerifyTokenAsync(string token);
+        Task<bool> VerifyAsync(string token);
     }
 }

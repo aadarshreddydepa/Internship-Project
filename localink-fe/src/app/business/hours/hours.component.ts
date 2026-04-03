@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EventEmitter, Output, Input } from '@angular/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 interface TimeSlot {
   open: string;
@@ -20,20 +21,20 @@ interface DaySchedule {
 @Component({
   selector: 'app-hours',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   templateUrl: './hours.component.html',
   styleUrls: ['./hours.component.css']
 })
 export class HoursComponent {
+  private translate = inject(TranslateService);
 
-  @Output() hoursSaved = new EventEmitter<any>();
-  @Input() initialHours: any;
-
+  @Input() initialHours: any[] = [];                  
+  @Output() hoursSaved = new EventEmitter<any[]>();
   ngOnInit() {
 
       if (this.initialHours && this.initialHours.length) {
         this.days.forEach(day => {
-          const saved = this.initialHours.find((d: { day: string; }) => d.day === day.name);
+          const saved = this.initialHours.find((d: { dayOfWeek: string; }) => d.dayOfWeek === day.name);
           if (saved) {
             day.mode = saved.mode;
             day.slots = saved.slots || [];
@@ -41,15 +42,15 @@ export class HoursComponent {
         });
       }
     }
-    
+   
   days: DaySchedule[] = [
-    { name: 'Monday', selected: false, mode: 'custom', slots: [] },
-    { name: 'Tuesday', selected: false, mode: 'custom', slots: [] },
-    { name: 'Wednesday', selected: false, mode: 'custom', slots: [] },
-    { name: 'Thursday', selected: false, mode: 'custom', slots: [] },
-    { name: 'Friday', selected: false, mode: 'custom', slots: [] },
-    { name: 'Saturday', selected: false, mode: 'custom', slots: [] },
-    { name: 'Sunday', selected: false, mode: 'custom', slots: [] }
+    { name: 'MONDAY', selected: false, mode: 'custom', slots: [] },
+    { name: 'TUESDAY', selected: false, mode: 'custom', slots: [] },
+    { name: 'WEDNESDAY', selected: false, mode: 'custom', slots: [] },
+    { name: 'THURSDAY', selected: false, mode: 'custom', slots: [] },
+    { name: 'FRIDAY', selected: false, mode: 'custom', slots: [] },
+    { name: 'SATURDAY', selected: false, mode: 'custom', slots: [] },
+    { name: 'SUNDAY', selected: false, mode: 'custom', slots: [] }
   ];
 
   errorMessage = '';
@@ -57,25 +58,26 @@ export class HoursComponent {
 
   showConfig = false;
 
+ 
   mode: Mode = 'custom';
-
+ 
   configSlots: TimeSlot[] = [
     { open: '09:00', close: '17:00' }
   ];
-
+ 
   get selectedDays() {
     return this.days.filter(d => d.selected);
   }
-
+ 
   selectAll() {
     this.days.forEach(d => d.selected = true);
   }
-
+ 
   clearSelection() {
     this.days.forEach(d => d.selected = false);
     this.showConfig = false;
   }
-
+ 
   openConfig() {
 
     const selected = this.selectedDays;
@@ -100,21 +102,21 @@ export class HoursComponent {
 
     this.showConfig = true;
   }
-
+ 
   addSlot() {
     if (this.configSlots.length < 2) {
       this.configSlots.push({ open: '09:00', close: '17:00' });
     }
   }
-
+ 
   removeSlot(i: number) {
     this.configSlots.splice(i, 1);
   }
-
+ 
   cancelConfig() {
     this.showConfig = false;
   }
-
+ 
   hasOverlap(): boolean {
 
     if (this.configSlots.length < 2) return false;
@@ -123,11 +125,11 @@ export class HoursComponent {
 
     return !(a.close <= b.open || b.close <= a.open);
   }
-
+ 
   applyHours() {
 
     if (this.mode === 'custom' && this.hasOverlap()) {
-      alert("Time slots cannot overlap");
+      alert(this.translate.instant('HOURS.OVERLAP_ERROR'));
       return;
     }
 
@@ -150,13 +152,13 @@ export class HoursComponent {
 
     this.showConfig = false;
   }
-
+ 
   saveBusinessHours() {
       const incompleteDays = this.days.filter(d =>
         d.mode === 'custom' && d.slots.length === 0
       );
       if (incompleteDays.length > 0) {
-        this.errorMessage = "Please configure business hours for all days";
+        this.errorMessage = this.translate.instant('VALIDATION.FILL_REQUIRED');
         return;
       }
       this.errorMessage = '';
@@ -167,10 +169,9 @@ export class HoursComponent {
       }));
       console.log("Saved Business Hours:", result);
       this.hoursSaved.emit(result);
-      this.successMessage = "Business hours saved successfully!";
+      this.successMessage = this.translate.instant('HOURS.SAVED_SUCCESS');
       setTimeout(() => {
         this.successMessage = '';
       }, 3000);
     }
-
 }

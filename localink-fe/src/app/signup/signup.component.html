@@ -5,23 +5,18 @@
     <div class="particles"></div>
     <canvas class="lines-canvas"></canvas>
     <div class="cursor-glow"></div>
-<div class="left-content">
-  <h1>Welcome Back</h1>
-  <p>Experience premium business discovery</p>
-</div>
+    <div class="left-content">
+      <h1>{{ 'LOGIN.WELCOME_BACK' | translate }}</h1>
+      <p>{{ 'LOGIN.SUBTITLE' | translate }}</p>
+    </div>
   </div>
   <!-- RIGHT SIDE -->
   <div class="signup-right">
-<div class="signup-container">
-  <!-- TITLE -->
-  <h2 class="title">Create Account</h2>
+    <div class="signup-container">
+      <!-- LANGUAGE SELECTOR -->
   <!-- SUBTITLE -->
   <p class="subtitle">
-    {{
-      selectedType === 'client'
-        ? 'Register your business and grow faster'
-        : 'Discover businesses around you'
-    }}
+    {{ selectedType === 'client' ? ('SIGNUP.CLIENT_SUBTITLE' | translate) : ('SIGNUP.USER_SUBTITLE' | translate) }}
   </p>
   <!-- TOGGLE -->
   <div class="toggle-pill">
@@ -29,14 +24,14 @@
       class="toggle-option" 
       [class.active]="selectedType === 'user'"
       (click)="selectType('user')">
-      User
+      {{ 'SIGNUP.USER' | translate }}
     </div>
 
     <div 
       class="toggle-option" 
       [class.active]="selectedType === 'client'"
       (click)="selectType('client')">
-      Client
+      {{ 'SIGNUP.CLIENT' | translate }}
     </div>
 
     <div class="toggle-indicator" 
@@ -49,18 +44,18 @@
     <!-- NAME -->
     <div class="form-group full-width">
       <span class="input-title">
-        {{ selectedType === 'client' ? 'Business Owner Name *' : 'Name *' }}
+        {{ selectedType === 'client' ? ('SIGNUP.OWNER_NAME' | translate) : ('SIGNUP.NAME' | translate) }} *
       </span>
       <input type="text" formControlName="name" placeholder=" " />
 
       <div class="error" *ngIf="f['name'].touched && f['name']?.errors">
-        <span *ngIf="f['name'].errors?.['required']">Name is required</span>
+        <span *ngIf="f['name'].errors?.['required']">{{ 'ERRORS.REQUIRED' | translate }}</span>
       </div>
     </div>
 
     <!-- PHONE -->
     <div class="form-group full-width">
-      <span class="input-title">Phone *</span>
+      <span class="input-title">{{ 'SIGNUP.PHONE' | translate }} *</span>
 
       <div class="phone-group">
 
@@ -80,19 +75,19 @@
       </div>
 
       <div class="error" *ngIf="f['phone'].touched && f['phone']?.errors">
-        <span *ngIf="f['phone'].errors?.['required']">Phone required</span>
-        <span *ngIf="f['phone'].errors?.['pattern']">Must be 10 digits</span>
+        <span *ngIf="f['phone'].errors?.['required']">{{ 'ERRORS.REQUIRED' | translate }}</span>
+        <span *ngIf="f['phone'].errors?.['pattern']">{{ 'ERRORS.PHONE_FORMAT' | translate }}</span>
       </div>
     </div>
 
     <!-- EMAIL -->
     <div class="form-group full-width">
-      <span class="input-title">Email *</span>
+      <span class="input-title">{{ 'SIGNUP.EMAIL' | translate }} *</span>
       <input type="email" formControlName="email" placeholder=" " />
 
       <div class="error" *ngIf="f['email'].touched && f['email']?.errors">
-        <span *ngIf="f['email'].errors?.['required']">Email required</span>
-        <span *ngIf="f['email'].errors?.['pattern']">Invalid email</span>
+        <span *ngIf="f['email'].errors?.['required']">{{ 'ERRORS.REQUIRED' | translate }}</span>
+        <span *ngIf="f['email'].errors?.['pattern']">{{ 'ERRORS.INVALID_EMAIL' | translate }}</span>
       </div>
     </div>
 
@@ -100,7 +95,7 @@
     <div class="address-row">
       <!-- COUNTRY -->
       <div class="form-group">
-        <span class="input-title">Country *</span>
+        <span class="input-title">{{ 'CONTACT.COUNTRY' | translate }} *</span>
         <ng-select
           [items]="countries"
           bindLabel="name"
@@ -111,13 +106,13 @@
         </ng-select>
 
         <div class="error" *ngIf="f['country'].touched && f['country']?.errors">
-          <span>Country required</span>
+          <span>{{ 'ERRORS.REQUIRED' | translate }}</span>
         </div>
       </div>
 
       <!-- STATE -->
       <div class="form-group">
-        <span class="input-title">State *</span>
+        <span class="input-title">{{ 'CONTACT.STATE' | translate }} *</span>
         <ng-select
           [items]="states"
           bindLabel="name"
@@ -127,29 +122,29 @@
         </ng-select>
 
         <div class="error" *ngIf="f['state'].touched && f['state']?.errors">
-          <span>State required</span>
+          <span>{{ 'ERRORS.REQUIRED' | translate }}</span>
         </div>
       </div>
 
       <!-- CITY -->
       <div class="form-group">
-        <span class="input-title">City *</span>
+        <span class="input-title">{{ 'CONTACT.CITY' | translate }} *</span>
         <input type="text" formControlName="city" placeholder=" " />
 
         <div class="error" *ngIf="f['city'].touched && f['city']?.errors">
-          <span>City required</span>
+          <span>{{ 'ERRORS.REQUIRED' | translate }}</span>
         </div>
       </div>
 
       <!-- PINCODE -->
       <div class="form-group">
-        <span class="input-title">Pincode *</span>
+        <span class="input-title">{{ 'CONTACT.PINCODE' | translate }} *</span>
         <input type="text" formControlName="pincode" placeholder=" " />
 
         <div class="error" *ngIf="f['pincode'].touched && f['pincode']?.errors">
-          <span *ngIf="f['pincode'].errors?.['required']">Pincode required</span>
+          <span *ngIf="f['pincode'].errors?.['required']">{{ 'ERRORS.REQUIRED' | translate }}</span>
           <span *ngIf="f['pincode'].errors?.['pattern']">
-            Must be 6 digits & not start with 0
+            {{ 'ERRORS.PINCODE_FORMAT' | translate }}
           </span>
         </div>
       </div>
@@ -158,18 +153,18 @@
 
     <!-- STREET -->
     <div class="form-group full-width">
-      <span class="input-title">Street Address *</span>
+      <span class="input-title">{{ 'CONTACT.STREET' | translate }} *</span>
       <input type="text" formControlName="street" placeholder=" " />
 
       <div class="error" *ngIf="f['street'].touched && f['street']?.errors">
-        <span>Street required</span>
+        <span>{{ 'ERRORS.REQUIRED' | translate }}</span>
       </div>
     </div>
 
     <!-- ================= SECURITY ================= -->
     <!-- PASSWORD -->
     <div class="form-group full-width">
-      <span class="input-title">Password *</span>
+      <span class="input-title">{{ 'SIGNUP.PASSWORD' | translate }} *</span>
 
       <div class="password-wrapper">
         <input
@@ -183,13 +178,13 @@
       </div>
 
       <div class="error" *ngIf="f['password'].touched && f['password']?.errors">
-        <span>Password must be strong</span>
+        <span>{{ 'ERRORS.PASSWORD_STRONG' | translate }}</span>
       </div>
     </div>
 
     <!-- CONFIRM PASSWORD -->
     <div class="form-group full-width">
-      <span class="input-title">Confirm Password *</span>
+      <span class="input-title">{{ 'SIGNUP.CONFIRM_PASSWORD' | translate }} *</span>
 
       <div class="password-wrapper">
         <input
@@ -204,7 +199,7 @@
 
       <div class="error"
            *ngIf="f['confirmPassword'].touched && signupForm.errors?.['passwordMismatch']">
-        <span>Passwords do not match</span>
+        <span>{{ 'ERRORS.PASSWORD_MISMATCH' | translate }}</span>
       </div>
     </div>
 
@@ -219,7 +214,7 @@
   class="signup-btn" 
   [disabled]="signupForm.invalid || isSubmitting">
   
-  {{ isSubmitting ? 'Creating...' : 'Sign Up' }}
+  {{ isSubmitting ? ('SIGNUP.CREATING' | translate) : ('SIGNUP.SUBMIT' | translate) }}
 </button>
 
   </form>
@@ -231,7 +226,7 @@
 <div class="popup-overlay" *ngIf="showSuccessPopup">
   <div class="popup-box">
     <div class="spinner"></div>
-    <h3>Account Created</h3>
-    <p>Redirecting to login...</p>
+    <h3>{{ 'SIGNUP.SUCCESS_TITLE' | translate }}</h3>
+    <p>{{ 'SIGNUP.SUCCESS_MSG' | translate }}</p>
   </div>
 </div>

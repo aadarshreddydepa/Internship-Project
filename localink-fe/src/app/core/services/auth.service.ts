@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+
 @Injectable({
   providedIn: 'root'
 })
@@ -26,8 +27,13 @@ export class AuthService {
     return this.http.get(`${this.baseUrl}/users/email?value=${email}`);
   }
 
-  // RESET PASSWORD
+  // SEND OTP
+  sendOtp(data: { email: string; captchaToken: string }) {
+    return this.http.post(`${this.baseUrl}/auth/forgot-password`, data);
+  }
+
+  // RESET PASSWORD WITH OTP (or old method depending on backend)
   resetPassword(data: any) {
-    return this.http.put(`${this.baseUrl}/users/password`, data);
+    return this.http.post(`${this.baseUrl}/auth/reset-password`, data);
   }
 }

@@ -5,6 +5,10 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { Router } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
 import { HttpClient } from '@angular/common/http';
+import { isPlatformBrowser } from '@angular/common';
+import { Inject, PLATFORM_ID } from '@angular/core';
+import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { LanguageSwitcherComponent } from '../components/language-switcher/language-switcher.component';
 
 // Declare global grecaptcha so TypeScript doesn't complain
 declare const grecaptcha: any;
@@ -12,7 +16,7 @@ declare const grecaptcha: any;
 @Component({
   selector: 'app-signup',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, NgSelectModule],
+  imports: [CommonModule, ReactiveFormsModule, NgSelectModule, TranslateModule, LanguageSwitcherComponent],
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.css']
 })
@@ -23,7 +27,7 @@ export class SignupComponent implements OnInit, AfterViewInit {
   showPassword = false;
   showConfirmPassword = false;
   showSuccessPopup = false;
-
+  errorMessage = '';
   // JSON DATA
   locationData: any[] = [];
   countries: string[] = [];
@@ -32,6 +36,13 @@ export class SignupComponent implements OnInit, AfterViewInit {
   selectedType: 'user' | 'client' = 'user';
   currentStep = 1;
   captchaToken: string | null = null;
+  currentLang = 'en';
+  availableLanguages = [
+    { code: 'en', label: 'English' },
+    { code: 'hi', label: 'हिन्दी' },
+    { code: 'es', label: 'Español' },
+    { code: 'te', label: 'తెలుగు' }
+  ];
 
   stepFields: any = {
     1: ['name', 'phone', 'email'],
@@ -43,8 +54,14 @@ export class SignupComponent implements OnInit, AfterViewInit {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private http: HttpClient
+    private http: HttpClient,
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private translate: TranslateService
   ) {
+    if (isPlatformBrowser(this.platformId)) {
+      this.currentLang = localStorage.getItem('localink_lang') || 'en';
+    }
+    this.translate.use(this.currentLang);
     this.signupForm = this.fb.group({
       userType: ['', Validators.required],
 
@@ -116,7 +133,6 @@ export class SignupComponent implements OnInit, AfterViewInit {
     state: ''
   });
 }
-
   // STEP NAVIGATION
   nextStep() {
     const fields = this.stepFields[this.currentStep];
@@ -167,26 +183,29 @@ export class SignupComponent implements OnInit, AfterViewInit {
     }
 
     this.isSubmitting = true;
+    this.errorMessage = '';
 
-    const { confirmPassword, ...payload } = this.signupForm.value;
+    const { confirmPassword, ...raw } = this.signupForm.value;
 
-    const formData = {
-      ...payload,
+    const payload = {
+      ...raw,
+      email: raw.email.trim().toLowerCase(), 
+      name: raw.name.trim(),
       userType: this.selectedType,
       captchaToken: this.captchaToken
     };
 
-    this.authService.register(formData).subscribe({
+    this.authService.register(payload).subscribe({
       next: () => {
         this.showSuccessPopup = true;
 
-        //smooth delay before redirect
         setTimeout(() => {
           this.router.navigate(['/login']);
         }, 2000);
       },
-      error: (err:any) => {
-        alert(err.error?.message || 'Signup failed');
+      error: (err: any) => {
+        this.errorMessage = err?.error?.message || 'Signup failed';
+        alert(this.errorMessage);
         this.isSubmitting = false;
       }
     });
@@ -212,9 +231,17 @@ allowOnlyNumbers(event: KeyboardEvent) {
     event.preventDefault();
   }
 }
+  switchLanguage(langCode: string) {
+    this.currentLang = langCode;
+    this.translate.use(langCode);
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem('localink_lang', langCode);
+    }
+  }
 
   // CANVAS ANIMATION (UNCHANGED)
   ngAfterViewInit() {
+    if(!isPlatformBrowser(this.platformId)) return;
 
     /* RECAPTCHA */
     setTimeout(() => {
@@ -235,7 +262,6 @@ allowOnlyNumbers(event: KeyboardEvent) {
         });
       }
     }, 300);
-
     const glow = document.querySelector('.cursor-glow') as HTMLElement;
 
     document.addEventListener('mousemove', (e) => {

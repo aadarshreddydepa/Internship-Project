@@ -36,5 +36,5 @@ namespace localink_be.Models.Entities
         [MaxLength(10)]
         [Column("pincode")]
         public string Pincode { get; set; } = string.Empty;
-    }
+}
 }

@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 
 import { BusinessListService } from '../../services/business-list.service';
 
 @Component({
   selector: 'app-business-list',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, TranslateModule],
   templateUrl: './business-list.component.html',
   styleUrls: ['./business-list.component.css']
 })
@@ -52,7 +53,14 @@ export class BusinessListComponent implements OnInit {
     this.service.getBusinessesBySubcategory(this.subcategoryId)
       .subscribe({
         next: (data) => {
-          this.businesses = data;
+
+          this.businesses = data.map((b: any) => ({
+            ...b,
+            primaryImage: b.primaryImage
+              ? 'http://localhost:5138' + b.primaryImage
+              : null
+          }));
+
           this.totalPages = Math.ceil(this.businesses.length / this.pageSize);
           this.updatePage();
         },

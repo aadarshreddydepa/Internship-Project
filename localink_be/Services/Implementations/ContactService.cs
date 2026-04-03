@@ -16,7 +16,7 @@ namespace localink_be.Services.Implementations
 
         public ContactService(AppDbContext db)
         {
-            _db = db;
+            _db = db ?? throw new ArgumentNullException(nameof(db));
         }
 
         // ADD CONTACT (used during registration)
@@ -37,6 +37,8 @@ namespace localink_be.Services.Implementations
                 State = dto.State,
                 Country = dto.Country,
                 Pincode = dto.Pincode,
+                Latitude = dto.Latitude,
+                Longitude = dto.Longitude,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -45,7 +47,6 @@ namespace localink_be.Services.Implementations
             await _db.SaveChangesAsync();
         }
 
-        // UPDATE CONTACT
         public async Task<BusinessContact?> UpdateContactAsync(long businessId, BusinessContact updated)
         {
             var existing = await _db.BusinessContacts
@@ -62,14 +63,15 @@ namespace localink_be.Services.Implementations
             existing.State = updated.State;
             existing.Country = updated.Country;
             existing.Pincode = updated.Pincode;
+            existing.Latitude = updated.Latitude;
+            existing.Longitude = updated.Longitude;
             existing.UpdatedAt = DateTime.UtcNow;
 
             await _db.SaveChangesAsync();
             return existing;
         }
 
-        // DELETE CONTACT
-        public async Task<bool> DeleteContactAsync(int contactId)
+        public async Task<bool> DeleteContactAsync(long contactId)
         {
             var contact = await _db.BusinessContacts.FindAsync(contactId);
             if (contact == null) return false;
@@ -79,13 +81,14 @@ namespace localink_be.Services.Implementations
             return true;
         }
 
-        // GET CONTACT BY BUSINESS ID
         public async Task<object?> GetContactByBusinessIdAsync(long businessId)
         {
             var contact = await _db.BusinessContacts
                 .Where(c => c.BusinessId == businessId)
                 .Select(c => new
                 {
+                    c.ContactId,
+                    c.BusinessId,
                     c.PhoneCode,
                     c.PhoneNumber,
                     c.Email,
@@ -94,11 +97,14 @@ namespace localink_be.Services.Implementations
                     c.City,
                     c.State,
                     c.Country,
-                    c.Pincode
-                })
-                .FirstOrDefaultAsync();
+                    c.Pincode,
+                    c.Latitude,
+                    c.Longitude,
+                    c.CreatedAt,
+                    c.UpdatedAt
+                }).FirstOrDefaultAsync();
 
-            return contact; // null if not found
+            return contact; 
         }
     }
 }

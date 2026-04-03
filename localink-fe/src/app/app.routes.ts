@@ -13,68 +13,125 @@ import { RegisterBusinessComponent } from './register-business/register-business
 import { UserDashboardComponent } from './dashboards/user-dashboard/user-dashboard.component';
 import { EditBusinessBusinessComponent } from './edit-business/edit-business.component';
 import { BusinessDetailComponent } from './pages/business-detail/business-detail.component';
-
+import { AdminDashboardComponent } from './dashboards/admin-dashboard/admin-dashboard.component';
+import { AuthGuard } from './guards/auth.guard';
+import { NoAuthGuard } from './guards/no-auth.guard';
+import { ErrorPageComponent } from './pages/error-page/error-page.component';
 
 export const routes: Routes = [
 
+  // ═══════════════════════════════════════════
+  //  PUBLIC ROUTES (NoAuthGuard — redirect if already logged in)
+  // ═══════════════════════════════════════════
   {
     path: '',
-    component: LoginComponent
+    component: LoginComponent,
+    canActivate: [NoAuthGuard]
   },
   {
-     path: 'signup',
-    component: SignupComponent
+    path: 'signup',
+    component: SignupComponent,
+    canActivate: [NoAuthGuard]
   },
   {
     path: 'forgot-password',
-    component: ForgotPasswordComponent
+    component: ForgotPasswordComponent,
+    canActivate: [NoAuthGuard]
+  },
+
+  // ═══════════════════════════════════════════
+  //  PROTECTED ROUTES (AuthGuard — any logged-in user)
+  // ═══════════════════════════════════════════
+  {
+    path: 'profile',
+    component: ProfileComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'change-password',
+    component: ChangePasswordComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'categories',
+    component: CategoriesComponent,
+    canActivate: [AuthGuard]
   },
   {
     path: 'subcategory/:id',
-    component: SubcategoryListComponent
+    component: SubcategoryListComponent,
+    canActivate: [AuthGuard]
   },
   {
     path: 'businesses/:categoryId/:subcategoryId',
-    component: BusinessListComponent
+    component: BusinessListComponent,
+    canActivate: [AuthGuard]
   },
   {
-    path:'profile',
-    component:ProfileComponent
-  },
-  {
-    path:'change-password',
-    component:ChangePasswordComponent,
+    path: 'business/:id',
+    component: BusinessDetailComponent,
+    canActivate: [AuthGuard]
   },
   {
     path: 'contact-details',
-    component: ContactDetailsComponent
+    component: ContactDetailsComponent,
+    canActivate: [AuthGuard]
   },
-  { 
-    path: 'user-dashboard', 
-    component: UserDashboardComponent 
+
+  // ═══════════════════════════════════════════
+  //  ROLE-PROTECTED ROUTES (AuthGuard + role check)
+  // ═══════════════════════════════════════════
+
+  // ── User Role ──
+  {
+    path: 'user-dashboard',
+    component: UserDashboardComponent,
+    canActivate: [AuthGuard],
+    data: { roles: ['user'] }
   },
-  { 
+
+  // ── Client Role ──
+  {
     path: 'client-dashboard',
-    component: ClientDashboardComponent 
+    component: ClientDashboardComponent,
+    canActivate: [AuthGuard],
+    data: { roles: ['client'] }
   },
-  { 
-    path: 'register-business', 
-    component: RegisterBusinessComponent 
+  {
+    path: 'register-business',
+    component: RegisterBusinessComponent,
+    canActivate: [AuthGuard],
+    data: { roles: ['client'] }
   },
   {
     path: 'edit-business/:id',
-    component: EditBusinessBusinessComponent
+    component: EditBusinessBusinessComponent,
+    canActivate: [AuthGuard],
+    data: { roles: ['client'] }
   },
+
+  // ── Admin Role ──
   {
-    path:'categories',
-    component:CategoriesComponent
+    path: 'admin-dashboard',
+    component: AdminDashboardComponent,
+    canActivate: [AuthGuard],
+    data: { roles: ['admin'] }
   },
-  { 
-    path: 'business/:id', 
-    component: BusinessDetailComponent 
+
+  // ═══════════════════════════════════════════
+  //  ERROR PAGE
+  // ═══════════════════════════════════════════
+  {
+    path: 'error',
+    component: ErrorPageComponent
   },
+
+  // ═══════════════════════════════════════════
+  //  FALLBACK - 404 Not Found
+  // ═══════════════════════════════════════════
   {
     path: '**',
-    redirectTo: '',
+    component: ErrorPageComponent,
+    data: { errorCode: '404' }
   }
 ];

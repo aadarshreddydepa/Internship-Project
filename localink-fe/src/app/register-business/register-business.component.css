@@ -223,3 +223,80 @@ app-photo-upload{
   justify-content: center;  
   width: 100%; 
 }
+
+/* Success Modal Popup */
+.success-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-content {
+  background: linear-gradient(135deg, #2A2A2A 0%, #1C1C1C 100%);
+  border: 2px solid #C8A97E;
+  border-radius: 16px;
+  padding: 40px 50px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  animation: slideUp 0.4s ease;
+  max-width: 400px;
+}
+
+@keyframes slideUp {
+  from { 
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to { 
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.success-icon {
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(135deg, #C8A97E 0%, #B19F91 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  color: #1C1C1C;
+  margin: 0 auto 20px;
+  box-shadow: 0 4px 15px rgba(200, 169, 126, 0.4);
+}
+
+.modal-content h3 {
+  color: #C8A97E;
+  font-size: 24px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.modal-content p {
+  color: #B19F91;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.redirect-text {
+  color: #F8F4F0 !important;
+  font-size: 14px !important;
+  margin-top: 20px;
+  font-style: italic;
+  opacity: 0.8;
+}

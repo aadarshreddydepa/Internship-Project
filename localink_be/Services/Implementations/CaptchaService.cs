@@ -1,5 +1,5 @@
+using System.Text.Json;
 using System.Net.Http;
-using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using localink_be.Services.Interfaces;
@@ -8,33 +8,44 @@ namespace localink_be.Services.Implementations
 {
     public class CaptchaService : ICaptchaService
     {
+        private readonly IConfiguration _config;
         private readonly HttpClient _httpClient;
-        private readonly string _secretKey;
 
-        public CaptchaService(HttpClient httpClient, IConfiguration configuration)
+        public CaptchaService(IConfiguration config, HttpClient httpClient)
         {
+            _config = config;
             _httpClient = httpClient;
-            _secretKey = configuration["Captcha:SecretKey"];
         }
 
-        public async Task<bool> VerifyTokenAsync(string token)
+        public async Task<bool> VerifyAsync(string token)
         {
-            if (string.IsNullOrEmpty(token)) return false;
+            if (string.IsNullOrWhiteSpace(token))
+                return false;
 
-            var response = await _httpClient.PostAsync(
-                $"https://www.google.com/recaptcha/api/siteverify?secret={_secretKey}&response={token}",
-                null
-            );
+            var secret = _config["Captcha:SecretKey"];
 
-            if (!response.IsSuccessStatusCode) return false;
+            if (string.IsNullOrWhiteSpace(secret))
+                return false;
 
-            var result = await response.Content.ReadFromJsonAsync<CaptchaResponse>();
-            return result?.Success ?? false;
+            try
+            {
+                var response = await _httpClient.PostAsync(
+                    $"https://www.google.com/recaptcha/api/siteverify?secret={secret}&response={token}",
+                    null
+                );
+
+                if (!response.IsSuccessStatusCode)
+                    return false;
+
+                var json = await response.Content.ReadAsStringAsync();
+
+                using var doc = JsonDocument.Parse(json);
+                return doc.RootElement.GetProperty("success").GetBoolean();
+            }
+            catch
+            {
+                return false; // fail safe
+            }
         }
-    }
-
-    public class CaptchaResponse
-    {
-        public bool Success { get; set; }
     }
 }

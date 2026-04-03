@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { CommonModule } from '@angular/common';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { HttpClient } from '@angular/common/http';
+import { TranslateModule } from '@ngx-translate/core';
 
 import { BusinessService } from '../services/register-business.service';
 
@@ -22,7 +23,8 @@ import { Router } from '@angular/router';
     ContactDetailsComponent,
     HoursComponent,
     PhotoUploadComponent,
-    PreviewComponent
+    PreviewComponent,
+    TranslateModule
   ],
   templateUrl: './register-business.component.html',
   styleUrls: ['./register-business.component.css']
@@ -119,7 +121,7 @@ export class RegisterBusinessComponent {
     this.hoursErrorMessage = '';
   }
 
-  savePhoto(photo: string) {
+  savePhoto(photo: string | null) {
     this.photoData = photo;
   }
 

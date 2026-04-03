@@ -9,6 +9,7 @@ namespace localink_be.Services.Interfaces
         Task<object> LoginAsync(LoginRequest request);
         Task<string> VerifyEmailAsync(string email);
         Task<string> ResetPasswordAsync(ForgotPasswordRequest request);
+        Task<string> SendResetOtpAsync(string email, string captchaToken);
+        Task<string> VerifyOtpAndResetPasswordAsync(string email, string otp, string newPassword);
     }
 }
-    

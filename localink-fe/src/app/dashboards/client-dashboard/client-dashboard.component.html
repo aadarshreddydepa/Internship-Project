@@ -1,94 +1,311 @@
 <div class="container">
+ 
+  <header class="header">
 
-  <!-- HEADER -->
-  <div class="header">
-    <div>
-      <h2>Client Dashboard</h2>
-      <h3>Hello {{ fullName }}</h3> 
+  <div class="logo" (click)="scrollToTop()">Localink</div>
+
+  <div class="header-right">
+
+    <h2 class="welcome">{{ 'DASHBOARD.WELCOME' | translate }}, {{ fullName || 'User' }}</h2>
+
+    <div class="profile" (click)="toggleProfile()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+           viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
     </div>
 
+  </div>
+
+</header>
+ 
+  <div class="hero">
+    <h1>{{ 'DASHBOARD.HERO_TITLE' | translate }}</h1>
+    <p>{{ 'DASHBOARD.HERO_SUBTITLE' | translate }}</p>
+ 
     <button class="btn-primary add-btn" (click)="addBusiness()">
-      + Add Business
+      + {{ 'BUSINESS.REGISTER_TITLE' | translate }}
     </button>
   </div>
-
-  <!-- LOADING -->
+ 
   <div *ngIf="isLoading" class="empty">
-    <h3>Loading businesses...</h3>
+    <h3>{{ 'DASHBOARD.LOADING' | translate }}</h3>
   </div>
-
-  <!-- MAIN CONTENT (only after loading) -->
+ 
   <div *ngIf="!isLoading">
-
-    <!-- BUSINESS LIST -->
     <div *ngIf="businesses.length > 0; else emptyState" class="business-list">
-
       <div class="card" *ngFor="let b of businesses; trackBy: trackById">
-
         <h3>{{ b.businessName }}</h3>
-
         <p>{{ b.category | titlecase}} - {{ b.subcategory | titlecase}}</p>
-
         <span class="status">{{ b.status | titlecase}}</span>
-
+ 
         <div class="actions">
-          <button class="btn-outline" (click)="viewBusiness(b.id)">
-            View
-          </button>
-
-          <button class="btn-primary" (click)="editBusiness(b.id)">
-            Edit
-          </button>
+          <button class="btn-outline" (click)="viewBusiness(b.id)">{{ 'BUSINESS.VIEW' | translate }}</button>
+          <button class="btn-primary" (click)="editBusiness(b.id)">{{ 'BUSINESS.EDIT' | translate }}</button>
         </div>
-
       </div>
-
     </div>
-
-    <!-- EMPTY STATE -->
+ 
     <ng-template #emptyState>
       <div class="empty">
-        <h3>No Businesses Yet</h3>
-        <p>Start by adding your first business</p>
-
-        <button class="btn-primary" (click)="addBusiness()">
-          Add Business
-        </button>
+        <h3>{{ 'DASHBOARD.NO_RESULTS' | translate }}</h3>
+        <button class="btn-primary" (click)="addBusiness()">{{ 'BUSINESS.REGISTER_TITLE' | translate }}</button>
       </div>
     </ng-template>
-
   </div>
-
-  <!-- VIEW PANEL -->
+ 
+  <!-- VIEW MODAL -->
   <div class="view-overlay" *ngIf="selectedBusiness">
-
     <div class="view-card">
-
+ 
       <div class="view-header">
-        <h3>{{ selectedBusiness.businessName }}</h3>
-        <button class="close-btn" (click)="closeView()">✕</button>
+        <h3 class="view-title">{{ 'BUSINESS.DETAILS' | translate }}</h3>
+        <button class="close-btn" (click)="closeView()">{{ 'COMMON.CLOSE' | translate }}</button>
       </div>
+ 
+      <div class="view-content split-layout">
+ 
+  <!-- LEFT SIDE -->
+  <div class="details">
+    <p><strong>{{ 'BUSINESS.NAME_LABEL' | translate }}:</strong> {{ selectedBusiness.businessName }}</p>
+    <p><strong>{{ 'BUSINESS.CATEGORY' | translate }}:</strong> {{ selectedBusiness.category| titlecase  }}</p>
+    <p><strong>{{ 'BUSINESS.SUBCATEGORY' | translate }}:</strong> {{ selectedBusiness.subcategory }}</p>
+    <p><strong>{{ 'BUSINESS.STATUS' | translate }}:</strong> {{ selectedBusiness.status }}</p>
+    <p><strong>{{ 'BUSINESS.DESCRIPTION' | translate }}:</strong> {{ selectedBusiness.description }}</p>
 
-      <div class="view-content">
+    <p><strong>{{ 'CONTACT.COUNTRY' | translate }}:</strong> {{ selectedBusiness.contact.country || ('COMMON.NA' | translate) }}</p>
+    <p><strong>{{ 'CONTACT.STATE' | translate }}:</strong> {{ selectedBusiness.contact.state || ('COMMON.NA' | translate) }}</p>
+    <p><strong>{{ 'CONTACT.CITY' | translate }}:</strong> {{ selectedBusiness.contact.city || ('COMMON.NA' | translate) }}</p>
+    <p><strong>{{ 'CONTACT.PINCODE' | translate }}:</strong> {{ selectedBusiness.contact.pincode || ('COMMON.NA' | translate) }}</p>
+    <p><strong>{{ 'CONTACT.STREET' | translate }}:</strong> {{ selectedBusiness.contact.streetAddress || ('COMMON.NA' | translate) }}</p>
 
-        <p><strong>Category:</strong> {{ selectedBusiness.category }}</p>
-        <p><strong>Subcategory:</strong> {{ selectedBusiness.subcategory }}</p>
-        <p><strong>Status:</strong> {{ selectedBusiness.status }}</p>
-
-        <hr>
-
-        <p><strong>Description:</strong> {{ selectedBusiness.description }}</p>
-
-        <hr>
-
-        <p><strong>Phone:</strong> {{ selectedBusiness.contact?.phone }}</p>
-        <p><strong>Email:</strong> {{ selectedBusiness.contact?.email }}</p>
-        <p><strong>City:</strong> {{ selectedBusiness.contact?.city }}</p>
-
-      </div>
-
-    </div>
-
+    <p><strong>{{ 'CONTACT.PHONE' | translate }}:</strong> {{ selectedCountry.code }} {{ selectedBusiness.contact.phone || ('COMMON.NA' | translate) }}</p>
+    <p><strong>{{ 'CONTACT.EMAIL' | translate }}:</strong> {{ selectedBusiness.contact.email || ('COMMON.NA' | translate) }}</p>
   </div>
+ 
+  <!-- RIGHT SIDE (IMAGE) -->
+  <div class="image-section" *ngIf="selectedPhotos.length > 0">
+   
+ 
+    <img
+      *ngFor="let p of selectedPhotos"
+      [src]="'http://localhost:5138' + p.imageUrl"
+      class="view-image"
+    />
+  </div>
+ 
+</div>
+ 
+    </div>
+  </div>
+ 
+  <!-- EDIT MODAL -->
+  <div class="view-overlay" *ngIf="editingBusiness">
+    <div class="view-card">
+ 
+      <div class="view-header">
+        <h3 class="view-title">{{ 'BUSINESS.EDIT_TITLE' | translate }}</h3>
+        <button class="close-btn" (click)="cancelEdit()">{{ 'COMMON.CLOSE' | translate }}</button>
+      </div>
+ 
+      <form #form="ngForm" class="view-content edit-form" (ngSubmit)="saveEdits()">
+ 
+        <div class="form-group full">
+          <label>{{ 'BUSINESS.NAME' | translate }}</label>
+          <input [(ngModel)]="editingBusiness.businessName" name="bn"
+            required minlength="3" pattern="^[a-zA-Z0-9 ]+$" #bn="ngModel" />
+          <small class="error" *ngIf="bn.invalid && bn.touched">{{ 'VALIDATION.INVALID_NAME' | translate }}</small>
+        </div>
+ 
+        <div class="form-row">
+          <div class="form-group">
+            <label>{{ 'BUSINESS.CATEGORY' | translate }}</label>
+            <select [(ngModel)]="editingBusiness.category"
+                    name="cat"
+                    (change)="onCategoryChange(editingBusiness.category)"
+                    required #cat="ngModel">
+
+              <option value="">{{ 'COMMON.SELECT' | translate }}</option>
+              <option *ngFor="let c of categories" [value]="c.name.toLowerCase()">
+                {{ c.name | titlecase}}
+              </option>
+            </select>
+          </div>
+ 
+          <div class="form-group">
+            <label>{{ 'BUSINESS.SUBCATEGORY' | translate }}</label>
+            <select [(ngModel)]="editingBusiness.subcategory"
+                    name="sub"
+                    required #sub="ngModel">
+
+              <option value="">{{ 'COMMON.SELECT' | translate }}</option>
+              <option *ngFor="let s of filteredSubcategories" [value]="s.name">
+                {{ s.name }}
+              </option>
+            </select>
+          </div>
+        </div>
+ 
+        <div class="form-group full">
+          <label>{{ 'BUSINESS.DESCRIPTION' | translate }}</label>
+          <textarea [(ngModel)]="editingBusiness.description"
+            name="desc" required minlength="10" #desc="ngModel"></textarea>
+        </div>
+ 
+        <div class="form-row">
+          <div class="form-group">
+            <label>{{ 'CONTACT.COUNTRY' | translate }}</label>
+            <select [(ngModel)]="editingBusiness.contact.country"
+              name="country"
+              (change)="onCountryChange(editingBusiness.contact.country || '')"
+              required #country="ngModel">
+              <option value="">{{ 'COMMON.SELECT' | translate }}</option>
+              <option *ngFor="let c of countries" [value]="c.name">{{ c.name }}</option>
+            </select>
+          </div>
+ 
+          <div class="form-group">
+            <label>{{ 'CONTACT.STATE' | translate }}</label>
+            <select [(ngModel)]="editingBusiness.contact.state" name="state" required>
+              <option value="">{{ 'COMMON.SELECT' | translate }}</option>
+              <option *ngFor="let s of states" [value]="s">
+                {{ s }}
+              </option>
+            </select>
+          </div>
+        </div>
+ 
+        <div class="form-group full">
+          <label>{{ 'CONTACT.STREET' | translate }}</label>
+          <input [(ngModel)]="editingBusiness.contact.streetAddress"
+            name="street" required minlength="5" #street="ngModel" />
+        </div>
+ 
+        <div class="form-row">
+          <div class="form-group">
+            <label>{{ 'CONTACT.CITY' | translate }}</label>
+            <input [(ngModel)]="editingBusiness.contact.city"
+              name="city" required pattern="^[a-zA-Z ]+$" #city="ngModel" />
+          </div>
+ 
+          <div class="form-group">
+            <label>{{ 'CONTACT.PINCODE' | translate }}</label>
+            <input [(ngModel)]="editingBusiness.contact.pincode"
+              name="pin"
+              required
+              [pattern]="getPincodePattern()"
+              #pin="ngModel" />
+            <small class="error" *ngIf="pin.invalid && pin.touched">
+              {{ 'VALIDATION.INVALID_PINCODE' | translate }}
+            </small>
+          </div>
+        </div>
+ 
+        <div class="form-row">
+
+          <div class="form-group" style="max-width:120px;">
+            <label>{{ 'CONTACT.PHONE_CODE' | translate }}</label>
+            <input [(ngModel)]="editingBusiness.contact.phoneCode"
+              name="phoneCode"
+              placeholder="+91"
+              required
+              pattern="^\+[0-9]{1,4}$"
+              #code="ngModel" />
+
+        <small class="error" *ngIf="code.invalid && code.touched">
+          {{ 'VALIDATION.INVALID_COUNTRY_CODE' | translate }}
+        </small>
+          </div>
+ 
+          <div class="form-group">
+            <label>{{ 'CONTACT.PHONE' | translate }}</label>
+            <input [(ngModel)]="editingBusiness.contact.phone"
+              name="phone"
+              required
+              [pattern]="getPhonePattern()"
+              #phone="ngModel" />
+            <small class="error" *ngIf="phone.invalid && phone.touched">
+              {{ 'VALIDATION.INVALID_PHONE' | translate }}
+            </small>
+          </div>
+ 
+          <div class="form-group">
+            <label>{{ 'CONTACT.EMAIL' | translate }}</label>
+            <input [(ngModel)]="editingBusiness.contact.email"
+              name="email"
+              required
+              pattern="^[a-zA-Z0-9][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+              #email="ngModel" />
+            <small class="error" *ngIf="email.invalid && email.touched">
+              {{ 'VALIDATION.INVALID_EMAIL' | translate }}
+            </small>
+          </div>
+
+        </div>
+ 
+        <!--  ADDED: EXISTING IMAGES -->
+        <div *ngIf="selectedPhotos && selectedPhotos.length > 0">
+          <h4>{{ 'BUSINESS.EXISTING_IMAGES' | translate }}</h4>
+
+          <div *ngFor="let p of selectedPhotos">
+            <img [src]="'http://localhost:5138' + p.imageUrl"
+                 style="width:120px;height:120px;margin:5px;border-radius:8px;" />
+
+            <button type="button"
+                    class="btn-outline"
+                    (click)="deleteImage(p.photoId)">
+              {{ 'BUSINESS.REMOVE' | translate }}
+            </button>
+          </div>
+        </div>
+ 
+        <!--  ADDED: UPLOAD -->
+        <div class="form-group full">
+          <label>{{ 'BUSINESS.UPLOAD_IMAGE' | translate }}</label>
+
+          <input type="file" (change)="onFileSelected($event)" />
+
+          <button type="button"
+                  class="btn-primary"
+                  (click)="uploadImage()"
+                  [disabled]="!selectedFile">
+            {{ 'COMMON.UPLOAD' | translate }}
+          </button>
+        </div>
+ 
+        <div class="actions edit-actions">
+          <div *ngIf="form.invalid && form.touched" class="error">
+            {{ 'VALIDATION.FILL_REQUIRED' | translate }}
+          </div>
+
+          <button type="submit"
+                  class="btn-primary"
+                  [disabled]="form.invalid">
+            {{ 'BUSINESS.SAVE' | translate }}
+          </button>
+
+          <button type="button" class="btn-outline" (click)="cancelEdit()">
+            {{ 'BUSINESS.CANCEL' | translate }}
+          </button>
+        </div>
+ 
+      </form>
+    </div>
+  </div>
+ 
+</div>
+ 
+<div 
+  class="overlay" 
+  *ngIf="showProfile"
+  (click)="closeProfile()">
+</div>
+
+<div 
+  class="profile-drawer" 
+  [class.open]="showProfile">
+
+  <app-profile></app-profile>
 
 </div>

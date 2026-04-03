@@ -16,11 +16,12 @@ import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Subject, of } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, catchError } from 'rxjs/operators';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-contact-details',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, NgSelectModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, NgSelectModule, FormsModule, TranslateModule],
   templateUrl: './contact-details.component.html',
   styleUrls: ['./contact-details.component.css']
 })
@@ -175,7 +176,7 @@ export class ContactDetailsComponent implements OnInit, AfterViewInit, OnDestroy
           const countryObj = this.countries.find(
             c => c.name === this.initialData.country
           );
-          this.states = countryObj ? countryObj.states : [];
+          this.states = countryObj ? countryObj.states.map((s: any) => s.name) : [];
 
           // Restore map pin if coordinates exist
           if (this.initialData.latitude && this.initialData.longitude) {
@@ -365,7 +366,7 @@ export class ContactDetailsComponent implements OnInit, AfterViewInit, OnDestroy
         const matchedCountry = countryObj ? countryObj.name : countryName;
 
         if (countryObj) {
-          this.states = countryObj.states || [];
+          this.states = countryObj.states.map((s: any) => s.name) || [];
         }
 
         // Find matching state
@@ -467,7 +468,7 @@ export class ContactDetailsComponent implements OnInit, AfterViewInit, OnDestroy
       c => c.name === selectedCountry
     );
 
-    this.states = countryObj ? countryObj.states : [];
+    this.states = countryObj ? countryObj.states.map((s: any) => s.name) : [];
 
     this.contactForm.get('state')?.setValue('');
 

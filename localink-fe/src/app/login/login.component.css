@@ -198,6 +198,7 @@ html, body {
   font-size: 32px;
   background: linear-gradient(90deg, #C8A97E, #fff);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -389,4 +390,28 @@ input.invalid {
   margin-top: 18px;
   transform: scale(0.95);
   transform-origin: center;
-}
+}
+.captcha-container {
+  display: flex;
+  justify-content: center;
+  margin: 15px 0 10px;
+}
+.captcha-container > div {
+  padding: 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(200, 169, 126, 0.3);
+  box-shadow: 0 0 15px rgba(200, 169, 126, 0.15);
+  transition: all 0.3s ease;
+}
+.captcha-container > div:hover {
+  box-shadow: 0 0 25px rgba(200, 169, 126, 0.4);
+}
+
+/* LANGUAGE SWITCHER */
+.language-switcher-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}

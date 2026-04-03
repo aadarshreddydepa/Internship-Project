@@ -1,7 +1,24 @@
-import { Component, EventEmitter, Output, AfterViewInit } from '@angular/core';
-import { FormBuilder, Validators, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import {
+  Component,
+  EventEmitter,
+  Output,
+  AfterViewInit,
+  OnDestroy,
+  ChangeDetectionStrategy,
+  Inject,
+  PLATFORM_ID
+} from '@angular/core';
+import {
+  FormBuilder,
+  Validators,
+  FormGroup,
+  ReactiveFormsModule
+} from '@angular/forms';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../core/services/auth.service';
+import { Subject, takeUntil } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 // Declare global grecaptcha so TypeScript doesn't complain
 declare const grecaptcha: any;
@@ -9,11 +26,12 @@ declare const grecaptcha: any;
 @Component({
   selector: 'app-forgot-password',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslateModule],
   templateUrl: './forgot-password.component.html',
-  styleUrls: ['./forgot-password.component.css']
+  styleUrls: ['./forgot-password.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush // PERFORMANCE BOOST
 })
-export class ForgotPasswordComponent implements AfterViewInit {
+export class ForgotPasswordComponent implements AfterViewInit, OnDestroy {
 
   @Output() backToLogin = new EventEmitter<void>();
 
@@ -28,10 +46,22 @@ export class ForgotPasswordComponent implements AfterViewInit {
 
   emailForm!: FormGroup;
   resetForm!: FormGroup;
-  submitted = false;
-  captchaToken: string | null = null;
 
-  constructor(private fb: FormBuilder, private authService: AuthService) {
+  emailSubmitted = false;
+  resetSubmitted = false;
+
+  captchaToken: string | null = null;
+  captchaError = false;
+  captchaRendered = false;
+
+  private destroy$ = new Subject<void>(); // memory leak fix
+  private countdownInterval: any;
+
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
 
     this.emailForm = this.fb.group({
       email: ['', [
@@ -42,28 +72,35 @@ export class ForgotPasswordComponent implements AfterViewInit {
     });
 
     this.resetForm = this.fb.group({
-  password: ['', [
-    Validators.required,
-    Validators.minLength(8),
-    Validators.maxLength(50),
-    Validators.pattern('^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$'),
-    Validators.pattern('^\\S(.*\\S)?$')
-  ]],
-  confirmPassword: ['', Validators.required]
-}, { validators: this.passwordMatchValidator });
+      otp: ['', [
+        Validators.required,
+        Validators.pattern('^[0-9]{6}$') // STRICT OTP VALIDATION
+      ]],
+      password: ['', [
+        Validators.required,
+        Validators.minLength(8),
+        Validators.maxLength(50),
+        Validators.pattern('^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$'),
+        Validators.pattern('^\\S(.*\\S)?$')
+      ]],
+      confirmPassword: ['', Validators.required]
+    }, { validators: this.passwordMatchValidator });
 
-    this.emailForm.valueChanges.subscribe(() => this.message = '');
-    this.resetForm.valueChanges.subscribe(() => this.message = '');
+    // Clear message on input change
+    this.emailForm.valueChanges.pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.message = '');
+
+    this.resetForm.valueChanges.pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.message = '');
   }
 
   passwordMatchValidator(form: FormGroup) {
-  const password = form.get('password')?.value;
-  const confirmPassword = form.get('confirmPassword')?.value;
+    const password = form.get('password')?.value?.trim();
+    const confirmPassword = form.get('confirmPassword')?.value?.trim();
 
-  if (!confirmPassword) return null;
-
-  return password === confirmPassword ? null : { mismatch: true };
-}
+    if (!confirmPassword) return null;
+    return password === confirmPassword ? null : { mismatch: true };
+  }
 
   togglePassword() {
     this.showPassword = !this.showPassword;
@@ -73,84 +110,90 @@ export class ForgotPasswordComponent implements AfterViewInit {
     this.showConfirmPassword = !this.showConfirmPassword;
   }
 
-  // STEP 1
-  async verifyEmail() {
-    try {
-      this.submitted = true;
+  // STEP 1 → SEND OTP
+  verifyEmail() {
+    this.emailSubmitted = true;
 
-      if (this.emailForm.invalid || this.isLoading) return;
+    if (this.emailForm.invalid || this.isLoading) return;
 
-      // Block if reCAPTCHA not completed
-      if (!this.captchaToken) {
-        this.message = 'Please complete the reCAPTCHA verification.';
-        return;
-      }
-
-      this.isLoading = true;
-      this.message = "";
-
-      this.email = this.emailForm.value.email.trim().toLowerCase();
-
-      this.authService.verifyEmail(this.email).subscribe({
-        next: () => {
-          this.step = 2;
-          this.isLoading = false;
-        },
-        error: (err:any) => {
-          this.message = err?.error?.message || "Email not found";
-          this.isLoading = false;
-        }
-      });
-
-    } catch (error) {
-      this.message = "Unexpected error occurred";
-      this.isLoading = false;
+    if (!this.captchaToken) {
+      this.captchaError = true;
+      return;
     }
+
+    this.isLoading = true;
+    this.message = "";
+
+    this.email = this.emailForm.value.email.trim().toLowerCase();
+
+    this.authService.sendOtp({
+      email: this.email,
+      captchaToken: this.captchaToken
+    })
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: () => {
+        this.step = 2;
+        this.isLoading = false;
+
+        this.resetSubmitted = false;
+        this.resetForm.reset();
+      },
+      error: (err: any) => {
+        this.message = err?.error?.message || "Something went wrong";
+        this.isLoading = false;
+
+        if (typeof grecaptcha !== 'undefined') {
+          grecaptcha.reset();
+          this.captchaToken = '';
+        }
+      }
+    });
   }
 
-  // STEP 2
-  async resetPassword() {
-    try {
-      this.submitted = true;
+  // STEP 2 → RESET PASSWORD
+  resetPassword() {
+    this.resetSubmitted = true;
 
-      if (this.resetForm.invalid || this.isLoading) return;
+    if (this.resetForm.invalid || this.isLoading) return;
 
-      this.isLoading = true;
-      this.message = "";
+    this.isLoading = true;
+    this.message = "";
 
-      const payload = {
-        email: this.email,
-        newPassword: this.resetForm.value.password.trim(),
-        captchaToken: this.captchaToken
-      };
-      
-      console.log('Sending reset payload:', payload);
+    const payload = {
+      email: this.email,
+      otp: this.resetForm.value.otp.trim(),
+      newPassword: this.resetForm.value.password.trim()
+    };
 
-      this.authService.resetPassword(payload).subscribe({
+    this.authService.resetPassword(payload)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
         next: () => {
           this.step = 3;
-          this.message = "Password updated successfully";
-
           this.startCountdown();
         },
-        error: (err:any) => {
-          this.message = err?.error?.message || "Something went wrong";
+        error: (err: any) => {
+          this.message = err?.error?.message || "Invalid OTP";
           this.isLoading = false;
         }
       });
-
-    } catch (error) {
-      this.message = "Unexpected error occurred";
-      this.isLoading = false;
-    }
   }
 
+  onCaptchaResolved(token: string) {
+    this.captchaToken = token;
+    this.captchaError = false;
+  }
+
+  // SAFE COUNTDOWN (NO MEMORY LEAK)
   startCountdown() {
-    const interval = setInterval(() => {
+    this.countdown = 3;
+
+    this.countdownInterval = setInterval(() => {
       this.countdown--;
 
-      if (this.countdown === 0) {
-        clearInterval(interval);
+      if (this.countdown <= 0) {
+        clearInterval(this.countdownInterval);
         this.backToLogin.emit();
       }
     }, 1000);
@@ -195,68 +238,30 @@ export class ForgotPasswordComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.renderCaptcha();
+    if (!isPlatformBrowser(this.platformId)) return;
 
-  /* CURSOR GLOW */
-  const glow = document.querySelector('.cursor-glow') as HTMLElement;
+    const interval = setInterval(() => {
+      if (!this.captchaRendered && typeof grecaptcha !== 'undefined') {
+        this.captchaRendered = true;
 
-  document.addEventListener('mousemove', (e) => {
-    if (glow) {
-      glow.style.left = e.clientX + 'px';
-      glow.style.top = e.clientY + 'px';
+        grecaptcha.render('forgotCaptcha', {
+          sitekey: environment.recaptchaSiteKey,
+          callback: (token: string) => {
+            this.onCaptchaResolved(token);
+          }
+        });
+
+        clearInterval(interval);
+      }
+    }, 500);
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+
+    if (this.countdownInterval) {
+      clearInterval(this.countdownInterval);
     }
-  });
-
-  /* CANVAS LINES */
-  const canvas = document.querySelector('.lines-canvas') as HTMLCanvasElement;
-  if (!canvas) return;
-
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
-
-  const resize = () => {
-    canvas.width = window.innerWidth / 2;
-    canvas.height = window.innerHeight;
-  };
-
-  resize();
-  window.addEventListener('resize', resize);
-
-  const points = Array.from({ length: 40 }, () => ({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height,
-    vx: (Math.random() - 0.5) * 0.4,
-    vy: (Math.random() - 0.5) * 0.4
-  }));
-
-  const draw = () => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    points.forEach(p => {
-      p.x += p.vx;
-      p.y += p.vy;
-
-      if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-      if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-
-      points.forEach(p2 => {
-        const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
-
-        if (dist < 130) {
-          ctx.strokeStyle = `rgba(200,169,126,${1 - dist / 130})`;
-          ctx.lineWidth = 1;
-
-          ctx.beginPath();
-          ctx.moveTo(p.x, p.y);
-          ctx.lineTo(p2.x, p2.y);
-          ctx.stroke();
-        }
-      });
-    });
-
-    requestAnimationFrame(draw);
-  };
-
-  draw();
-}
+  }
 }

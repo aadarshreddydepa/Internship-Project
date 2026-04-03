@@ -9,11 +9,11 @@
     }"
     class="back"
   >
-    ← Back to Businesses
+    {{ 'BUSINESS.BACK_TO_LIST' | translate }}
   </a>
 
     <p class="category">
-    {{ business.categoryName | titlecase }} › {{ business.subcategoryName | titlecase }}
+    {{ categoryName | titlecase }} › {{ subcategoryName | titlecase }}
   </p>
 
   <!-- MAIN CARD -->
@@ -29,8 +29,8 @@
         />
 
         <div *ngIf="!business.primaryImage" class="image-placeholder">
-          <span>📷</span>
-          <p>No Image Available</p>
+          <span>{{ 'COMMON.CAMERA_ICON' | translate }}</span>
+          <p>{{ 'COMMON.NO_IMAGE' | translate }}</p>
         </div>
 
       </div>
@@ -40,33 +40,35 @@
     <div class="info-section">
 
       <div class="title-row">
-        <h1>Business Name : {{ business.name }}</h1>
+        <h1>{{ 'BUSINESS.NAME_LABEL' | translate }} : {{ business.businessName }}</h1>
+        <span class="rating-badge" *ngIf="totalReviews > 0">
+          {{ 'COMMON.STAR' | translate }} {{ averageRating }} / 5
+        </span>
       </div>
 
       
 
       <p class="description">
-        <span>Description: </span> {{ business.description || 'No description available' }}
-        reyifgeurohfljwioefhowugfohwiefjluiowehfuiwegfteshrdyfukgiygf jyf ytfyu giu y tftg ihu yfvb hiuf tvusydhofwehfoiwejhfiowehfuwgeofheifhweoifh wewhehweofoiwehfiwh fhwrhfowirhfowrhfwrhfhwrf hwr hfoiwehfoiwejpiwehfoiwehfoiwhfwehofwhehwwoih
+        <span>{{ 'BUSINESS.DESCRIPTION_LABEL' | translate }}: </span> {{ business.description || ('BUSINESS.NO_DESCRIPTION' | translate) }}
       </p>
 
       <!-- CONTACT DETAILS (TEXT STYLE) -->
       <div class="contact-details">
 
         <div class="row">
-          <span class="label">Phone</span>
-          <span class="value">{{ business.phoneNumber || '—' }}</span>
+          <span class="label">{{ 'CONTACT.PHONE' | translate }}</span>
+          <span class="value">{{ business.contact?.phoneNumber || ('COMMON.DASH' | translate) }}</span>
         </div>
 
         <div class="row">
-          <span class="label">Email</span>
-          <span class="value">{{ business.email || '—' }}</span>
+          <span class="label">{{ 'CONTACT.EMAIL' | translate }}</span>
+          <span class="value">{{ business.contact?.email || ('COMMON.DASH' | translate) }}</span>
         </div>
 
         <div class="row">
-          <span class="label">Location</span>
+          <span class="label">{{ 'CONTACT.LOCATION' | translate }}</span>
           <span class="value">
-            {{ business.city || 'N/A' }}, {{ business.state || '' }}
+             {{ business.contact?.city || ('COMMON.NA' | translate) }}, {{ business.contact?.state || '' }}
           </span>
         </div>
 
@@ -74,11 +76,69 @@
 
       <!-- ACTIONS -->
       <div class="actions">
-        <button class="contact-btn">Contact Business</button>
-        <button class="direction-btn">Get Directions</button>
+        <button class="contact-btn" (click)="contactBusiness()">{{ 'BUSINESS.CONTACT_BUSINESS' | translate }}</button>
+        <button class="direction-btn" (click)="getDirections()">{{ 'COMMON.PIN_ICON' | translate }} {{ 'BUSINESS.GET_DIRECTIONS' | translate }}</button>
       </div>
 
     </div>
+
+  </div>
+    <!-- REVIEW LIST -->
+    <div class="review-grid">
+    <div *ngFor="let r of visibleReviews" class="review-card">
+      <strong>{{ r.userName }}</strong>
+      <p>{{ 'COMMON.STAR' | translate }} {{ r.rating }}</p>
+      <p>{{ r.comment }}</p>
+    </div>
+  </div>
+  
+  <div class="review-section">
+
+    <!-- NO REVIEWS STATE -->
+    <div *ngIf="totalReviews === 0" class="no-review-container">
+
+      <p class="no-review-text">
+        {{ 'REVIEW.FIRST' | translate }}
+      </p>
+
+      <button class="add-review-btn-inline" (click)="toggleReviewForm()">
+        {{ 'REVIEW.ADD' | translate }}
+      </button>
+
+    </div>
+
+    <!-- HAS REVIEWS STATE -->
+    <div *ngIf="totalReviews > 0" class="add-review-container">
+      <button class="add-review-btn" (click)="toggleReviewForm()">
+        {{ 'REVIEW.ADD' | translate }}
+      </button>
+    </div>
+
+    <div *ngIf="showReviewForm" class="add-review">
+
+      <div class="star-rating">
+        <span
+          *ngFor="let star of [1,2,3,4,5]"
+          (click)="setRating(star)"
+          (mouseenter)="setHover(star)"
+          (mouseleave)="clearHover()"
+          [class.active]="star <= (hoverRating || rating)"
+        >
+          ★
+        </span>
+      </div>
+
+      <textarea [(ngModel)]="comment" placeholder="{{ 'REVIEW.WRITE_PLACEHOLDER' | translate }}"></textarea>
+
+      <button class="submit" (click)="submitReview()">{{ 'REVIEW.SUBMIT' | translate }}</button>
+
+    </div>
+
+  <div *ngIf="reviews.length > 6" class="view-more">
+    <button (click)="toggleViewMore()">
+      {{ showAllReviews ? ('REVIEW.VIEW_LESS' | translate) : ('REVIEW.VIEW_MORE' | translate) }}
+    </button>
+  </div>
 
   </div>
 

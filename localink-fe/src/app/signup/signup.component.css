@@ -426,3 +426,43 @@ border-color: #ff4d4f;
   transform-origin: center;
 }
 
+/* LANGUAGE SELECTOR */
+.language-selector {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.lang-label {
+  font-size: 18px;
+  display: block !important;
+  cursor: default;
+}
+
+.lang-dropdown {
+  padding: 6px 12px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(200,169,126,0.3);
+  border-radius: 8px;
+  color: #C8A97E;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.25s ease;
+  min-width: 120px;
+}
+
+.lang-dropdown:hover,
+.lang-dropdown:focus {
+  border-color: #C8A97E;
+  box-shadow: 0 0 8px rgba(200,169,126,0.25);
+}
+
+.lang-dropdown option {
+  background: #1a1a1a;
+  color: #F8F4F0;
+  padding: 8px;
+}

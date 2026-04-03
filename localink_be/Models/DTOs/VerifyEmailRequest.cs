@@ -7,5 +7,5 @@ namespace localink_be.Models.DTOs
         [Required]
         [EmailAddress]
         public string Email { get; set; } = string.Empty;
-    }
+}
 }
