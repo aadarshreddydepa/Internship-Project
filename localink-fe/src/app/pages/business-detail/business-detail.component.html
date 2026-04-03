@@ -130,6 +130,27 @@
 
       <textarea [(ngModel)]="comment" placeholder="{{ 'REVIEW.WRITE_PLACEHOLDER' | translate }}"></textarea>
 
+      <!-- AI Suggestion Button -->
+      <button 
+        class="ai-suggest-btn" 
+        (click)="getAiSuggestions()"
+        [disabled]="isLoadingAiSuggestions || !comment || comment.trim().length < 3 || rating < 1">
+        <span *ngIf="isLoadingAiSuggestions">✨ Thinking...</span>
+        <span *ngIf="!isLoadingAiSuggestions">✨ Improve with AI</span>
+      </button>
+
+      <!-- AI Suggestions -->
+      <div *ngIf="showAiSuggestions && aiSuggestions.length > 0" class="ai-suggestions">
+        <p class="suggestion-label">AI Suggestions - Click one to use:</p>
+        <div 
+          *ngFor="let suggestion of aiSuggestions; let i = index" 
+          class="suggestion-chip"
+          (click)="applySuggestion(suggestion)">
+          <span class="suggestion-number">{{ i + 1 }}</span>
+          <span class="suggestion-text">{{ suggestion }}</span>
+        </div>
+      </div>
+
       <button class="submit" (click)="submitReview()">{{ 'REVIEW.SUBMIT' | translate }}</button>
 
     </div>

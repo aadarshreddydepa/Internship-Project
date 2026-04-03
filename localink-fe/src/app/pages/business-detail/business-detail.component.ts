@@ -27,6 +27,9 @@ export class BusinessDetailComponent implements OnInit {
   showReviewForm = false;
   showAllReviews = false;
   comment = '';
+  aiSuggestions: string[] = [];
+  isLoadingAiSuggestions = false;
+  showAiSuggestions = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -181,5 +184,40 @@ subcategoryId!: number;
         window.open(`mailto:${email}`, '_self');
       }
     }
+  }
+
+  getAiSuggestions() {
+    if (!this.comment || this.comment.trim().length < 3) {
+      alert('Please write at least a few words first');
+      return;
+    }
+    if (this.rating < 1) {
+      alert('Please select a rating first');
+      return;
+    }
+
+    this.isLoadingAiSuggestions = true;
+    this.showAiSuggestions = false;
+
+    this.reviewService.getReviewSuggestions(
+      this.comment,
+      this.rating,
+      this.business?.businessName || 'this business'
+    ).subscribe({
+      next: (response: any) => {
+        this.aiSuggestions = response.data || [];
+        this.showAiSuggestions = this.aiSuggestions.length > 0;
+        this.isLoadingAiSuggestions = false;
+      },
+      error: () => {
+        alert('Failed to get AI suggestions');
+        this.isLoadingAiSuggestions = false;
+      }
+    });
+  }
+
+  applySuggestion(suggestion: string) {
+    this.comment = suggestion;
+    this.showAiSuggestions = false;
   }
 }
