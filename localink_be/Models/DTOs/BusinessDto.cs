@@ -24,6 +24,6 @@ namespace localink_be.Models.DTOs
         public int SubcategoryId { get; set; }
         public double? Latitude { get; set; }
         public double? Longitude { get; set; }
-        public double? Distance { get; set; } // Distance from user in km
+        public double? Distance { get; set; } 
     }
 }

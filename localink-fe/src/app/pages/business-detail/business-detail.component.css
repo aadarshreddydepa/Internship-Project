@@ -266,6 +266,7 @@ textarea {
   padding: 16px;
 }
 .submit {
+  margin-left: 10px;
   margin-top: 10px;
   background: #C8A97E;
   color: #1C1C1C;
