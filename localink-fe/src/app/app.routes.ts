@@ -18,6 +18,7 @@ import { AuthGuard } from './guards/auth.guard';
 import { NoAuthGuard } from './guards/no-auth.guard';
 import { ErrorPageComponent } from './pages/error-page/error-page.component';
 import { ContactUsComponent } from './contact-us/contact-us.component';
+import { AboutComponent } from './pages/about/about.component';
 
 export const routes: Routes = [
 
@@ -138,6 +139,14 @@ export const routes: Routes = [
   {
     path: 'contact-us',
     component: ContactUsComponent
+  },
+
+  // ═══════════════════════════════════════════
+  //  ABOUT US PAGE (Public)
+  // ═══════════════════════════════════════════
+  {
+    path: 'about',
+    component: AboutComponent
   },
 
   // ═══════════════════════════════════════════

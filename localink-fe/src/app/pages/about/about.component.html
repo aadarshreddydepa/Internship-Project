@@ -1,0 +1,66 @@
+<div class="about-wrapper">
+  <div class="about-bg"></div>
+
+  <div class="about-container">
+    <!-- HERO SECTION -->
+    <div class="hero-section">
+      <div class="logo-wrapper">
+        <img src="assets/remove_bg.png" alt="LocaLink Logo" class="about-logo"/>
+      </div>
+      <h1 class="title">About LocaLink</h1>
+      <p class="subtitle">Your trusted business directory platform</p>
+    </div>
+
+    <!-- ABOUT CARD -->
+    <div class="about-card">
+      <p>
+        Welcome to LocaLink — your trusted business directory platform.
+        We help users discover and connect with global businesses easily and efficiently through a seamless and intuitive search experience.
+      </p>
+      <p>
+        LocaLink also empowers business owners to register and showcase their businesses by providing detailed information, managing their presence, and reaching a wider audience. Businesses can engage with customers through reviews and ratings, helping build credibility and trust.
+      </p>
+      <p>
+        Our goal is to simplify global search while creating a reliable ecosystem where users find accurate, real-time information and businesses grow through visibility and customer interaction.
+      </p>
+    </div>
+
+    <!-- FEATURES -->
+    <div class="features-section">
+      <h2 class="section-title">What We Offer</h2>
+      <div class="features-row">
+        <div class="feature-box">
+          <h3>🌍 Global Search</h3>
+          <p>Find businesses across countries with a unified and powerful search system.</p>
+        </div>
+        <div class="feature-box">
+          <h3>⚡ Real-Time Data</h3>
+          <p>Access up-to-date business details instantly with accurate live data.</p>
+        </div>
+        <div class="feature-box">
+          <h3>🔍 Smart Filtering</h3>
+          <p>Quickly refine results using intelligent filters based on location and category.</p>
+        </div>
+        <div class="feature-box">
+          <h3>🔐 Secure Platform</h3>
+          <p>Robust authentication ensures safe user data and secure access.</p>
+        </div>
+        <div class="feature-box">
+          <h3>🤖 AI Insights</h3>
+          <p>Get smart recommendations to discover relevant businesses faster.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEAM -->
+    <div class="team-section">
+      <h2 class="section-title">Our Team</h2>
+      <div class="team-row">
+        <div class="team-box" *ngFor="let dev of team">
+          <img [src]="dev.img" [alt]="dev.name" class="team-img"/>
+          <h4>{{ dev.name }}</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
