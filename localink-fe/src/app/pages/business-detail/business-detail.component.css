@@ -401,3 +401,122 @@ textarea {
   line-height: 1.4;
   flex: 1;
 }
+
+/* AI REVIEW SUMMARY */
+.ai-review-summary {
+  background: linear-gradient(145deg, rgba(139, 92, 246, 0.15), rgba(124, 58, 237, 0.08));
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin: 16px 0;
+  animation: fadeIn 0.4s ease;
+}
+
+.summary-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.ai-icon {
+  font-size: 18px;
+}
+
+.summary-label {
+  color: #B19F91;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.summary-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.summary-text {
+  color: #F8F4F0;
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0;
+  font-style: italic;
+}
+
+.summary-text::before {
+  content: '"';
+  color: #8B5CF6;
+  font-size: 20px;
+  margin-right: 4px;
+}
+
+.summary-text::after {
+  content: '"';
+  color: #8B5CF6;
+  font-size: 20px;
+  margin-left: 4px;
+}
+
+.generate-summary-btn {
+  background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  align-self: flex-start;
+}
+
+.generate-summary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.summary-loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #B19F91;
+  font-size: 14px;
+}
+
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(139, 92, 246, 0.3);
+  border-top-color: #8B5CF6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.summary-error {
+  color: #EF4444;
+  font-size: 13px;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .ai-review-summary {
+    padding: 14px 16px;
+    margin: 12px 0;
+  }
+
+  .summary-text {
+    font-size: 14px;
+  }
+
+  .generate-summary-btn {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+}

@@ -30,6 +30,9 @@ export class BusinessDetailComponent implements OnInit {
   aiSuggestions: string[] = [];
   isLoadingAiSuggestions = false;
   showAiSuggestions = false;
+  aiReviewSummary: string | null = null;
+  isLoadingAiSummary = false;
+  aiSummaryError: string | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -219,5 +222,41 @@ subcategoryId!: number;
   applySuggestion(suggestion: string) {
     this.comment = suggestion;
     this.showAiSuggestions = false;
+  }
+
+  generateReviewSummary() {
+    if (this.reviews.length === 0) {
+      this.aiSummaryError = 'No reviews available to summarize';
+      return;
+    }
+
+    this.isLoadingAiSummary = true;
+    this.aiSummaryError = null;
+
+    const reviewComments = this.reviews
+      .filter(r => r.comment && r.comment.trim().length > 0)
+      .map(r => r.comment);
+
+    if (reviewComments.length === 0) {
+      this.aiSummaryError = 'No review comments available to summarize';
+      this.isLoadingAiSummary = false;
+      return;
+    }
+
+    this.reviewService.getReviewSummary(
+      reviewComments,
+      this.averageRating,
+      this.totalReviews,
+      this.business?.businessName || 'this business'
+    ).subscribe({
+      next: (response: any) => {
+        this.aiReviewSummary = response.data;
+        this.isLoadingAiSummary = false;
+      },
+      error: () => {
+        this.aiSummaryError = 'Failed to generate review summary';
+        this.isLoadingAiSummary = false;
+      }
+    });
   }
 }

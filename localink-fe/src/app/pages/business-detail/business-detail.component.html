@@ -46,7 +46,27 @@
         </span>
       </div>
 
-      
+      <!-- AI Review Summary -->
+      <div class="ai-review-summary" *ngIf="totalReviews > 0">
+        <div class="summary-header">
+          <span class="ai-icon">✨</span>
+          <span class="summary-label">What people say</span>
+        </div>
+        <div class="summary-content" *ngIf="!isLoadingAiSummary">
+          <p class="summary-text" *ngIf="aiReviewSummary">{{ aiReviewSummary }}</p>
+          <button 
+            *ngIf="!aiReviewSummary && !aiSummaryError" 
+            class="generate-summary-btn" 
+            (click)="generateReviewSummary()">
+            Generate AI Summary
+          </button>
+          <p class="summary-error" *ngIf="aiSummaryError">{{ aiSummaryError }}</p>
+        </div>
+        <div class="summary-loading" *ngIf="isLoadingAiSummary">
+          <span class="loading-spinner"></span>
+          <span>Analyzing reviews...</span>
+        </div>
+      </div>
 
       <p class="description">
         <span>{{ 'BUSINESS.DESCRIPTION_LABEL' | translate }}: </span> {{ business.description || ('BUSINESS.NO_DESCRIPTION' | translate) }}
