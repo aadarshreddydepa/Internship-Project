@@ -67,8 +67,11 @@
     "USER": "వినియోగదారు",
     "CLIENT": "క్లయింట్",
     "SELECT_LANGUAGE": "భాష",
+    "CREATE_ACCOUNT": "ఖాతాను సృష్టించండి",
     "SUCCESS_TITLE": "ఖాతా సృష్టించబడింది",
-    "SUCCESS_MSG": "లాగిన్‌కు మళ్లిస్తోంది..."
+    "SUCCESS_MSG": "లాగిన్‌కు మళ్లిస్తోంది...",
+    "HAVE_ACCOUNT": "ఇప్పటికే ఖాతా ఉందా?",
+    "SIGN_IN": "సైన్ ఇన్ చేయండి"
   },
   "DASHBOARD": {
     "WELCOME": "స్వాగతం",

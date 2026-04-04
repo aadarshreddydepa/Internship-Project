@@ -66,8 +66,9 @@
     "USER": "प्रयोगकर्ता",
     "CLIENT": "क्लाइन्ट",
     "SELECT_LANGUAGE": "भाषा",
-    "SUCCESS_TITLE": "खाता सिर्जना गरियो",
-    "SUCCESS_MSG": "लगइनमा पुन: निर्देशित गरिँदै..."
+    "CREATE_ACCOUNT": "खाता बनाबू",
+    "HAVE_ACCOUNT": "पहिने सँ खाता अछि?",
+    "SIGN_IN": "साइन इन"
   },
   "DASHBOARD": {
     "WELCOME": "स्वागत छ",

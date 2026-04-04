@@ -53,7 +53,6 @@ export class BusinessListComponent implements OnInit {
     this.service.getBusinessesBySubcategory(this.subcategoryId)
       .subscribe({
         next: (data) => {
-
           this.businesses = data.map((b: any) => ({
             ...b,
             primaryImage: b.primaryImage

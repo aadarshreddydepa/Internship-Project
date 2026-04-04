@@ -6,10 +6,13 @@
 
   <div class="carousel">
 
-    <div class="business-card" *ngFor="let business of businesses" >
+    <div class="business-card" 
+         *ngFor="let business of businesses" 
+         (click)="goToBusinessDetail(business)"
+         style="cursor: pointer;">
 
       <!-- Favorite Button -->
-      <button (click)="toggleFavorite(business)" style="border:none; background:none; cursor:pointer; position:absolute; top:10px; right:10px; z-index:10;">
+      <button (click)="$event.stopPropagation(); toggleFavorite(business)" style="border:none; background:none; cursor:pointer; position:absolute; top:10px; right:10px; z-index:10;">
         <span *ngIf="business.isFavorite" style="font-size:24px;">❤️</span>
         <span *ngIf="!business.isFavorite" style="font-size:24px;">🤍</span>
       </button>
@@ -18,8 +21,7 @@
         <img 
           *ngIf="business.image" 
           [src]="business.image" 
-          [alt]="business.name"
-        />
+          [alt]="business.name"/>
         <span *ngIf="!business.image">No Image</span>
       </div>
 

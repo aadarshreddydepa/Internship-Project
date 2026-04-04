@@ -67,7 +67,10 @@
     "CLIENT": "ਕਲਾਇੰਟ",
     "SELECT_LANGUAGE": "ਭਾਸ਼ਾ",
     "SUCCESS_TITLE": "ਖਾਤਾ ਬਣਾਇਆ ਗਿਆ",
-    "SUCCESS_MSG": "ਲਾਗਿਨ ਤੇ ਰੀਡਾਇਰੈਕਟ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ..."
+    "SUCCESS_MSG": "ਲਾਗਿਨ ਤੇ ਰੀਡਾਇਰੈਕਟ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ...",
+    "CREATE_ACCOUNT": "ਖਾਤਾ ਬਣਾਓ",
+    "HAVE_ACCOUNT": "ਪਹਿਲਾਂ ਤੋਂ ਖਾਤਾ ਹੈ?",
+    "SIGN_IN": "ਸਾਈਨ ਇਨ"
   },
   "DASHBOARD": {
     "WELCOME": "ਸਵਾਗਤ ਹੈ",

@@ -31,4 +31,21 @@ export class ReviewService {
   getSummary(businessId: number) {
     return this.http.get(`${this.baseUrl}/summary/${businessId}`);
   }
+
+  getReviewSuggestions(draftText: string, rating: number, businessName: string) {
+    return this.http.post('http://localhost:5138/api/v1/ai/review-suggestions', {
+      draftText,
+      rating,
+      businessName
+    }, this.getHeaders());
+  }
+
+  getReviewSummary(reviews: string[], averageRating: number, totalReviews: number, businessName: string) {
+    return this.http.post('http://localhost:5138/api/v1/ai/review-summary', {
+      reviews,
+      averageRating,
+      totalReviews,
+      businessName
+    }, this.getHeaders());
+  }
 }

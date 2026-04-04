@@ -69,8 +69,11 @@
     "USER": "उपयोगकर्ता",
     "CLIENT": "ग्राहक",
     "SELECT_LANGUAGE": "भाषा",
+    "CREATE_ACCOUNT": "खाता बनाएं",
     "SUCCESS_TITLE": "खाता बनाया गया",
-    "SUCCESS_MSG": "लॉगिन पर पुनर्निर्देशित हो रहा है..."
+    "SUCCESS_MSG": "लॉगिन पर पुनर्निर्देशित हो रहा है...",
+    "HAVE_ACCOUNT": "पहले से खाता है?",
+    "SIGN_IN": "साइन इन करें"
   },
   "DASHBOARD": {
     "WELCOME": "स्वागत है",

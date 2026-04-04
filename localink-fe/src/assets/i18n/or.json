@@ -67,7 +67,10 @@
     "CLIENT": "କ୍ଲାଇଣ୍ଟ୍",
     "SELECT_LANGUAGE": "ଭାଷା",
     "SUCCESS_TITLE": "ଖାତା ସୃଷ୍ଟି ହେଲା",
-    "SUCCESS_MSG": "ଲଗଇନ୍‌କୁ ପୁନର୍ନିର୍ଦ୍ଦେଶ କରାଯାଉଛି..."
+    "SUCCESS_MSG": "ଲଗଇନ୍‌କୁ ପୁନର୍ନିର୍ଦ୍ଦେଶ କରାଯାଉଛି...",
+    "CREATE_ACCOUNT": "ଖାତା ସୃଷ୍ଟି କରନ୍ତୁ",
+    "HAVE_ACCOUNT": "ପୂର୍ବରୁ ଖାତା ଅଛି?",
+    "SIGN_IN": "ସାଇନ ଇନ"
   },
   "DASHBOARD": {
     "WELCOME": "ସ୍ୱାଗତ",

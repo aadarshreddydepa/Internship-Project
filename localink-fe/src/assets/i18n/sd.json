@@ -66,8 +66,11 @@
     "USER": "استعمال ڪندڙ",
     "CLIENT": "ڪلائنٽ",
     "SELECT_LANGUAGE": "ٻولي",
-    "SUCCESS_TITLE": "اڪائونٽ ٺاهيو ويو",
-    "SUCCESS_MSG": "لاگ ان ڏانھن ريڊائريڪٽ ڪيو پيو وڃي..."
+    "SUCCESS_TITLE": "کاتو تخليق ٿيو",
+    "SUCCESS_MSG": "لاگ ان ڏانهن ريڊائريڪٽ ڪري رهيا آهيون...",
+    "CREATE_ACCOUNT": "کاتو تخليق ڪريو",
+    "HAVE_ACCOUNT": "پهرين کان ئي کاتو آهي؟",
+    "SIGN_IN": "سائن ان"
   },
   "DASHBOARD": {
     "WELCOME": "ڀليڪار",

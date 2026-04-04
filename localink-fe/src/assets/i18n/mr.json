@@ -67,7 +67,10 @@
     "CLIENT": "क्लायंट",
     "SELECT_LANGUAGE": "भाषा",
     "SUCCESS_TITLE": "खाते तयार झाले",
-    "SUCCESS_MSG": "लॉगिनकडे पुनर्निर्देशित करत आहे..."
+    "SUCCESS_MSG": "लॉगिनकडे पुनर्निर्देशित करत आहे...",
+    "CREATE_ACCOUNT": "खाते तयार करा",
+    "HAVE_ACCOUNT": "आधीपासूनच खाते आहे?",
+    "SIGN_IN": "साइन इन"
   },
   "DASHBOARD": {
     "WELCOME": "स्वागत आहे",

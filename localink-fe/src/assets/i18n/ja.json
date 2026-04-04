@@ -68,8 +68,11 @@
     "USER": "ユーザー",
     "CLIENT": "事業者",
     "SELECT_LANGUAGE": "言語",
-    "SUCCESS_TITLE": "アカウントが作成されました",
-    "SUCCESS_MSG": "ログイン画面にリダイレクトします..."
+    "CREATE_ACCOUNT": "アカウントを作成",
+    "SUCCESS_TITLE": "アカウント作成完了",
+    "SUCCESS_MSG": "ログイン画面にリダイレクト中...",
+    "HAVE_ACCOUNT": "すでにアカウントをお持ちですか？",
+    "SIGN_IN": "サインイン"
   },
   "DASHBOARD": {
     "WELCOME": "ようこそ",
@@ -288,6 +291,10 @@
     "UR": "اردو (Urdu)"
   },
   "RTL": {
-    "LANGUAGES": ["ar", "sd", "ur"]
+    "LANGUAGES": [
+      "ar",
+      "sd",
+      "ur"
+    ]
   }
 }

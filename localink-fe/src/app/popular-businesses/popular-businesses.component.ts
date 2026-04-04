@@ -1,5 +1,6 @@
 import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Router } from '@angular/router';
 import { PopularService, PopularBusiness } from '../services/popular.service';
 import { FavoritesService } from '../services/favorites.service';
 
@@ -19,6 +20,7 @@ export class PopularBusinessesComponent implements OnInit {
   constructor(
     private popularService: PopularService,
     private favoritesService: FavoritesService,
+    private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
@@ -78,6 +80,17 @@ export class PopularBusinessesComponent implements OnInit {
         },
         error: (err) => console.error('Error removing favorite', err)
       });
+  }
+
+  goToBusinessDetail(business: PopularBusiness): void {
+    this.router.navigate(['/business', business.id], {
+      queryParams: {
+        categoryName: business.categoryName,
+        subcategoryName: business.subcategoryName,
+        categoryId: business.categoryId,
+        subcategoryId: business.subcategoryId
+      }
+    });
   }
 
   getStars(rating: number): string {

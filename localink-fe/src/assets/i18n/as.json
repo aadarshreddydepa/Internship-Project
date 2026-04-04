@@ -67,7 +67,10 @@
     "CLIENT": "ক্লাইণ্ট",
     "SELECT_LANGUAGE": "ভাষা",
     "SUCCESS_TITLE": "একাউণ্ট সৃষ্টি হ’ল",
-    "SUCCESS_MSG": "লগইনলৈ পুনৰ্নিৰ্দেশিত কৰা হৈছে..."
+    "SUCCESS_MSG": "লগইনলৈ পুনৰ্নিৰ্দেশিত কৰা হৈছে...",
+    "CREATE_ACCOUNT": "একাউণ্ট সৃষ্টি কৰক",
+    "HAVE_ACCOUNT": "ইতিমধ্যে একাউণ্ত আছে?",
+    "SIGN_IN": "ছাইন ইন"
   },
   "DASHBOARD": {
     "WELCOME": "স্বাগতম",

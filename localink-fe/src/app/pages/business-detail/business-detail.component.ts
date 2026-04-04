@@ -27,6 +27,12 @@ export class BusinessDetailComponent implements OnInit {
   showReviewForm = false;
   showAllReviews = false;
   comment = '';
+  aiSuggestions: string[] = [];
+  isLoadingAiSuggestions = false;
+  showAiSuggestions = false;
+  aiReviewSummary: string | null = null;
+  isLoadingAiSummary = false;
+  aiSummaryError: string | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -181,5 +187,76 @@ subcategoryId!: number;
         window.open(`mailto:${email}`, '_self');
       }
     }
+  }
+
+  getAiSuggestions() {
+    if (!this.comment || this.comment.trim().length < 3) {
+      alert('Please write at least a few words first');
+      return;
+    }
+    if (this.rating < 1) {
+      alert('Please select a rating first');
+      return;
+    }
+
+    this.isLoadingAiSuggestions = true;
+    this.showAiSuggestions = false;
+
+    this.reviewService.getReviewSuggestions(
+      this.comment,
+      this.rating,
+      this.business?.businessName || 'this business'
+    ).subscribe({
+      next: (response: any) => {
+        this.aiSuggestions = response.data || [];
+        this.showAiSuggestions = this.aiSuggestions.length > 0;
+        this.isLoadingAiSuggestions = false;
+      },
+      error: () => {
+        alert('Failed to get AI suggestions');
+        this.isLoadingAiSuggestions = false;
+      }
+    });
+  }
+
+  applySuggestion(suggestion: string) {
+    this.comment = suggestion;
+    this.showAiSuggestions = false;
+  }
+
+  generateReviewSummary() {
+    if (this.reviews.length === 0) {
+      this.aiSummaryError = 'No reviews available to summarize';
+      return;
+    }
+
+    this.isLoadingAiSummary = true;
+    this.aiSummaryError = null;
+
+    const reviewComments = this.reviews
+      .filter(r => r.comment && r.comment.trim().length > 0)
+      .map(r => r.comment);
+
+    if (reviewComments.length === 0) {
+      this.aiSummaryError = 'No review comments available to summarize';
+      this.isLoadingAiSummary = false;
+      return;
+    }
+
+    this.reviewService.getReviewSummary(
+      reviewComments,
+      this.averageRating,
+      this.totalReviews,
+      this.business?.businessName || 'this business'
+    ).subscribe({
+      next: (response: any) => {
+        this.aiReviewSummary = response.data;
+        this.isLoadingAiSummary = false;
+      },
+      error: () => {
+        this.aiSummaryError = 'Failed to generate review summary';
+        this.isLoadingAiSummary = false;
+      }
+    });
   }
 }

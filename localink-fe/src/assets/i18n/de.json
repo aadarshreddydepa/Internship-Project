@@ -69,7 +69,10 @@
     "CLIENT": "Unternehmer",
     "SELECT_LANGUAGE": "Sprache",
     "SUCCESS_TITLE": "Konto erstellt",
-    "SUCCESS_MSG": "Weiterleitung zur Anmeldung..."
+    "SUCCESS_MSG": "Weiterleitung zur Anmeldung...",
+    "CREATE_ACCOUNT": "Konto erstellen",
+    "HAVE_ACCOUNT": "Bereits ein Konto?",
+    "SIGN_IN": "Anmelden"
   },
   "DASHBOARD": {
     "WELCOME": "Willkommen",
@@ -288,6 +291,10 @@
     "UR": "اردو (Urdu)"
   },
   "RTL": {
-    "LANGUAGES": ["ar", "sd", "ur"]
+    "LANGUAGES": [
+      "ar",
+      "sd",
+      "ur"
+    ]
   }
 }

@@ -145,6 +145,17 @@ export class UserDashboardComponent implements OnInit {
     window.location.href = `/subcategory/${categoryId}`;
   }
 
+  goToBusinessDetail(business: BusinessDto): void {
+    this.router.navigate(['/business', business.id], {
+      queryParams: {
+        categoryName: business.categoryName,
+        subcategoryName: business.subcategoryName,
+        categoryId: 0,
+        subcategoryId: business.subcategoryId
+      }
+    });
+  }
+
   // Voice search handlers - improved for real-time search
   onVoiceSearch(result: VoiceSearchResult): void {
     // Update search term with the recognized query

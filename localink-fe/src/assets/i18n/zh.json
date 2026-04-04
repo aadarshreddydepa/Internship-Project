@@ -68,8 +68,11 @@
     "USER": "用户",
     "CLIENT": "商家",
     "SELECT_LANGUAGE": "语言",
+    "CREATE_ACCOUNT": "创建账户",
     "SUCCESS_TITLE": "账户已创建",
-    "SUCCESS_MSG": "正在跳转到登录页面..."
+    "SUCCESS_MSG": "正在跳转到登录页面...",
+    "HAVE_ACCOUNT": "已有账户？",
+    "SIGN_IN": "登录"
   },
   "DASHBOARD": {
     "WELCOME": "欢迎",
