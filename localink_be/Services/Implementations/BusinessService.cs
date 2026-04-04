@@ -47,6 +47,12 @@ namespace localink_be.Services.Implementations
                     .Where(p => p.BusinessId == b.BusinessId && p.IsPrimary)
                     .Select(p => p.ImageUrl)
                     .FirstOrDefault(),
+                AverageRating = _db.BusinessReviews
+                    .Where(r => r.BusinessId == b.BusinessId)
+                    .Select(r => (double?)r.Rating)
+                    .Average() ?? 0,
+                TotalReviews = _db.BusinessReviews
+                    .Count(r => r.BusinessId == b.BusinessId),
                 b.CreatedAt
             })
             .ToListAsync<object>();

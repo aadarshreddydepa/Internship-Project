@@ -9,6 +9,11 @@ export interface PopularBusiness {
   description: string;
   image: string | null;
   rating: number;
+  totalReviews: number;
+  categoryId: number;
+  subcategoryId: number;
+  categoryName: string;
+  subcategoryName: string;
 }
 
 @Injectable({
@@ -24,17 +29,25 @@ export class PopularService {
     return this.http.get<any[]>(`${this.baseUrl}/business`)
       .pipe(
         map((data) =>
-          data.slice(0, 8).map((b: any) => ({
-
-            id: b.businessId,
-            name: b.businessName,
-            category: `${b.categoryName  || 'General'} -> ${b.subcategoryName || ''}`,
-            description: b.description || 'No description available',
-            image: b.primaryImage
-              ? 'http://localhost:5138' + b.primaryImage
-              : null,
-            rating: 4
-          }))
+          data
+            .map((b: any) => ({
+              id: b.businessId,
+              name: b.businessName,
+              category: `${b.categoryName || 'General'} → ${b.subcategoryName || ''}`,
+              description: b.description || 'No description available',
+              image: b.primaryImage
+                ? 'http://localhost:5138' + b.primaryImage
+                : null,
+              rating: b.averageRating || 0,
+              totalReviews: b.totalReviews || 0,
+              categoryId: b.categoryId,
+              subcategoryId: b.subcategoryId,
+              categoryName: b.categoryName || 'General',
+              subcategoryName: b.subcategoryName || ''
+            }))
+            .filter((b: PopularBusiness) => b.totalReviews > 0)
+            .sort((a: PopularBusiness, b: PopularBusiness) => b.rating - a.rating)
+            .slice(0, 10)
         )
       );
   }

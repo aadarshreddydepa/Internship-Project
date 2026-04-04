@@ -6,7 +6,10 @@
 
   <div class="carousel">
 
-    <div class="business-card" *ngFor="let business of businesses" >
+    <div class="business-card" 
+         *ngFor="let business of businesses" 
+         (click)="goToBusinessDetail(business)"
+         style="cursor: pointer;">
       <div class="image-placeholder">
         <img 
           *ngIf="business.image" 
