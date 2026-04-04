@@ -28,8 +28,12 @@ export class PopularService {
   getTopBusinesses(): Observable<PopularBusiness[]> {
     return this.http.get<any[]>(`${this.baseUrl}/business`)
       .pipe(
-        map((data) =>
-          data
+        map((data) => {
+          if (!data || data.length === 0) {
+            return [];
+          }
+          
+          return data
             .map((b: any) => ({
               id: b.businessId,
               name: b.businessName,
@@ -47,8 +51,8 @@ export class PopularService {
             }))
             .filter((b: PopularBusiness) => b.totalReviews > 0)
             .sort((a: PopularBusiness, b: PopularBusiness) => b.rating - a.rating)
-            .slice(0, 10)
-        )
+            .slice(0, 10);
+        })
       );
   }
 }
