@@ -35,7 +35,7 @@
 
     <!--IMAGE LEFT -->
     <div class="image">
-      <img *ngIf="b.primaryImage" [src]="'http://localhost:5138' + b.primaryImage" />
+      <img *ngIf="b.primaryImage" [src]="b.primaryImage" />
       <span *ngIf="!b.primaryImage">{{ 'COMMON.NO_IMAGE' | translate }}</span>
     </div>
 
