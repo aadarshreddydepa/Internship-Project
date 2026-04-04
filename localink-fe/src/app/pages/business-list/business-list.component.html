@@ -3,7 +3,7 @@
   <!-- HEADER -->
   <div class="page-header">
 
-    <a [routerLink]="['/subcategory', categoryId]" class="back">
+    <a [routerLink]="['/subcategory', categoryId]" [queryParams]="{categoryName: categoryName}" class="back">
     {{ 'COMMON.BACK' | translate }} {{ 'SUBCATEGORY.TITLE' | translate }}
   </a>
 
@@ -26,16 +26,16 @@
   <div class="business-card"
      *ngFor="let b of paginatedBusinesses"
      [routerLink]="['/business', b.id]"
-      [queryParams]="{
-      categoryName: b.categoryName,
-      subcategoryName: b.subcategoryName,
+     [queryParams]="{
+      categoryName: categoryName,
+      subcategoryName: subcategoryName,
       categoryId: categoryId,
       subcategoryId: subcategoryId
     }">
 
     <!--IMAGE LEFT -->
     <div class="image">
-      <img *ngIf="b.primaryImage" [src]="b.primaryImage" />
+      <img *ngIf="b.primaryImage" [src]="'http://localhost:5138' + b.primaryImage" />
       <span *ngIf="!b.primaryImage">{{ 'COMMON.NO_IMAGE' | translate }}</span>
     </div>
 
@@ -50,13 +50,13 @@
         {{ b.subcategoryName | titlecase}}
       </p>
 
-      <p class="desc">
-        {{ b.description | titlecase }}
+      <p class="desc" *ngIf="b.description">
+        {{ b.description }}
       </p>
 
       <div class="details">
-        <span>📞 {{ b.phoneNumber }}</span>
-        <span>{{ 'COMMON.PIN_ICON' | translate }} {{ b.city }}, {{ b.state }}</span>
+        <span *ngIf="b.phoneNumber && b.phoneNumber.trim()">📞 {{ b.phoneNumber }}</span>
+        <span *ngIf="b.city || b.state">{{ 'COMMON.PIN_ICON' | translate }} {{ b.city }}{{ b.city && b.state ? ', ' : '' }}{{ b.state }}</span>
       </div>
 
     </div>

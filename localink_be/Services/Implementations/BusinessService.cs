@@ -372,7 +372,35 @@ namespace localink_be.Services.Implementations
                 .Select(b => new BusinessDto
                 {
                     Id = b.BusinessId,
-                    Name = b.BusinessName
+                    Name = b.BusinessName,
+                    Description = b.Description,
+                    CategoryName = b.Category != null ? b.Category.CategoryName : "",
+                    SubcategoryName = b.Subcategory != null ? b.Subcategory.SubcategoryName : "",
+                    SubcategoryId = b.SubcategoryId,
+                    PhoneNumber = _db.BusinessContacts
+                        .Where(c => c.BusinessId == b.BusinessId)
+                        .Select(c => (c.PhoneCode ?? "") + " " + (c.PhoneNumber ?? ""))
+                        .FirstOrDefault(),
+                    Email = _db.BusinessContacts
+                        .Where(c => c.BusinessId == b.BusinessId)
+                        .Select(c => c.Email)
+                        .FirstOrDefault(),
+                    City = _db.BusinessContacts
+                        .Where(c => c.BusinessId == b.BusinessId)
+                        .Select(c => c.City)
+                        .FirstOrDefault(),
+                    State = _db.BusinessContacts
+                        .Where(c => c.BusinessId == b.BusinessId)
+                        .Select(c => c.State)
+                        .FirstOrDefault(),
+                    Country = _db.BusinessContacts
+                        .Where(c => c.BusinessId == b.BusinessId)
+                        .Select(c => c.Country)
+                        .FirstOrDefault(),
+                    PrimaryImage = _db.BusinessPhotos
+                        .Where(p => p.BusinessId == b.BusinessId && p.IsPrimary)
+                        .Select(p => p.ImageUrl)
+                        .FirstOrDefault()
                 })
                 .ToListAsync();
         }
