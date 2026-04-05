@@ -17,7 +17,7 @@ export class PopularBusinessesComponent implements OnInit {
 
   businesses: PopularBusiness[] = [];
   favoriteIds: number[] = [];
-  userId: number = 2;
+  userId: number = 0;
 
   constructor(
     private popularService: PopularService,
@@ -25,7 +25,34 @@ export class PopularBusinessesComponent implements OnInit {
     private toastService: ToastService,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
-  ) {}
+  ) {
+    this.extractUserIdFromToken();
+  }
+
+  private extractUserIdFromToken(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      // Check multiple possible claim names
+      const userIdValue = 
+        payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] ||
+        payload.nameid ||
+        payload.userId ||
+        payload.UserId ||
+        payload.sub ||
+        '0';
+      this.userId = parseInt(userIdValue, 10);
+      if (this.userId <= 0) {
+        console.error('Invalid userId extracted from token:', userIdValue);
+        this.userId = 0;
+      }
+    } catch (error) {
+      console.error('Failed to extract userId from token:', error);
+      this.userId = 0;
+    }
+  }
 
   ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;

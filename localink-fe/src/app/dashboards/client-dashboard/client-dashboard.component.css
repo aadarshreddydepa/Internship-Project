@@ -1,6 +1,6 @@
 /* CONTAINER */
 .container {
-  padding: 40px 60px;
+  padding: 0;
   background: #1C1C1C;
   min-height: 100vh;
   color: #F8F4F0;
@@ -13,8 +13,9 @@
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:18px 0px;
+  padding:18px 60px 0px 60px;
   backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
   border-bottom:1px solid rgba(255,255,255,0.05);
 }
 
@@ -22,6 +23,7 @@
   font-size:24px;
   font-weight:600;
   color:#C8A97E;
+  letter-spacing:1px;
   cursor:pointer;
 }
 
@@ -39,6 +41,7 @@
 
 .welcome{
   font-size:18px;
+  font-weight:500;
   color:#B19F91;
 }
 
@@ -52,6 +55,11 @@
   border-radius:50%;
   background:#2A2A2A;
   border:1px solid #484948;
+  transition:0.2s;
+}
+
+.profile:hover{
+  background:#343434;
 }
 
 .overlay {
@@ -97,7 +105,7 @@
   border: 1px solid #484948;
   border-radius: 14px;
   padding: 30px;
-  margin-bottom: 30px;
+  margin: 30px 60px 30px 60px;
 }
  
 .hero h1 {
@@ -115,6 +123,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 20px;
+  padding: 0 60px 40px 60px;
 }
  
 /* CARD */
@@ -180,6 +189,7 @@
   text-align: center;
   margin-top: 80px;
   color: #B19F91;
+  padding: 0 60px;
 }
  
 .empty h3 {
@@ -512,27 +522,11 @@ textarea {
 }
 
 /* Language Switcher in Header */
-.header-language-switcher ::ng-deep .language-sidebar-trigger {
-  padding: 8px 14px;
-  border-radius: 50px;
-  background: #2A2A2A;
-  border: 1px solid #484948;
-  color: #B19F91;
-  font-size: 13px;
-}
-
-.header-language-switcher ::ng-deep .language-sidebar-trigger:hover {
-  background: #343434;
-  border-color: #C8A97E;
-  color: #C8A97E;
-}
-
 .header-language-switcher {
   display: flex;
   align-items: center;
 }
 
-/* Language sidebar visibility control */
 .header-language-switcher ::ng-deep .language-sidebar {
   transform: translateX(100%) !important;
   visibility: hidden;
@@ -541,4 +535,23 @@ textarea {
 .header-language-switcher ::ng-deep .language-sidebar.open {
   transform: translateX(0) !important;
   visibility: visible;
+}
+
+.header-language-switcher ::ng-deep .language-sidebar-trigger {
+  padding: 8px 12px;
+  border-radius: 50px;
+  background: #2A2A2A;
+  border: 1px solid #484948;
+  color: #B19F91;
+  font-size: 12px;
+}
+
+.header-language-switcher ::ng-deep .language-sidebar-trigger:hover {
+  background: #343434;
+  color: #C8A97E;
+  border-color: #C8A97E;
+}
+
+.header-language-switcher ::ng-deep .current-lang {
+  max-width: 60px;
 }

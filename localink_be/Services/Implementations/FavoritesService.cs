@@ -17,6 +17,16 @@ namespace localink_be.Services.Implementations
 
         public async Task<string> AddFavoriteAsync(FavoriteDto dto)
         {
+            // Validate that the user exists
+            var userExists = await _context.Users.AnyAsync(u => u.UserId == dto.UserId);
+            if (!userExists)
+                return "User not found";
+
+            // Validate that the business exists
+            var businessExists = await _context.Businesses.AnyAsync(b => b.BusinessId == dto.BusinessId);
+            if (!businessExists)
+                return "Business not found";
+
             var exists = await _context.Favorites
                 .AnyAsync(f => f.UserId == dto.UserId && f.BusinessId == dto.BusinessId);
 

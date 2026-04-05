@@ -14,7 +14,7 @@ html, body {
 .dashboard {
   width: 100%;
   min-height: 100vh;
-  padding: 40px;
+  padding: 0;
   background: #121212;
   color: #F8F4F0;
   font-family: Arial, Helvetica, sans-serif;
@@ -23,6 +23,8 @@ html, body {
 .title {
   font-size: 28px;
   margin-bottom: 25px;
+  padding: 0 40px;
+  margin-top: 25px;
 }
 
 /* Tabs */
@@ -30,6 +32,7 @@ html, body {
   display: flex;
   gap: 10px;
   margin-bottom: 20px;
+  padding: 0 40px;
 }
 
 .tabs button {
@@ -56,6 +59,7 @@ html, body {
   display: flex;
   gap: 15px;
   margin-bottom: 20px;
+  padding: 0 40px;
 }
 
 .toolbar input {
@@ -82,11 +86,12 @@ html, body {
 
 /* Table */
 table {
-  width: 100%;
+  width: calc(100% - 80px);
   border-collapse: collapse;
   background: #1C1C1C;
   border-radius: 8px;
   overflow: hidden;
+  margin: 0 40px;
 }
 
 th {
@@ -161,6 +166,7 @@ tr:hover {
   border-radius: 8px;
   text-align: center;
   color: #aaa;
+  margin: 0 40px;
 }
 
 /* Modal backdrop */
@@ -292,7 +298,7 @@ z-index:100;
 display:flex;
 justify-content:space-between;
 align-items:center;
-padding:18px 0px;
+padding:18px 40px 0px 40px;
 background:rgba(18,18,18,0.6);
 backdrop-filter:blur(10px);
 -webkit-backdrop-filter:blur(10px);
@@ -311,6 +317,12 @@ cursor:pointer;
 display:flex;
 align-items:center;
 gap:20px;
+}
+
+.header-icons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .welcome{
@@ -372,13 +384,38 @@ background:#343434;
 }
 
 /* Language Switcher in Header */
+.header-language-switcher {
+  display: flex;
+  align-items: center;
+}
+
+.header-language-switcher ::ng-deep .language-sidebar {
+  transform: translateX(100%) !important;
+  visibility: hidden;
+}
+
+.header-language-switcher ::ng-deep .language-sidebar.open {
+  transform: translateX(0) !important;
+  visibility: visible;
+}
+
 .header-language-switcher ::ng-deep .language-sidebar-trigger {
-  padding: 8px 14px;
+  padding: 8px 12px;
   border-radius: 50px;
   background: #2A2A2A;
   border: 1px solid #484948;
   color: #B19F91;
-  font-size: 13px;
+  font-size: 12px;
+}
+
+.header-language-switcher ::ng-deep .language-sidebar-trigger:hover {
+  background: #343434;
+  color: #C8A97E;
+  border-color: #C8A97E;
+}
+
+.header-language-switcher ::ng-deep .current-lang {
+  max-width: 60px;
 }
 
 .header-language-switcher ::ng-deep .language-sidebar-trigger:hover {

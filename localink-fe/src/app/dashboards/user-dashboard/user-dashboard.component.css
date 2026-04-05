@@ -14,7 +14,7 @@ z-index:100;
 display:flex;
 justify-content:space-between;
 align-items:center;
-padding:18px 18px 0px;
+padding:18px 0px 18px;
 background:rgba(18,18,18,0.6);
 backdrop-filter:blur(10px);
 -webkit-backdrop-filter:blur(10px);

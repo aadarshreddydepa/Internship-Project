@@ -37,7 +37,7 @@ export class BusinessDetailComponent implements OnInit {
   isLoadingAiSummary = false;
   aiSummaryError: string | null = null;
   isFavorite = false;
-  userId = 2;
+  userId = 0;
   isLoadingFavorite = false;
 
   constructor(
@@ -47,7 +47,34 @@ export class BusinessDetailComponent implements OnInit {
     private favoritesService: FavoritesService,
     private toastService: ToastService,
     @Inject(PLATFORM_ID) private platformId: Object
-  ) {}
+  ) {
+    this.extractUserIdFromToken();
+  }
+
+  private extractUserIdFromToken(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      // Check multiple possible claim names
+      const userIdValue = 
+        payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] ||
+        payload.nameid ||
+        payload.userId ||
+        payload.UserId ||
+        payload.sub ||
+        '0';
+      this.userId = parseInt(userIdValue, 10);
+      if (this.userId <= 0) {
+        console.error('Invalid userId extracted from token:', userIdValue);
+        this.userId = 0;
+      }
+    } catch (error) {
+      console.error('Failed to extract userId from token:', error);
+      this.userId = 0;
+    }
+  }
 
   subcategoryId!: number;
 

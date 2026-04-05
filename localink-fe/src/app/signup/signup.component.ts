@@ -88,7 +88,7 @@ export class SignupComponent implements OnInit, AfterViewInit {
         ]
       ],
 
-      phoneCode: ['+91', Validators.required],
+      phoneCode: ['91', Validators.required],
       phone: [
         '',
         [
