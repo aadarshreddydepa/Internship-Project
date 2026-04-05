@@ -12,9 +12,9 @@ import { LanguageSwitcherComponent } from '../../components/language-switcher/la
 })
 export class AboutComponent {
   team = [
-    { name: 'Prem Kumar', img: '/assets/images/team/ceo.jpg', initial: 'A' },
+    { name: 'Prem Kumar', img: '/assets/images/team/1.jpg', initial: 'A' },
     { name: 'Anurag', img: '/assets/images/team/2.jpeg', initial: 'R' },
-    { name: 'Harshini Sai', img: '/assets/images/team/product.jpg', initial: 'M' },
+    { name: 'Harshini Sai', img: '/assets/images/team/3.jepg', initial: 'M' },
     { name: 'Aadarsh Reddy Depa', img: '/assets/images/team/4.jpeg', initial: 'D' },
     { name: 'Sai Sankeerth', img: '/assets/images/team/image.png', initial: 'P' },
     { name: 'Sai Chandrashekar', img: '/assets/images/team/6.jpg', initial: 'J' }

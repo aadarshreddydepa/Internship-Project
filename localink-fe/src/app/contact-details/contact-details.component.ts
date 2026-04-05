@@ -6,8 +6,10 @@ import {
   OnInit,
   AfterViewInit,
   OnDestroy,
+  OnChanges,
   PLATFORM_ID,
-  Inject
+  Inject,
+  SimpleChanges
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
@@ -27,7 +29,7 @@ import { BusinessPincodeService } from '../services/business-pincode.service';
   templateUrl: './contact-details.component.html',
   styleUrls: ['./contact-details.component.css']
 })
-export class ContactDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
+export class ContactDetailsComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
 
   contactForm!: FormGroup;
 
@@ -267,6 +269,54 @@ export class ContactDetailsComponent implements OnInit, AfterViewInit, OnDestroy
     if (this.map) {
       this.map.remove();
       this.map = null;
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    // Handle when initialData arrives after component initialization
+    if (changes['initialData'] && this.initialData && this.countries.length > 0) {
+      // Process initialData same as in ngOnInit
+      let phoneCode = this.initialData.phoneCode || '';
+      let phoneNumber = this.initialData.phone || '';
+
+      // If phone contains code+number combined (e.g., "+91 9876543210")
+      if (this.initialData.phone && this.initialData.phone.includes(' ')) {
+        const [code, ...numberParts] = this.initialData.phone.split(' ');
+        phoneCode = code.replace('+', '');
+        phoneNumber = numberParts.join(' ');
+      }
+
+      this.contactForm.patchValue({
+        ...this.initialData,
+        phoneCode: phoneCode,
+        phone: phoneNumber
+      });
+
+      // Load states for the selected country
+      const countryObj = this.countries.find(
+        c => c.name === this.initialData.country
+      );
+      if (countryObj) {
+        this.locationService.getStates(countryObj.iso2)
+          .subscribe(res => {
+            this.states = res;
+            // Load cities if state exists
+            if (this.initialData.state) {
+              const stateObj = this.states.find((s: any) => s.name === this.initialData.state);
+              if (stateObj) {
+                this.locationService.getCities(countryObj.iso2, stateObj.iso2)
+                  .subscribe(citiesRes => {
+                    this.cities = citiesRes;
+                  });
+              }
+            }
+            // Restore map pin if coordinates exist
+            if (this.initialData.latitude && this.initialData.longitude) {
+              this.selectedLat = this.initialData.latitude;
+              this.selectedLng = this.initialData.longitude;
+            }
+          });
+      }
     }
   }
 
