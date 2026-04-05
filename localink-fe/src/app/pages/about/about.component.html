@@ -12,54 +12,56 @@
       <div class="logo-wrapper">
         <img src="assets/remove_bg.png" alt="LocaLink Logo" class="about-logo"/>
       </div>
-      <h1 class="title">About LocaLink</h1>
-      <p class="subtitle">Your trusted business directory platform</p>
+      <h1 class="title">{{ 'ABOUT.TITLE' | translate }}</h1>
+      <p class="subtitle">{{ 'ABOUT.SUBTITLE' | translate }}</p>
     </div>
 
     <!-- ABOUT CARD -->
     <div class="about-card">
       <p>
-        Welcome to LocaLink — your trusted business directory platform.
-        We help users discover and connect with global businesses easily and efficiently through a seamless and intuitive search experience.
+        {{ 'ABOUT.WELCOME_TITLE' | translate }}
       </p>
       <p>
-        LocaLink also empowers business owners to register and showcase their businesses by providing detailed information, managing their presence, and reaching a wider audience. Businesses can engage with customers through reviews and ratings, helping build credibility and trust.
+        {{ 'ABOUT.WELCOME_DESC1' | translate }}
       </p>
       <p>
-        Our goal is to simplify global search while creating a reliable ecosystem where users find accurate, real-time information and businesses grow through visibility and customer interaction.
+        {{ 'ABOUT.WELCOME_DESC2' | translate }}
+      </p>
+      <p>
+        {{ 'ABOUT.WELCOME_DESC3' | translate }}
       </p>
     </div>
 
     <!-- FEATURES -->
     <div class="features-section">
-      <h2 class="section-title">What We Offer</h2>
+      <h2 class="section-title">{{ 'ABOUT.OFFER_TITLE' | translate }}</h2>
       <div class="features-row">
         <div class="feature-box">
-          <h3>🌍 Global Search</h3>
-          <p>Find businesses across countries with a unified and powerful search system.</p>
+          <h3>🌍 {{ 'ABOUT.GLOBAL_SEARCH' | translate }}</h3>
+          <p>{{ 'ABOUT.GLOBAL_SEARCH_DESC' | translate }}</p>
         </div>
         <div class="feature-box">
-          <h3>⚡ Real-Time Data</h3>
-          <p>Access up-to-date business details instantly with accurate live data.</p>
+          <h3>⚡ {{ 'ABOUT.REAL_TIME_DATA' | translate }}</h3>
+          <p>{{ 'ABOUT.REAL_TIME_DATA_DESC' | translate }}</p>
         </div>
         <div class="feature-box">
-          <h3>🔍 Smart Filtering</h3>
-          <p>Quickly refine results using intelligent filters based on location and category.</p>
+          <h3>🔍 {{ 'ABOUT.SMART_FILTERING' | translate }}</h3>
+          <p>{{ 'ABOUT.SMART_FILTERING_DESC' | translate }}</p>
         </div>
         <div class="feature-box">
-          <h3>🔐 Secure Platform</h3>
-          <p>Robust authentication ensures safe user data and secure access.</p>
+          <h3>🔐 {{ 'ABOUT.SECURE_PLATFORM' | translate }}</h3>
+          <p>{{ 'ABOUT.SECURE_PLATFORM_DESC' | translate }}</p>
         </div>
         <div class="feature-box">
-          <h3>🤖 AI Insights</h3>
-          <p>Get smart recommendations to discover relevant businesses faster.</p>
+          <h3>🤖 {{ 'ABOUT.AI_INSIGHTS' | translate }}</h3>
+          <p>{{ 'ABOUT.AI_INSIGHTS_DESC' | translate }}</p>
         </div>
       </div>
     </div>
 
     <!-- TEAM -->
     <div class="team-section">
-      <h2 class="section-title">Our Team</h2>
+      <h2 class="section-title">{{ 'ABOUT.TEAM_TITLE' | translate }}</h2>
       <div class="team-row">
         <div class="team-box" *ngFor="let dev of team">
           <img [src]="dev.img" [alt]="dev.name" class="team-img"/>
@@ -68,4 +70,4 @@
       </div>
     </div>
   </div>
-</div>
+</div>

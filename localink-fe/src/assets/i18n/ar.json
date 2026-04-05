@@ -3,10 +3,6 @@
     "TITLE": "Localink",
     "TAGLINE": "Discover Local Businesses"
   },
-  "AUTH": {
-    "WELCOME": "Welcome Back",
-    "SUBTITLE": "Join our community and discover local businesses"
-  },
   "NAV": {
     "HOME": "Home",
     "PROFILE": "Profile",
@@ -464,23 +460,23 @@
     "HELP_TEXT": "Available commands: Say 'go to home' to navigate, 'search for restaurants' to find businesses, 'clear' to reset, 'back' to go back, or 'help' to hear this message again."
   },
   "ABOUT": {
-    "TITLE": "About LocaLink",
-    "SUBTITLE": "Your trusted business directory platform",
-    "WELCOME_TITLE": "Welcome to LocaLink — your trusted business directory platform.",
-    "WELCOME_DESC1": "We help users discover and connect with global businesses easily and efficiently through a seamless and intuitive search experience.",
-    "WELCOME_DESC2": "LocaLink also empowers business owners to register and showcase their businesses by providing detailed information, managing their presence, and reaching a wider audience. Businesses can engage with customers through reviews and ratings, helping build credibility and trust.",
-    "WELCOME_DESC3": "Our goal is to simplify global search while creating a reliable ecosystem where users find accurate, real-time information and businesses grow through visibility and customer interaction.",
-    "OFFER_TITLE": "What We Offer",
-    "GLOBAL_SEARCH": "Global Search",
-    "GLOBAL_SEARCH_DESC": "Find businesses across countries with a unified and powerful search system.",
-    "REAL_TIME_DATA": "Real-Time Data",
-    "REAL_TIME_DATA_DESC": "Access up-to-date business details instantly with accurate live data.",
-    "SMART_FILTERING": "Smart Filtering",
-    "SMART_FILTERING_DESC": "Quickly refine results using intelligent filters based on location and category.",
-    "SECURE_PLATFORM": "Secure Platform",
-    "SECURE_PLATFORM_DESC": "Robust authentication ensures safe user data and secure access.",
-    "AI_INSIGHTS": "AI Insights",
-    "AI_INSIGHTS_DESC": "Get smart recommendations to discover relevant businesses faster.",
-    "TEAM_TITLE": "Our Team"
+    "TITLE": "حول لوكا لينك",
+    "SUBTITLE": "منصة دليل الأعمال الموثوقة الخاصة بك",
+    "WELCOME_TITLE": "مرحبًا بك في لوكا لينك — منصة دليل الأعمال الموثوقة الخاصة بك.",
+    "WELCOME_DESC1": "نحن نساعد المستخدمين على اكتشاف الشركات العالمية والتواصل معها بسهولة وكفاءة من خلال تجربة بحث سلسة وبديهية.",
+    "WELCOME_DESC2": "كما يمنح لوكا لينك أصحاب الأعمال القدرة على تسجيل أعمالهم وعرضها من خلال تقديم معلومات مفصلة، وإدارة تواجدهم، والوصول إلى جمهور أوسع. يمكن للشركات التفاعل مع العملاء من خلال المراجعات والتقييمات، مما يساعد على بناء المصداقية والثقة.",
+    "WELCOME_DESC3": "هدفنا هو تبسيط البحث العالمي مع إنشاء نظام بيئي موثوق حيث يجد المستخدمون معلومات دقيقة في الوقت الفعلي وتنمو الشركات من خلال الرؤية والتفاعل مع العملاء.",
+    "OFFER_TITLE": "ما نقدمه",
+    "GLOBAL_SEARCH": "بحث عالمي",
+    "GLOBAL_SEARCH_DESC": "ابحث عن الشركات عبر البلدان من خلال نظام بحث موحد وقوي.",
+    "REAL_TIME_DATA": "بيانات اللحظة الحقيقية",
+    "REAL_TIME_DATA_DESC": "احصل على تفاصيل العمل المحدثة على الفور ببيانات حية دقيقة.",
+    "SMART_FILTERING": "تصفية ذكية",
+    "SMART_FILTERING_DESC": "قم بتحسين النتائج بسرعة باستخدام فلاتر ذكية تعتمد على الموقع والفئة.",
+    "SECURE_PLATFORM": "منصة آمنة",
+    "SECURE_PLATFORM_DESC": "يضمن المصادقة القوية أمان بيانات المستخدم والوصول الآمن.",
+    "AI_INSIGHTS": "رؤى الذكاء الاصطناعي",
+    "AI_INSIGHTS_DESC": "احصل على توصيات ذكية لاكتشاف الشركات ذات الصلة بشكل أسرع.",
+    "TEAM_TITLE": "فريقنا"
   }
 }

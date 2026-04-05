@@ -3,10 +3,6 @@
     "TITLE": "Localink",
     "TAGLINE": "Discover Local Businesses"
   },
-  "AUTH": {
-    "WELCOME": "Welcome Back",
-    "SUBTITLE": "Join our community and discover local businesses"
-  },
   "NAV": {
     "HOME": "Home",
     "PROFILE": "Profile",
@@ -464,23 +460,23 @@
     "HELP_TEXT": "Available commands: Say 'go to home' to navigate, 'search for restaurants' to find businesses, 'clear' to reset, 'back' to go back, or 'help' to hear this message again."
   },
   "ABOUT": {
-    "TITLE": "About LocaLink",
-    "SUBTITLE": "Your trusted business directory platform",
-    "WELCOME_TITLE": "Welcome to LocaLink — your trusted business directory platform.",
-    "WELCOME_DESC1": "We help users discover and connect with global businesses easily and efficiently through a seamless and intuitive search experience.",
-    "WELCOME_DESC2": "LocaLink also empowers business owners to register and showcase their businesses by providing detailed information, managing their presence, and reaching a wider audience. Businesses can engage with customers through reviews and ratings, helping build credibility and trust.",
-    "WELCOME_DESC3": "Our goal is to simplify global search while creating a reliable ecosystem where users find accurate, real-time information and businesses grow through visibility and customer interaction.",
-    "OFFER_TITLE": "What We Offer",
-    "GLOBAL_SEARCH": "Global Search",
-    "GLOBAL_SEARCH_DESC": "Find businesses across countries with a unified and powerful search system.",
-    "REAL_TIME_DATA": "Real-Time Data",
-    "REAL_TIME_DATA_DESC": "Access up-to-date business details instantly with accurate live data.",
-    "SMART_FILTERING": "Smart Filtering",
-    "SMART_FILTERING_DESC": "Quickly refine results using intelligent filters based on location and category.",
-    "SECURE_PLATFORM": "Secure Platform",
-    "SECURE_PLATFORM_DESC": "Robust authentication ensures safe user data and secure access.",
-    "AI_INSIGHTS": "AI Insights",
-    "AI_INSIGHTS_DESC": "Get smart recommendations to discover relevant businesses faster.",
-    "TEAM_TITLE": "Our Team"
+    "TITLE": "LocaLink Hakkında",
+    "SUBTITLE": "Güvenilir işletme rehberi platformunuz",
+    "WELCOME_TITLE": "LocaLink'e Hoş Geldiniz — güvenilir işletme rehberi platformunuz.",
+    "WELCOME_DESC1": "Kullanıcıların küresel işletmeleri keşfetmelerine ve kesintisiz ve sezgisel bir arama deneyimi aracılığıyla kolayca bağlantı kurmalarına yardımcı oluyoruz.",
+    "WELCOME_DESC2": "LocaLink ayrıca işletme sahiplerine ayrıntılı bilgiler sağlayarak, varlıklarını yöneterek ve daha geniş bir kitleye ulaşarak işletmelerini kaydetme ve sergileme yetkisi verir. İşletmeler, güvenilirlik ve güven oluşturmaya yardımcı olan incelemeler ve derecelendirmeler yoluyla müşterilerle etkileşim kurabilir.",
+    "WELCOME_DESC3": "Amacımız, kullanıcıların doğru ve gerçek zamanlı bilgiler bulduğu ve işletmelerin görünürlük ve müşteri etkileşimi yoluyla büyüdüğü güvenilir bir ekosistem oluştururken küresel aramayı basitleştirmektir.",
+    "OFFER_TITLE": "Neler Sunuyoruz",
+    "GLOBAL_SEARCH": "Küresel Arama",
+    "GLOBAL_SEARCH_DESC": "Birleşik ve güçlü bir arama sistemiyle ülkeler genelinde işletmeleri bulun.",
+    "REAL_TIME_DATA": "Gerçek Zamanlı Veri",
+    "REAL_TIME_DATA_DESC": "Doğru canlı verilerle güncel işletme ayrıntılarına anında erişin.",
+    "SMART_FILTERING": "Akıllı Filtreleme",
+    "SMART_FILTERING_DESC": "Konum ve kategoriye dayalı akıllı filtreleri kullanarak sonuçları hızla daraltın.",
+    "SECURE_PLATFORM": "Güvenli Platform",
+    "SECURE_PLATFORM_DESC": "Sağlam kimlik doğrulama, güvenli kullanıcı verileri ve güvenli erişim sağlar.",
+    "AI_INSIGHTS": "Yapay Zeka İçgörüleri",
+    "AI_INSIGHTS_DESC": "İlgili işletmeleri daha hızlı keşfetmek için akıllı öneriler alın.",
+    "TEAM_TITLE": "Ekibimiz"
   }
 }

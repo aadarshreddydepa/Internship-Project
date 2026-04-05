@@ -296,6 +296,30 @@
     "UR": "اردو (Urdu)"
   },
   "RTL": {
-    "LANGUAGES": ["ar", "sd", "ur"]
+    "LANGUAGES": [
+      "ar",
+      "sd",
+      "ur"
+    ]
+  },
+  "ABOUT": {
+    "TITLE": "À propos de LocaLink",
+    "SUBTITLE": "Votre plateforme d'annuaire d'entreprises de confiance",
+    "WELCOME_TITLE": "Bienvenue sur LocaLink — votre plateforme d'annuaire d'entreprises de confiance.",
+    "WELCOME_DESC1": "Nous aidons les utilisateurs à découvrir et à se connecter aux entreprises mondiales facilement et efficacement grâce à une expérience de recherche fluide et intuitive.",
+    "WELCOME_DESC2": "LocaLink permet également aux propriétaires d'entreprises d'enregistrer et de présenter leurs activités en fournissant des informations détaillées, en gérant leur présence et en atteignant un public plus large. Les entreprises peuvent interagir avec les clients via des avis et des notes, aidant ainsi à renforcer la crédibilité et la confiance.",
+    "WELCOME_DESC3": "Notre objectif est de simplifier la recherche mondiale tout en créant un écosystème fiable où les utilisateurs trouvent des informations précises en temps réel et où les entreprises se développent grâce à la visibilité et à l'interaction client.",
+    "OFFER_TITLE": "Ce que nous proposons",
+    "GLOBAL_SEARCH": "Recherche Mondiale",
+    "GLOBAL_SEARCH_DESC": "Trouvez des entreprises dans plusieurs pays grâce à un système de recherche unifié et puissant.",
+    "REAL_TIME_DATA": "Données en Temps Réel",
+    "REAL_TIME_DATA_DESC": "Accédez instantanément aux détails actualisés des entreprises avec des données précises en direct.",
+    "SMART_FILTERING": "Filtrage Intelligent",
+    "SMART_FILTERING_DESC": "Affinez rapidement les résultats en utilisant des filtres intelligents basés sur l'emplacement et la catégorie.",
+    "SECURE_PLATFORM": "Plateforme Sécurisée",
+    "SECURE_PLATFORM_DESC": "Une authentification robuste assure la sécurité des données utilisateur et un accès sécurisé.",
+    "AI_INSIGHTS": "Aperçus IA",
+    "AI_INSIGHTS_DESC": "Obtenez des recommandations intelligentes pour découvrir plus rapidement les entreprises pertinentes.",
+    "TEAM_TITLE": "Notre Équipe"
   }
 }
