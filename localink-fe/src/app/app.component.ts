@@ -5,6 +5,7 @@ import { isPlatformBrowser, DOCUMENT } from '@angular/common';
 import { filter } from 'rxjs/operators';
 
 import { LanguageSwitcherComponent } from './components/language-switcher/language-switcher.component';
+import { ToastComponent } from './components/toast/toast.component';
 import { CommonModule } from '@angular/common';
 import { ScreenReaderService } from './services/screen-reader.service';
 import { GlobalAccessibilitySoundService } from './services/global-accessibility-sound.service';
@@ -14,7 +15,7 @@ import { FooterComponent } from './shared/footer/footer.component';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, LanguageSwitcherComponent, CommonModule, UniversalAccessibilitySoundDirective, FooterComponent],
+  imports: [RouterOutlet, RouterLink, LanguageSwitcherComponent, CommonModule, UniversalAccessibilitySoundDirective, FooterComponent, ToastComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
@@ -29,6 +30,9 @@ export class AppComponent implements OnInit {
 
   // RTL languages
   private readonly rtlLangs = ['ar', 'sd', 'ur'];
+
+  // Hide footer on login/signup pages
+  showFooter = true;
 
   constructor(
     private translate: TranslateService,
@@ -58,6 +62,10 @@ export class AppComponent implements OnInit {
     ).subscribe((event: any) => {
       const pageName = this.getPageNameFromUrl(event.url);
       this.screenReader.announcePageChange(pageName);
+      
+      // Hide footer on login, signup, and forgot-password pages
+      const noFooterRoutes = ['/login', '/signup', '/forgot-password'];
+      this.showFooter = !noFooterRoutes.some(route => event.url.startsWith(route));
     });
   }
 

@@ -4,6 +4,7 @@ import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/
 import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
+import { LanguageInterceptor, LocationInterceptor } from './core/interceptors/language.interceptor';
 import { TranslateModule } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AccessibilitySettingsService } from './services/accessibility-settings.service';
@@ -46,7 +47,7 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     provideHttpClient(
       withFetch(),
-      withInterceptors([AuthInterceptor])
+      withInterceptors([AuthInterceptor, LanguageInterceptor, LocationInterceptor])
     ),
     importProvidersFrom(
       TranslateModule.forRoot({

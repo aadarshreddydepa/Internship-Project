@@ -1,21 +1,23 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
+import { LanguageSwitcherComponent } from '../../components/language-switcher/language-switcher.component';
 
 @Component({
   selector: 'app-about',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule, LanguageSwitcherComponent],
   templateUrl: './about.component.html',
   styleUrl: './about.component.css'
 })
 export class AboutComponent {
   team = [
-    { name: 'Alice Johnson', role: 'Founder & CEO', img: '/assets/images/team/ceo.jpg', initial: 'A' },
-    { name: 'Raj Patel', role: 'CTO', img: '/assets/images/team/cto.jpg', initial: 'R' },
-    { name: 'Maria Chen', role: 'Head of Product', img: '/assets/images/team/product.jpg', initial: 'M' },
-    { name: 'David Kim', role: 'Lead Developer', img: '/assets/images/team/dev-lead.jpg', initial: 'D' },
-    { name: 'Priya Sharma', role: 'UX Designer', img: '/assets/images/team/designer.jpg', initial: 'P' },
-    { name: 'James Wilson', role: 'Accessibility Lead', img: '/assets/images/team/accessibility.jpg', initial: 'J' }
+    { name: 'Prem Kumar', img: '/assets/images/team/ceo.jpg', initial: 'A' },
+    { name: 'Anurag', img: '/assets/images/team/2.jpeg', initial: 'R' },
+    { name: 'Harshini Sai', img: '/assets/images/team/product.jpg', initial: 'M' },
+    { name: 'Aadarsh Reddy Depa', img: '/assets/images/team/4.jpeg', initial: 'D' },
+    { name: 'Sai Sankeerth', img: '/assets/images/team/image.png', initial: 'P' },
+    { name: 'Sai Chandrashekar', img: '/assets/images/team/6.jpg', initial: 'J' }
   ];
 
   features = [
@@ -36,4 +38,3 @@ export class AboutComponent {
     imgElement.style.display = 'none';
   }
 }
- 

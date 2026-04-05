@@ -109,12 +109,9 @@ interface Language {
     </div>
   `,
   styles: [`
-    /* Trigger Button - Fixed Right Side */
+    /* Trigger Button - Normal Position (scrolls with page) */
     .language-sidebar-trigger {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 9998;
+      position: relative;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -386,8 +383,6 @@ interface Language {
       
       .language-sidebar-trigger {
         padding: 8px 12px;
-        top: 15px;
-        right: 15px;
       }
       
       .current-lang {

@@ -370,3 +370,19 @@ background:#343434;
     right: -80%;
   }
 }
+
+/* Language Switcher in Header */
+.header-language-switcher ::ng-deep .language-sidebar-trigger {
+  padding: 8px 14px;
+  border-radius: 50px;
+  background: #2A2A2A;
+  border: 1px solid #484948;
+  color: #B19F91;
+  font-size: 13px;
+}
+
+.header-language-switcher ::ng-deep .language-sidebar-trigger:hover {
+  background: #343434;
+  border-color: #C8A97E;
+  color: #C8A97E;
+}

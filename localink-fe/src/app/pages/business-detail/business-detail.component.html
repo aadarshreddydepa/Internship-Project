@@ -1,5 +1,10 @@
 <div *ngIf="business" class="detail-container">
 
+  <!-- Language Switcher -->
+  <div class="detail-language-switcher">
+    <app-language-switcher></app-language-switcher>
+  </div>
+
   <!-- BACK -->
   <a
     [routerLink]="['/businesses', categoryId, subcategoryId]"
@@ -12,7 +17,7 @@
     {{ 'BUSINESS.BACK_TO_LIST' | translate }}
   </a>
 
-    <p class="category" *ngIf="categoryName || subcategoryName">
+  <p class="category" *ngIf="categoryName || subcategoryName">
     {{ (categoryName || business.categoryName) | titlecase }} › {{ (subcategoryName || business.subcategoryName) | titlecase }}
   </p>
 
@@ -76,6 +81,19 @@
       <div class="actions">
         <button class="contact-btn" (click)="contactBusiness()">{{ 'BUSINESS.CONTACT_BUSINESS' | translate }}</button>
         <button class="direction-btn" (click)="getDirections()">{{ 'COMMON.PIN_ICON' | translate }} {{ 'BUSINESS.GET_DIRECTIONS' | translate }}</button>
+        <button 
+          class="favorite-btn" 
+          [class.is-favorite]="isFavorite"
+          (click)="toggleFavorite()"
+          [disabled]="isLoadingFavorite">
+          <svg *ngIf="!isFavorite" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+          <svg *ngIf="isFavorite" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+          {{ isFavorite ? 'Remove from Favorites' : 'Add to Favorites' }}
+        </button>
       </div>
 
     </div>

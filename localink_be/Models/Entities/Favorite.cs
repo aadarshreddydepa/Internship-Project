@@ -8,7 +8,7 @@ namespace localink_be.Models.Entities
     public class Favorite
     {
         [Key]
-        [Column("favorite_id")]
+        [Column("id")]
         public long Id { get; set; }
 
         [Column("user_id")]

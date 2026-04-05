@@ -105,7 +105,7 @@ export class EditBusinessBusinessComponent implements OnInit {
         this.countries = data;
         this.phoneCountries = data.map((c: any) => ({
           name: c.name,
-          code: c.code,
+          code: c.code?.startsWith('+') ? c.code : `+${c.code || c.phonecode || ''}`,
           flag: c.flag
         }));
         this.loadCountriesCache$.next();
@@ -138,7 +138,8 @@ export class EditBusinessBusinessComponent implements OnInit {
 
     // Update phone code in contact data if available
     if (this.contactData) {
-      this.contactData.phoneCode = '+' + country.phonecode;
+      const rawCode = country.phonecode || '';
+      this.contactData.phoneCode = rawCode.startsWith('+') ? rawCode : `+${rawCode}`;
     }
   }
 
@@ -210,7 +211,8 @@ export class EditBusinessBusinessComponent implements OnInit {
         if (res.country && !phoneCode) {
           const country = this.countries.find(c => c.name === res.country);
           if (country) {
-            phoneCode = country.code || '+' + country.phonecode;
+            const rawCode = country.code || country.phonecode || '';
+            phoneCode = rawCode.startsWith('+') ? rawCode : `+${rawCode}`;
           }
         }
 

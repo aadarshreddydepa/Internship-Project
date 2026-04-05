@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using localink_be.Models.DTOs;
 using localink_be.Services.Interfaces;
 
@@ -16,30 +17,73 @@ namespace localink_be.Controllers
         }
 
         [HttpPost("add")]
-        public async Task<IActionResult> AddFavorite(FavoriteDto dto)
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> AddFavorite([FromBody] FavoriteDto dto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Validation failed",
+                    errors = ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage)
+                });
+            }
+
             var result = await _favoritesService.AddFavoriteAsync(dto);
 
             if (result == "Already added")
-                return BadRequest(result);
+                return BadRequest(new { success = false, message = result });
 
-            return Ok(result);
+            return Ok(new { success = true, message = result });
         }
 
         [HttpDelete("remove")]
-        public async Task<IActionResult> RemoveFavorite(long userId, long businessId)
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> RemoveFavorite(
+            [FromQuery][Required][Range(1, long.MaxValue)] long userId,
+            [FromQuery][Required][Range(1, long.MaxValue)] long businessId)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Validation failed",
+                    errors = ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage)
+                });
+            }
+
             var result = await _favoritesService.RemoveFavoriteAsync(userId, businessId);
 
             if (result == "Not found")
-                return NotFound(result);
+                return NotFound(new { success = false, message = result });
 
-            return Ok(result);
+            return Ok(new { success = true, message = result });
         }
 
         [HttpGet("user/{userId}")]
-        public async Task<IActionResult> GetFavorites(long userId)
+        [ProducesResponseType(typeof(List<long>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetFavorites(
+            [FromRoute][Range(1, long.MaxValue)] long userId)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Invalid User ID"
+                });
+            }
+
             var favorites = await _favoritesService.GetUserFavoritesAsync(userId);
             return Ok(favorites);
         }

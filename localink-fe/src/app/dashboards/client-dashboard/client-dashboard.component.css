@@ -31,6 +31,12 @@
   gap:20px;
 }
 
+.header-icons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .welcome{
   font-size:18px;
   color:#B19F91;
@@ -503,4 +509,36 @@ textarea {
 .details span {
   color: #F8F4F0;
   word-break: break-word;
+}
+
+/* Language Switcher in Header */
+.header-language-switcher ::ng-deep .language-sidebar-trigger {
+  padding: 8px 14px;
+  border-radius: 50px;
+  background: #2A2A2A;
+  border: 1px solid #484948;
+  color: #B19F91;
+  font-size: 13px;
+}
+
+.header-language-switcher ::ng-deep .language-sidebar-trigger:hover {
+  background: #343434;
+  border-color: #C8A97E;
+  color: #C8A97E;
+}
+
+.header-language-switcher {
+  display: flex;
+  align-items: center;
+}
+
+/* Language sidebar visibility control */
+.header-language-switcher ::ng-deep .language-sidebar {
+  transform: translateX(100%) !important;
+  visibility: hidden;
+}
+
+.header-language-switcher ::ng-deep .language-sidebar.open {
+  transform: translateX(0) !important;
+  visibility: visible;
 }

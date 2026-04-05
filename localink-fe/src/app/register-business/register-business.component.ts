@@ -91,7 +91,17 @@ export class RegisterBusinessComponent {
   goToNext() {
     if (this.currentStep === 1) {
       if (this.businessForm.valid) {
-        this.businessData = this.businessForm.value;
+        const formValue = this.businessForm.value;
+        const selectedCategory = this.categories.find(c => c.id == formValue.category);
+        const selectedSubcategory = this.subcategories.find(s => s.id == formValue.subcategory);
+        
+        this.businessData = {
+          ...formValue,
+          categoryId: formValue.category,
+          subcategoryId: formValue.subcategory,
+          categoryName: selectedCategory?.name || '',
+          subcategoryName: selectedSubcategory?.name || ''
+        };
         this.currentStep = 2;
       } else {
         this.businessForm.markAllAsTouched();
@@ -194,10 +204,10 @@ export class RegisterBusinessComponent {
     this.finalRegistrationData = {
       businessName: this.businessData.businessName,
       description: this.businessData.description,
-      categoryId: this.businessData.category,
-      subcategoryId: this.businessData.subcategory,
-      phoneCode: this.contactData.phoneCode,
-      phoneNumber: this.contactData.phone.replace(this.contactData.phoneCode, ''),
+      categoryId: this.businessData.categoryId || this.businessData.category,
+      subcategoryId: this.businessData.subcategoryId || this.businessData.subcategory,
+      phoneCode: this.contactData.phoneCode?.startsWith('+') ? this.contactData.phoneCode : `+${this.contactData.phoneCode}`,
+      phoneNumber: this.contactData.phone?.split(' ').pop() || this.contactData.phone,
       email: this.contactData.email,
       website: this.contactData.website,
       address: this.contactData.address,

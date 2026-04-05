@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { ProfileComponent } from '../../pages/profile/profile.component';
 import { ClientDashboardService } from '../../services/client-dashboard.service';
 import { TranslateModule } from '@ngx-translate/core';
+import { LanguageSwitcherComponent } from '../../components/language-switcher/language-switcher.component';
 import { NotificationService } from '../../services/notification.service';
 
 interface Business {
@@ -29,7 +30,7 @@ interface Business {
 @Component({
   selector: 'app-client-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, ProfileComponent, TranslateModule],
+  imports: [CommonModule, FormsModule, ProfileComponent, TranslateModule, LanguageSwitcherComponent],
   templateUrl: './client-dashboard.component.html',
   styleUrls: ['./client-dashboard.component.css']
 })

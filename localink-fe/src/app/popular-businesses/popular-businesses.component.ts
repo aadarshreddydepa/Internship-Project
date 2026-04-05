@@ -1,13 +1,15 @@
 import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { PopularService, PopularBusiness } from '../services/popular.service';
 import { FavoritesService } from '../services/favorites.service';
+import { ToastService } from '../services/toast.service';
 
 @Component({
   selector: 'app-popular-businesses',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './popular-businesses.component.html',
   styleUrl: './popular-businesses.component.css'
 })
@@ -20,6 +22,7 @@ export class PopularBusinessesComponent implements OnInit {
   constructor(
     private popularService: PopularService,
     private favoritesService: FavoritesService,
+    private toastService: ToastService,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
@@ -67,8 +70,12 @@ export class PopularBusinessesComponent implements OnInit {
       .subscribe({
         next: () => {
           business.isFavorite = true;
+          this.toastService.success('Added to favorites');
         },
-        error: (err) => console.error('Error adding favorite', err)
+        error: (err) => {
+          console.error('Error adding favorite', err);
+          this.toastService.error('Failed to add to favorites');
+        }
       });
   }
 
@@ -77,8 +84,12 @@ export class PopularBusinessesComponent implements OnInit {
       .subscribe({
         next: () => {
           business.isFavorite = false;
+          this.toastService.success('Removed from favorites');
         },
-        error: (err) => console.error('Error removing favorite', err)
+        error: (err) => {
+          console.error('Error removing favorite', err);
+          this.toastService.error('Failed to remove from favorites');
+        }
       });
   }
 

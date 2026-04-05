@@ -271,3 +271,25 @@
   transform: translateY(-6px);
   box-shadow: 0 10px 25px rgba(200,169,126,0.2);
 }
+
+/* LANGUAGE SWITCHER */
+.about-language-switcher {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 100;
+}
+
+.about-language-switcher ::ng-deep .language-sidebar-trigger {
+  padding: 8px 14px;
+  border-radius: 50px;
+  background: rgba(26, 26, 26, 0.9);
+  border: 1px solid rgba(200, 169, 126, 0.4);
+  color: #c8a97e;
+  font-size: 13px;
+}
+
+.about-language-switcher ::ng-deep .language-sidebar-trigger:hover {
+  background: rgba(200, 169, 126, 0.15);
+  border-color: #c8a97e;
+}

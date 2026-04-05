@@ -174,7 +174,9 @@ namespace localink_be.Data
             {
                 entity.ToTable("Favorites");
                 entity.HasKey(f => f.Id);
-                entity.Property(f => f.Id).HasColumnName("favorite_id");
+                entity.Property(f => f.Id)
+                    .HasColumnName("id")
+                    .ValueGeneratedOnAdd();
                 entity.Property(f => f.UserId).HasColumnName("user_id");
                 entity.Property(f => f.BusinessId).HasColumnName("business_id");
                 entity.Property(f => f.CreatedAt).HasColumnName("created_at");

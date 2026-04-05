@@ -36,6 +36,18 @@ namespace localink_be.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> RegisterBusiness([FromBody] RegisterBusinessDto dto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Validation failed",
+                    errors = ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage)
+                });
+            }
+
             var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
             var businessId = await _service.RegisterBusinessAsync(dto, long.Parse(userId));
@@ -51,8 +63,20 @@ namespace localink_be.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateBusiness(long id, [FromBody] UpdateBusinessDto dto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Validation failed",
+                    errors = ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage)
+                });
+            }
+
             var result = await _service.UpdateBusinessFullAsync(id, dto);
-            return result == null ? NotFound() : Ok(result);
+            return result == null ? NotFound(new { success = false, message = "Business not found" }) : Ok(new { success = true, data = result });
         }
 
         [Authorize(Roles = "client")]
