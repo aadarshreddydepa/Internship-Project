@@ -52,7 +52,7 @@
         <th>City</th>
         <th *ngIf="currentSection==='rejected'">Rejection Reason</th>
         <th>Status</th>
-        <th>Actions</th>
+        <th *ngIf="currentSection!=='rejected'">Actions</th>
       </tr>
     </thead>
 
@@ -88,11 +88,44 @@
           </span>
         </td>
 
-        <td class="actions">
-          <button *ngIf="currentSection==='pending'" class="approve" (click)="approve(b.id)">Approve</button>
-          <button *ngIf="currentSection==='pending'" class="reject" (click)="openRejectModal(b.id)">Reject</button>
-          <button *ngIf="currentSection==='approved'" class="deactivate" (click)="deactivate(b.id)">Deactivate</button>
-          <button *ngIf="currentSection==='inactive'" class="activate" (click)="activate(b.id)">Activate</button>
+        <td class="actions" *ngIf="currentSection!=='rejected'">
+          <button 
+            *ngIf="currentSection==='pending'" 
+            class="approve" 
+            (click)="approve(b.id)"
+            [disabled]="loadingActionId === b.id && loadingActionType === 'approve'">
+            <span *ngIf="loadingActionId === b.id && loadingActionType === 'approve'" class="spinner"></span>
+            <span *ngIf="!(loadingActionId === b.id && loadingActionType === 'approve')">Approve</span>
+          </button>
+          <button 
+            *ngIf="currentSection==='pending' && !(loadingActionId === b.id && loadingActionType === 'reject')" 
+            class="reject" 
+            (click)="openRejectModal(b.id)">
+            Reject
+          </button>
+          <button 
+            *ngIf="currentSection==='pending' && (loadingActionId === b.id && loadingActionType === 'reject')" 
+            class="reject" 
+            disabled
+            style="opacity: 0.5;">
+            <span class="spinner"></span>
+          </button>
+          <button 
+            *ngIf="currentSection==='approved'" 
+            class="deactivate" 
+            (click)="deactivate(b.id)"
+            [disabled]="loadingActionId === b.id && loadingActionType === 'deactivate'">
+            <span *ngIf="loadingActionId === b.id && loadingActionType === 'deactivate'" class="spinner"></span>
+            <span *ngIf="!(loadingActionId === b.id && loadingActionType === 'deactivate')">Deactivate</span>
+          </button>
+          <button 
+            *ngIf="currentSection==='inactive'" 
+            class="activate" 
+            (click)="activate(b.id)"
+            [disabled]="loadingActionId === b.id && loadingActionType === 'activate'">
+            <span *ngIf="loadingActionId === b.id && loadingActionType === 'activate'" class="spinner"></span>
+            <span *ngIf="!(loadingActionId === b.id && loadingActionType === 'activate')">Activate</span>
+          </button>
         </td>
 
       </tr>
@@ -142,19 +175,30 @@
     </div>
   </div>
 
-  <!-- Reject Modal unchanged -->
+  <!-- Reject Modal -->
   <div class="modal" *ngIf="rejectModalOpen">
-    <div class="modal-box">
-      <h2>Reject Business</h2>
-      <textarea [(ngModel)]="rejectComment" rows="4"></textarea>
-      <div class="modal-actions">
+    <div class="reject-modal-box">
+      <div class="reject-modal-header">
+        <h2>Reject Business</h2>
+        <button class="close-btn" (click)="closeRejectModal()">×</button>
+      </div>
+      
+      <div class="reject-modal-content">
+        <label for="rejectReason">{{ 'REJECTION_REASON' | translate }}</label>
+        <textarea 
+          id="rejectReason"
+          [(ngModel)]="rejectComment" 
+          rows="5"
+          placeholder="Enter the reason for rejection (e.g., Invalid business documents, Insufficient information, Policy violation, etc.)">
+        </textarea>
+      </div>
+
+      <div class="reject-modal-actions">
         <button class="cancel" (click)="closeRejectModal()">Cancel</button>
-        <button class="confirm" (click)="submitRejection()">Reject</button>
+        <button class="confirm" (click)="submitRejection()">Reject Business</button>
       </div>
     </div>
   </div>
-
-  <div class="toast" *ngIf="showToast">{{toastMessage}}</div>
 </div>
 <div 
   class="overlay" 

@@ -3,6 +3,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService, AdminBusiness } from '../../services/admin.service';
 import { UserProfile, UserService } from '../../services/user.service';
+import { ToastService } from '../../services/toast.service';
 import { ProfileComponent } from '../../pages/profile/profile.component';
 import { TranslateModule } from '@ngx-translate/core';
 import { LanguageSwitcherComponent } from '../../components/language-switcher/language-switcher.component';
@@ -24,15 +25,18 @@ export class AdminDashboardComponent implements OnInit {
   showProfile = false;
   selectedBusiness: AdminBusiness | null = null;
   username = localStorage.getItem('username') || 'Admin';
-  toastMessage = '';
-  showToast = false;
 
   rejectModalOpen = false;
   rejectComment = '';
   rejectBusinessId: number | null = null;
 
+  // Loading states for each business action
+  loadingActionId: number | null = null;
+  loadingActionType: 'approve' | 'reject' | 'deactivate' | 'activate' | null = null;
+
   constructor(private service: AdminService,
               private userService: UserService,
+              private toastService: ToastService,
               @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
@@ -67,9 +71,18 @@ export class AdminDashboardComponent implements OnInit {
   }
   
   approve(id: number): void {
+    this.loadingActionId = id;
+    this.loadingActionType = 'approve';
     this.service.updateStatus(id, { status: 'Approved' }).subscribe(() => {
-      this.notify('Business Approved');
+      this.toastService.success('Business Approved Successfully');
+      this.loadingActionId = null;
+      this.loadingActionType = null;
       this.refresh();
+    },
+    (error) => {
+      this.loadingActionId = null;
+      this.loadingActionType = null;
+      this.toastService.error('Failed to approve business');
     });
   }
 
@@ -81,13 +94,22 @@ export class AdminDashboardComponent implements OnInit {
   submitRejection(): void {
     if (!this.rejectComment.trim() || this.rejectBusinessId === null) return;
 
+    this.loadingActionId = this.rejectBusinessId;
+    this.loadingActionType = 'reject';
     this.service.updateStatus(this.rejectBusinessId, {
       status: 'Rejected',
       rejectionReason: this.rejectComment
     }).subscribe(() => {
-      this.notify('Business Rejected');
+      this.toastService.success('Business Rejected Successfully');
+      this.loadingActionId = null;
+      this.loadingActionType = null;
       this.closeRejectModal();
       this.refresh();
+    },
+    (error) => {
+      this.loadingActionId = null;
+      this.loadingActionType = null;
+      this.toastService.error('Failed to reject business');
     });
   }
 
@@ -98,15 +120,34 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   deactivate(id: number): void {
+    this.loadingActionId = id;
+    this.loadingActionType = 'deactivate';
     this.service.updateStatus(id, { status: 'Inactive' }).subscribe(() => {
-      this.notify('Business Deactivated');
+      this.toastService.success('Business Deactivated Successfully');
+      this.loadingActionId = null;
+      this.loadingActionType = null;
       this.refresh();
+    },
+    (error) => {
+      this.loadingActionId = null;
+      this.loadingActionType = null;
+      this.toastService.error('Failed to deactivate business');
     });
   }
+
   activate(id: number): void {
+    this.loadingActionId = id;
+    this.loadingActionType = 'activate';
     this.service.updateStatus(id, { status: 'Approved' }).subscribe(() => {
-      this.notify('Business Activated');
+      this.toastService.success('Business Activated Successfully');
+      this.loadingActionId = null;
+      this.loadingActionType = null;
       this.refresh();
+    },
+    (error) => {
+      this.loadingActionId = null;
+      this.loadingActionType = null;
+      this.toastService.error('Failed to activate business');
     });
   }
 
@@ -116,11 +157,6 @@ export class AdminDashboardComponent implements OnInit {
 
   closeModal(): void {
     this.selectedBusiness = null;
-  }
-  notify(message: string): void {
-    this.toastMessage = message;
-    this.showToast = true;
-    setTimeout(() => { this.showToast = false; }, 2500);
   }
 
   downloadExcel(): void {

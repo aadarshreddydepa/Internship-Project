@@ -96,6 +96,8 @@ public class AdminService : IAdminService
             throw new Exception("Invalid status");
         }
 
+        var isRejectedStatus = parsedStatus == BusinessStatus.Rejected;
+
         var data = await _db.AdminDashboards
             .Include(a => a.Business)
                 .ThenInclude(b => b.Category)
@@ -133,14 +135,35 @@ public class AdminService : IAdminService
 
                 Status = a.Status.ToString(),
 
-                RejectionReason = a.RejectionReason 
+                RejectionReason = isRejectedStatus ? a.RejectionReason : null
                             })
             .ToListAsync();
 
         using var package = new OfficeOpenXml.ExcelPackage();
         var sheet = package.Workbook.Worksheets.Add("Businesses");
 
-        sheet.Cells.LoadFromCollection(data, true);
+        // Remove RejectionReason column if not rejected status
+        if (!isRejectedStatus && data.Count > 0)
+        {
+            var dataWithoutReason = data.Select(d => new
+            {
+                d.BusinessName,
+                d.OwnerName,
+                d.RegisteredDate,
+                d.Category,
+                d.Subcategory,
+                d.Description,
+                d.Email,
+                d.Phone,
+                d.Address,
+                d.Status
+            }).ToList();
+            sheet.Cells.LoadFromCollection(dataWithoutReason, true);
+        }
+        else
+        {
+            sheet.Cells.LoadFromCollection(data, true);
+        }
 
         int totalColumns = sheet.Dimension.Columns;
         int totalRows = sheet.Dimension.Rows;
