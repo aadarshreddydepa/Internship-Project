@@ -167,9 +167,9 @@
 }
 
 .contact-btn {
-  background: #C8A97E;
-  color: #1C1C1C;
-  border: none;
+  background: transparent;
+  border: 1px solid #484948;
+  color: #F8F4F0;
   padding: 10px 16px;
   border-radius: 8px;
   cursor: pointer;
@@ -177,7 +177,7 @@
 }
 
 .contact-btn:hover {
-  opacity: 0.9;
+  border-color: #C8A97E;
 }
 
 .direction-btn {

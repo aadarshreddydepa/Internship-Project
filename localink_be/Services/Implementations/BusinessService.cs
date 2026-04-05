@@ -320,9 +320,14 @@ namespace localink_be.Services.Implementations
                     SubcategoryName = b.Subcategory != null ? b.Subcategory.SubcategoryName : "",
                     SubcategoryId = b.SubcategoryId,
 
+                    PhoneCode = _db.BusinessContacts
+                        .Where(c => c.BusinessId == b.BusinessId)
+                        .Select(c => c.PhoneCode)
+                        .FirstOrDefault(),
+
                     PhoneNumber = _db.BusinessContacts
                         .Where(c => c.BusinessId == b.BusinessId)
-                        .Select(c => (c.PhoneCode ?? "") + " " + (c.PhoneNumber ?? ""))
+                        .Select(c => c.PhoneNumber)
                         .FirstOrDefault(),
 
                     Email = _db.BusinessContacts
@@ -348,6 +353,11 @@ namespace localink_be.Services.Implementations
                     Pincode = _db.BusinessContacts
                         .Where(c => c.BusinessId == b.BusinessId)
                         .Select(c => c.Pincode)
+                        .FirstOrDefault(),
+
+                    StreetAddress = _db.BusinessContacts
+                        .Where(c => c.BusinessId == b.BusinessId)
+                        .Select(c => c.StreetAddress)
                         .FirstOrDefault(),
 
                     Latitude = _db.BusinessContacts

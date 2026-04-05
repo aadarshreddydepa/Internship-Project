@@ -22,7 +22,7 @@ import { Subscription } from 'rxjs';
   styles: [`
     .toast-container {
       position: fixed;
-      bottom: 30px;
+      top: 30px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 10000;
@@ -44,7 +44,7 @@ import { Subscription } from 'rxjs';
       background: linear-gradient(135deg, #343434 0%, #2A2A2A 100%);
       border: 1px solid #484948;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-      animation: slideUp 0.3s ease-out;
+      animation: slideDown 0.3s ease-out;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -66,9 +66,9 @@ import { Subscription } from 'rxjs';
       background: linear-gradient(135deg, #343434 0%, #2A2A2A 100%);
     }
 
-    @keyframes slideUp {
+    @keyframes slideDown {
       from {
-        transform: translateY(100%);
+        transform: translateY(-100%);
         opacity: 0;
       }
       to {
@@ -83,7 +83,7 @@ import { Subscription } from 'rxjs';
         opacity: 1;
       }
       to {
-        transform: translateY(100%);
+        transform: translateY(-100%);
         opacity: 0;
       }
     }

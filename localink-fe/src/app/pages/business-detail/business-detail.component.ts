@@ -212,19 +212,12 @@ export class BusinessDetailComponent implements OnInit {
   }
 
   contactBusiness() {
-    if (!this.business?.contact) {
-      alert('Contact information not available.');
+    if (!this.business?.contact?.email) {
+      this.toastService.error('Email not available for this business');
       return;
     }
-    const phone = this.business.contact.phoneNumber;
-    if (phone) {
-      window.open(`tel:${phone}`, '_self');
-    } else {
-      const email = this.business.contact.email;
-      if (email) {
-        window.open(`mailto:${email}`, '_self');
-      }
-    }
+    const email = this.business.contact.email;
+    window.location.href = `mailto:${email}`;
   }
 
   getAiSuggestions() {

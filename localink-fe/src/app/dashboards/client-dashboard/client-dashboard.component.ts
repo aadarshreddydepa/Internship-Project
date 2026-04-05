@@ -136,7 +136,7 @@ export class ClientDashboardComponent implements OnInit {
               email: b.email || '',
               city: b.city || '',
               state: b.state || '',
-              streetAddress: b.streetAddress || '',
+              streetAddress: b.streetAddress || b.street || b.address || '',
               country: b.country || '',
               pincode: b.pincode || ''
             }
@@ -378,6 +378,19 @@ export class ClientDashboardComponent implements OnInit {
     if (code === '+91') return '^[6-9][0-9]{9}$';
     if (code === '+1') return '^[0-9]{10}$';
     return '^[0-9]{6,12}$';
+  }
+
+  onPhoneInputEdit(event: any) {
+    const input = event.target.value;
+    // Allow only digits
+    const digitsOnly = input.replace(/\D/g, '');
+    
+    const maxLength = this.editingBusiness?.contact?.phoneCode === '+91' ? 10 : 15;
+    if (digitsOnly.length <= maxLength) {
+      this.editingBusiness!.contact.phone = digitsOnly;
+    } else {
+      this.editingBusiness!.contact.phone = digitsOnly.substring(0, maxLength);
+    }
   }
 
   // ✅ FIXED PINCODE

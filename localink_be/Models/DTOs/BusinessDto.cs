@@ -9,6 +9,7 @@ namespace localink_be.Models.DTOs
         public string SubcategoryName { get; set; } = null!;
 
     public string? PhoneNumber { get; set; }
+    public string? PhoneCode { get; set; }
     public string? Email { get; set; }
     
     public string? Country { get; set; }
