@@ -17,6 +17,9 @@ import { AdminDashboardComponent } from './dashboards/admin-dashboard/admin-dash
 import { AuthGuard } from './guards/auth.guard';
 import { NoAuthGuard } from './guards/no-auth.guard';
 import { ErrorPageComponent } from './pages/error-page/error-page.component';
+import { ContactUsComponent } from './contact-us/contact-us.component';
+import { AboutComponent } from './pages/about/about.component';
+import { FavoritesComponent } from './pages/favorites/favorites.component';
 
 export const routes: Routes = [
 
@@ -82,6 +85,11 @@ export const routes: Routes = [
     component: ContactDetailsComponent,
     canActivate: [AuthGuard]
   },
+  {
+    path: 'favorites',
+    component: FavoritesComponent,
+    canActivate: [AuthGuard]
+  },
 
   // ═══════════════════════════════════════════
   //  ROLE-PROTECTED ROUTES (AuthGuard + role check)
@@ -129,6 +137,22 @@ export const routes: Routes = [
   {
     path: 'error',
     component: ErrorPageComponent
+  },
+
+  // ═══════════════════════════════════════════
+  //  CONTACT US PAGE (Public)
+  // ═══════════════════════════════════════════
+  {
+    path: 'contact-us',
+    component: ContactUsComponent
+  },
+
+  // ═══════════════════════════════════════════
+  //  ABOUT US PAGE (Public)
+  // ═══════════════════════════════════════════
+  {
+    path: 'about',
+    component: AboutComponent
   },
 
   // ═══════════════════════════════════════════

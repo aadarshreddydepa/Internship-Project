@@ -9,6 +9,7 @@ export interface PopularBusiness {
   description: string;
   image: string | null;
   rating: number;
+  isFavorite?: boolean;
   totalReviews: number;
   categoryId: number;
   subcategoryId: number;
@@ -32,7 +33,7 @@ export class PopularService {
           if (!data || data.length === 0) {
             return [];
           }
-          
+
           return data
             .map((b: any) => ({
               id: b.businessId,

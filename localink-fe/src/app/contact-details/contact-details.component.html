@@ -1,12 +1,11 @@
 <div class="container">
-
   <h2>{{ 'CONTACT.TITLE' | translate }}</h2>
-
+ 
   <form [formGroup]="contactForm">
     <label>{{ 'CONTACT.PHONE' | translate }} *</label>
-
+ 
     <div class="phone-wrapper">
-
+ 
       <ng-select
         class="phone-code"
         [items]="phoneCountries"
@@ -15,16 +14,16 @@
         formControlName="phoneCode"
         [searchable]="true"
         [clearable]="false">
-
+ 
         <ng-template ng-label-tmp let-item="item">
-          <span class="flag">{{item.flag}}</span> +{{item.code}}
+          <span class="flag">{{item.flag}}</span> {{item.code}}
         </ng-template>
-
+ 
         <ng-template ng-option-tmp let-item="item">
           <span class="flag">{{item.flag}}</span>
-          {{item.name}} (+{{item.code}})
+          {{item.name}} ({{item.code}})
         </ng-template>
-
+ 
       </ng-select>
 
       <input
@@ -33,25 +32,25 @@
         placeholder="{{ 'CONTACT.PLACEHOLDER_PHONE' | translate }}"
         (input)="allowOnlyNumbers($event)"
         [attr.maxlength]="contactForm.get('phoneCode')?.value === '+91' ? 10 : 15">
-
+ 
     </div>
 
     <div class="error"
         *ngIf="contactForm.get('phone')?.invalid &&
                 (contactForm.get('phone')?.dirty || contactForm.get('phone')?.touched)">
-
+ 
       <span *ngIf="contactForm.get('phone')?.errors?.['required']">
         {{ 'ERRORS.REQUIRED' | translate }}
       </span>
-
+ 
       <span *ngIf="contactForm.get('phone')?.errors?.['pattern']">
         {{ 'VALIDATION.PHONE_PATTERN' | translate }}
       </span>
-
+ 
       <span *ngIf="contactForm.get('phone')?.errors?.['countryMismatch']">
         {{ 'VALIDATION.COUNTRY_MISMATCH' | translate }}
       </span>
-
+ 
     </div>
 
     <label>{{ 'CONTACT.EMAIL' | translate }} *</label>
@@ -85,7 +84,7 @@
       placeholder="{{ 'CONTACT.SELECT_COUNTRY' | translate }}"
       formControlName="country"
       [searchable]="true"
-      [clearable]="false"
+      [clearable]="true"
       [virtualScroll]="true"
       (change)="onCountryChange()">
     </ng-select>
@@ -104,11 +103,15 @@
 
     <ng-select
       [items]="states"
+      bindLabel="name"
+      bindValue="name"
       placeholder="{{ 'CONTACT.SELECT_STATE' | translate }}"
       formControlName="state"
       [searchable]="true"
-      [clearable]="false"
-      [disabled]="!contactForm.get('country')?.value">
+      [clearable]="true"
+      [virtualScroll]="true"
+      [disabled]="!contactForm.get('country')?.value"
+      (change)="onStateChange($event)">
     </ng-select>
 
     <div class="error" *ngIf="contactForm.get('state')?.touched && contactForm.get('state')?.invalid">
@@ -123,13 +126,20 @@
 
     <label>{{ 'CONTACT.CITY' | translate }} *</label>
 
-    <input type="text" formControlName="city" placeholder="{{ 'CONTACT.PLACEHOLDER_CITY' | translate }}">
+    <ng-select
+      [items]="cities"
+      bindLabel="name"
+      bindValue="name"
+      placeholder="{{ 'CONTACT.SELECT_CITY' | translate }}"
+      formControlName="city"
+      [searchable]="true"
+      [clearable]="true"
+      [virtualScroll]="true"
+      [disabled]="!contactForm.get('state')?.value">
+    </ng-select>
 
     <div class="error" *ngIf="contactForm.get('city')?.touched && contactForm.get('city')?.invalid">
-      <div *ngIf="contactForm.get('city')?.errors?.['required']">{{ 'ERRORS.REQUIRED' | translate }}</div>
-      <div *ngIf="contactForm.get('city')?.errors?.['minlength']">{{ 'VALIDATION.CITY_MIN' | translate }}</div>
-      <div *ngIf="contactForm.get('city')?.errors?.['maxlength']">{{ 'VALIDATION.CITY_MAX' | translate }}</div>
-      <div *ngIf="contactForm.get('city')?.errors?.['pattern']">{{ 'VALIDATION.CITY_PATTERN' | translate }}</div>
+      <span *ngIf="contactForm.get('city')?.errors?.['required']">{{ 'ERRORS.REQUIRED' | translate }}</span>
     </div>
 
     </div>  
@@ -157,7 +167,6 @@
 
     <label>{{ 'CONTACT.STREET' | translate }} *</label>
     <input type="text" formControlName="address" placeholder="{{ 'CONTACT.PLACEHOLDER_ADDRESS' | translate }}">
-
     <div class="error" *ngIf="contactForm.get('address')?.touched && contactForm.get('address')?.invalid">
       <div *ngIf="contactForm.get('address')?.errors?.['required']">{{ 'ERRORS.REQUIRED' | translate }}</div>
       <div *ngIf="contactForm.get('address')?.errors?.['minlength']">{{ 'VALIDATION.ADDRESS_MIN' | translate }}</div>

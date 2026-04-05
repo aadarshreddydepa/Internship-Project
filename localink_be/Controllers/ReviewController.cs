@@ -17,17 +17,30 @@ public class ReviewController : ControllerBase
     [Authorize] 
     public async Task<IActionResult> AddOrUpdateReview([FromBody] ReviewRequestDto dto)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Validation failed",
+                errors = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+            });
+        }
+
         try
         {
             var userId = GetUserId();
 
             if (userId == 0)
-                return Unauthorized("Invalid user");
+                return Unauthorized(new { success = false, message = "Invalid user" });
 
             await _reviewService.AddOrUpdateReview(userId, dto);
 
             return Ok(new
             {
+                success = true,
                 message = "Review submitted successfully"
             });
         }
@@ -35,6 +48,7 @@ public class ReviewController : ControllerBase
         {
             return BadRequest(new
             {
+                success = false,
                 error = ex.Message
             });
         }

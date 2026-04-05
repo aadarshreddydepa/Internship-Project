@@ -15,6 +15,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../core/services/auth.service';
 import { TokenService } from '../core/services/token.service';
 import { ForgotPasswordComponent } from '../forgot-password/forgot-password.component';
+import { LanguageSwitcherComponent } from '../components/language-switcher/language-switcher.component';
 import { environment } from '../../environments/environment';
 
 // IMPORTANT (global grecaptcha)
@@ -23,7 +24,7 @@ declare var grecaptcha: any;
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, ForgotPasswordComponent, TranslateModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, ForgotPasswordComponent, TranslateModule, LanguageSwitcherComponent],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
@@ -121,7 +122,7 @@ export class LoginComponent implements AfterViewInit {
       const payload = {
         usernameOrEmail: this.loginForm.value.usernameOrEmail.trim().toLowerCase(),
         password: this.loginForm.value.password,
-        captchaToken: this.captchaToken // 👈 ready for backend
+        captchaToken: this.captchaToken // 
       };
 
       this.authService.login(payload).subscribe({

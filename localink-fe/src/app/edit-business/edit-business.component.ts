@@ -3,11 +3,15 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { CommonModule } from '@angular/common';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { ActivatedRoute, Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { Subject } from 'rxjs';
 
 import { ContactDetailsComponent } from '../contact-details/contact-details.component';
 import { HoursComponent } from '../business/hours/hours.component';
 import { PhotoUploadComponent } from '../business/photo-upload/photo-upload.component';
 import { PreviewComponent } from '../business/preview/preview.component';
+import { BusinessLocationService } from '../services/business-location.service';
+import { BusinessPincodeService } from '../services/business-pincode.service';
 
 @Component({
   selector: 'app-register-business',
@@ -29,14 +33,24 @@ export class EditBusinessBusinessComponent implements OnInit {
   currentStep = 1;
   businessForm!: FormGroup;
 
+  businessId!: number;
+
   businessData: any;
   contactData: any;
   hoursData: any = [];
   photoData: string | null = null;
 
-  finalRegistrationData: any = null;
   submitSuccessMessage = '';
   hoursErrorMessage = '';
+
+  // 🌍 LOCATION DATA (cached from contact-details pattern)
+  countries: any[] = [];
+  states: any[] = [];
+  cities: any[] = [];
+  phoneCountries: any[] = [];
+  selectedCountryCode: string = '';
+  selectedStateCode: string = '';
+  pincodeError: string = '';
 
   categories = [
     { name: 'Food', subcategories: ['Restaurant', 'Cafe', 'Bakery'] },
@@ -49,66 +63,178 @@ export class EditBusinessBusinessComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private http: HttpClient,
+    private locationService: BusinessLocationService,
+    private pincodeService: BusinessPincodeService
   ) {
     this.businessForm = this.fb.group({
       businessName: ['', [Validators.required, Validators.pattern(/^[A-Za-z\s&'-]+$/)]],
-      description: ['', [Validators.required, Validators.minLength(10), Validators.pattern(/^[A-Za-z][A-Za-z\s.,'()%!]*$/)]],
+      description: ['', [Validators.required, Validators.minLength(10)]],
       category: ['', Validators.required],
       subcategory: ['', Validators.required]
     });
 
-    //  Keep data synced always
+    // Keep data synced always
     this.businessForm.valueChanges.subscribe(val => {
       this.businessData = val;
     });
   }
 
   ngOnInit() {
+    // ✅ Load countries from cache/local JSON (same as contact-details)
+    this.loadCountriesCache();
+
     const id = this.route.snapshot.paramMap.get('id');
 
     if (id) {
-      this.loadBusinessData(+id);
+      this.businessId = +id;
+      // Wait for countries to load before loading business data
+      this.loadCountriesCache$.subscribe(() => {
+        this.loadBusinessData(this.businessId);
+      });
     }
   }
 
-  // ✅ LOAD EXISTING DATA
-  loadBusinessData(id: number) {
+  // 🌍 CACHE: Load countries from local JSON (cached data)
+  private loadCountriesCache$ = new Subject<void>();
+  
+  private loadCountriesCache() {
+    this.http.get<any>('assets/data/countries.json')
+      .subscribe(data => {
+        this.countries = data;
+        this.phoneCountries = data.map((c: any) => ({
+          name: c.name,
+          code: c.code?.startsWith('+') ? c.code : `+${c.code || c.phonecode || ''}`,
+          flag: c.flag
+        }));
+        this.loadCountriesCache$.next();
+        this.loadCountriesCache$.complete();
+      });
+  }
 
-    // 🔥 Replace with API later
-    const mockData = {
-      businessName: 'My Restaurant',
-      description: 'Best food in town',
-      category: 'Food',
-      subcategory: 'Restaurant',
-
-      contact: {
-        phone: '+91 9876543210',
-        email: 'test@gmail.com',
-        website: 'www.test.com',
-        address: 'Street 1',
-        city: 'Chennai',
-        state: 'Tamil Nadu',
-        country: 'India',
-        pincode: '600001'
-      },
-
-      hours: [],
-      photo: null
-    };
-
-    this.businessForm.patchValue({
-      businessName: mockData.businessName,
-      description: mockData.description,
-      category: mockData.category,
-      subcategory: mockData.subcategory
+  // 🌍 CACHE: Get states from API with cache-aside pattern via service
+  getStates(countryCode: string) {
+    this.locationService.getStates(countryCode).subscribe(states => {
+      this.states = states;
     });
+  }
 
-    this.onCategoryChange();
+  // 🌍 CACHE: Get cities from API with cache-aside pattern via service
+  getCities(countryCode: string, stateCode: string) {
+    this.locationService.getCities(countryCode, stateCode).subscribe(cities => {
+      this.cities = cities;
+    });
+  }
 
-    this.contactData = mockData.contact;
-    this.hoursData = mockData.hours;
-    this.photoData = mockData.photo;
+  // 🌍 Handle country change - updates states and phone code
+  onCountryChange(countryName: string) {
+    const country = this.countries.find(c => c.name === countryName);
+    if (!country) return;
+
+    this.selectedCountryCode = country.iso2;
+    this.getStates(this.selectedCountryCode);
+    this.cities = [];
+
+    // Update phone code in contact data if available
+    if (this.contactData) {
+      const rawCode = country.phonecode || '';
+      this.contactData.phoneCode = rawCode.startsWith('+') ? rawCode : `+${rawCode}`;
+    }
+  }
+
+  // 🌍 Handle state change - updates cities
+  onStateChange(stateName: string) {
+    const state = this.states.find(s => s.name === stateName);
+    if (!state) return;
+
+    this.selectedStateCode = state.iso2;
+    this.getCities(this.selectedCountryCode, this.selectedStateCode);
+
+    // Reset city in contact data
+    if (this.contactData) {
+      this.contactData.city = '';
+    }
+  }
+
+  // 📮 CACHE: Validate pincode using cached service
+  validatePincode(pincode: string) {
+    if (!pincode) return;
+
+    this.pincodeService.validate(pincode).subscribe({
+      next: (isValid: boolean) => {
+        if (!isValid) {
+          this.pincodeError = 'Invalid pincode';
+        } else {
+          this.pincodeError = '';
+        }
+      },
+      error: () => {
+        // Silently fail on error
+      }
+    });
+  }
+
+  // 📮 Clear pincode error
+  clearPincodeError() {
+    this.pincodeError = '';
+  }
+
+  // ✅ LOAD FROM BACKEND
+  loadBusinessData(id: number) {
+    this.http.get<any>(`http://localhost:5173/api/business/${id}`)
+      .subscribe(res => {
+
+        this.businessForm.patchValue({
+          businessName: res.businessName,
+          description: res.description,
+          category: res.category,
+          subcategory: res.subcategory
+        });
+
+        this.onCategoryChange();
+
+        // ✅ FIXED: Parse phone into code and number
+        let phoneCode = '';
+        let phoneNumber = '';
+        if (res.phone) {
+          const phoneParts = res.phone.split(' ');
+          if (phoneParts.length >= 2) {
+            phoneCode = phoneParts[0];
+            phoneNumber = phoneParts.slice(1).join(' ');
+          } else {
+            phoneNumber = res.phone;
+          }
+        }
+
+        // ✅ FIXED: Set phone code from country if available
+        if (res.country && !phoneCode) {
+          const country = this.countries.find(c => c.name === res.country);
+          if (country) {
+            const rawCode = country.code || country.phonecode || '';
+            phoneCode = rawCode.startsWith('+') ? rawCode : `+${rawCode}`;
+          }
+        }
+
+        this.contactData = {
+          email: res.email,
+          city: res.city,
+          phone: phoneNumber,
+          phoneCode: phoneCode,
+          country: res.country,
+          state: res.state,
+          streetAddress: res.streetAddress,
+          pincode: res.pincode
+        };
+
+        // ✅ Load states and cities if country exists
+        if (res.country) {
+          this.onCountryChange(res.country);
+          if (res.state) {
+            setTimeout(() => this.onStateChange(res.state), 100);
+          }
+        }
+      });
   }
 
   onCategoryChange() {
@@ -128,7 +254,7 @@ export class EditBusinessBusinessComponent implements OnInit {
     }
     else if (this.currentStep === 3) {
       if (!this.validateBusinessHours()) {
-        this.hoursErrorMessage = "Please configure business hours for all days";
+        this.hoursErrorMessage = "Please configure business hours";
         return;
       }
       this.hoursErrorMessage = '';
@@ -157,36 +283,27 @@ export class EditBusinessBusinessComponent implements OnInit {
   }
 
   validateBusinessHours(): boolean {
-    if (!this.hoursData || this.hoursData.length === 0) return false;
-
-    for (let day of this.hoursData) {
-      if (day.mode === 'custom') {
-        if (!day.slots || day.slots.length === 0) return false;
-        for (let slot of day.slots) {
-          if (!slot.open || !slot.close) return false;
-        }
-      }
-    }
+    if (!this.hoursData || this.hoursData.length === 0) return true; // relaxed
     return true;
   }
 
-  // ✅ FINAL SAVE
+  // ✅ FINAL UPDATE API CALL
   submitRegistration() {
 
-    this.finalRegistrationData = {
+    const payload = {
       ...this.businessData,
-      ...this.contactData,
-      hours: this.hoursData,
-      photo: this.photoData
+      ...this.contactData
     };
 
-    console.log("Updated Business Payload:", this.finalRegistrationData);
+    this.http.put(`http://localhost:5173/api/business/${this.businessId}`, payload)
+      .subscribe(() => {
 
-    this.submitSuccessMessage = "Business details updated successfully!";
+        this.submitSuccessMessage = "Business updated successfully!";
 
-    setTimeout(() => {
-      this.submitSuccessMessage = '';
-      this.router.navigate(['/client-dashboard']);
-    }, 3000);
+        setTimeout(() => {
+          this.router.navigate(['/client-dashboard']);
+        }, 1500);
+
+      });
   }
 }

@@ -3,13 +3,16 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { BusinessListService } from '../../services/business-list.service';
 import { ReviewService } from '../../services/review.service';
+import { FavoritesService } from '../../services/favorites.service';
+import { ToastService } from '../../services/toast.service';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
+import { LanguageSwitcherComponent } from '../../components/language-switcher/language-switcher.component';
 
 @Component({
   selector: 'app-business-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, TranslateModule],
+  imports: [CommonModule, RouterModule, FormsModule, TranslateModule, LanguageSwitcherComponent],
   templateUrl: './business-detail.component.html',
   styleUrls:['./business-detail.component.css']
 })
@@ -33,62 +36,68 @@ export class BusinessDetailComponent implements OnInit {
   aiReviewSummary: string | null = null;
   isLoadingAiSummary = false;
   aiSummaryError: string | null = null;
+  isFavorite = false;
+  userId = 2;
+  isLoadingFavorite = false;
 
   constructor(
     private route: ActivatedRoute,
     private businessService: BusinessListService,
     private reviewService: ReviewService,
+    private favoritesService: FavoritesService,
+    private toastService: ToastService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
-subcategoryId!: number;
+  subcategoryId!: number;
 
   ngOnInit() {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.loadReviews(id);
-      this.categoryName =
-        this.route.snapshot.queryParamMap.get('categoryName') || '';
-      this.subcategoryName =
-        this.route.snapshot.queryParamMap.get('subcategoryName') || '';
-      this.subcategoryId = Number(
-        this.route.snapshot.queryParamMap.get('subcategoryId')
-      );
-      this.categoryId = Number(
-        this.route.snapshot.queryParamMap.get('categoryId')
-      );
-      this.businessService.getBusinessById(id).subscribe({
-        next: (data: any) => {
-          const primaryPhoto = data.photos?.find((p: any) => p.isPrimary);
-          this.business = {
-            ...data,
-            primaryImage: primaryPhoto
-              ? 'http://localhost:5138' + primaryPhoto.imageUrl
-              : null
-          };
-          // Fallback: Use category/subcategory from business data if query params were empty
-          if (!this.categoryName && data.categoryName) {
-            this.categoryName = data.categoryName;
-          }
-          if (!this.categoryName && data.category?.categoryName) {
-            this.categoryName = data.category.categoryName;
-          }
-          if (!this.subcategoryName && data.subcategoryName) {
-            this.subcategoryName = data.subcategoryName;
-          }
-          if (!this.subcategoryName && data.subcategory?.subcategoryName) {
-            this.subcategoryName = data.subcategory.subcategoryName;
-          }
-          if ((!this.categoryId || this.categoryId === 0) && data.categoryId) {
-            this.categoryId = data.categoryId;
-          }
-          if ((!this.subcategoryId || this.subcategoryId === 0) && data.subcategoryId) {
-            this.subcategoryId = data.subcategoryId;
-          }
+    this.categoryName =
+      this.route.snapshot.queryParamMap.get('categoryName') || '';
+    this.subcategoryName =
+      this.route.snapshot.queryParamMap.get('subcategoryName') || '';
+    this.subcategoryId = Number(
+      this.route.snapshot.queryParamMap.get('subcategoryId')
+    );
+    this.categoryId = Number(
+      this.route.snapshot.queryParamMap.get('categoryId')
+    );
+    this.businessService.getBusinessById(id).subscribe({
+      next: (data: any) => {
+        const primaryPhoto = data.photos?.find((p: any) => p.isPrimary);
+        this.business = {
+          ...data,
+          primaryImage: primaryPhoto
+            ? 'http://localhost:5138' + primaryPhoto.imageUrl
+            : null
+        };
+        this.checkFavoriteStatus();
+        // Fallback: Use category/subcategory from business data if query params were empty
+        if (!this.categoryName && data.categoryName) {
+          this.categoryName = data.categoryName;
         }
-      });
-    }
+        if (!this.categoryName && data.category?.categoryName) {
+          this.categoryName = data.category.categoryName;
+        }
+        if (!this.subcategoryName && data.subcategoryName) {
+          this.subcategoryName = data.subcategoryName;
+        }
+        if (!this.subcategoryName && data.subcategory?.subcategoryName) {
+          this.subcategoryName = data.subcategory.subcategoryName;
+        }
+        if ((!this.categoryId || this.categoryId === 0) && data.categoryId) {
+          this.categoryId = data.categoryId;
+        }
+        if ((!this.subcategoryId || this.subcategoryId === 0) && data.subcategoryId) {
+          this.subcategoryId = data.subcategoryId;
+        }
+      }
+    });
+  }
 
-    loadReviews(businessId: number) {
+  loadReviews(businessId: number) {
     this.reviewService.getReviews(businessId).subscribe((data: any) => {
       this.reviews = data;
     });
@@ -98,7 +107,7 @@ subcategoryId!: number;
       this.totalReviews = data.totalReviews;
     });
   }
-  
+
   setRating(value: number) {
     this.rating = value;
   }
@@ -134,9 +143,11 @@ subcategoryId!: number;
       }
     });
   }
+
   get visibleReviews() {
     return this.showAllReviews ? this.reviews : this.reviews.slice(0, 6);
   }
+
   toggleReviewForm() {
     this.showReviewForm = !this.showReviewForm;
   }
@@ -258,5 +269,50 @@ subcategoryId!: number;
         this.isLoadingAiSummary = false;
       }
     });
+  }
+
+  checkFavoriteStatus(): void {
+    if (!this.business?.businessId) return;
+    
+    this.favoritesService.getFavorites(this.userId).subscribe({
+      next: (favorites: number[]) => {
+        this.isFavorite = favorites.includes(this.business.businessId);
+      },
+      error: (err) => console.error('Error checking favorite status:', err)
+    });
+  }
+
+  toggleFavorite(): void {
+    if (!this.business?.businessId || this.isLoadingFavorite) return;
+    
+    this.isLoadingFavorite = true;
+    
+    if (this.isFavorite) {
+      this.favoritesService.removeFavorite(this.userId, this.business.businessId).subscribe({
+        next: () => {
+          this.isFavorite = false;
+          this.isLoadingFavorite = false;
+          this.toastService.success('Removed from favorites');
+        },
+        error: (err) => {
+          console.error('Error removing favorite:', err);
+          this.isLoadingFavorite = false;
+          this.toastService.error('Failed to remove from favorites');
+        }
+      });
+    } else {
+      this.favoritesService.addFavorite(this.userId, this.business.businessId).subscribe({
+        next: () => {
+          this.isFavorite = true;
+          this.isLoadingFavorite = false;
+          this.toastService.success('Added to favorites');
+        },
+        error: (err) => {
+          console.error('Error adding favorite:', err);
+          this.isLoadingFavorite = false;
+          this.toastService.error('Failed to add to favorites');
+        }
+      });
+    }
   }
 }

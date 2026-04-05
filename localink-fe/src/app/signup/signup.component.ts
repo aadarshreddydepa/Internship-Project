@@ -88,7 +88,7 @@ export class SignupComponent implements OnInit, AfterViewInit {
         ]
       ],
 
-      phoneCode: ['91', Validators.required],
+      phoneCode: ['+91', Validators.required],
       phone: [
         '',
         [
@@ -123,7 +123,8 @@ export class SignupComponent implements OnInit, AfterViewInit {
     /* Dynamic phone validation */
     this.signupForm.get('phoneCode')?.valueChanges.subscribe(code => {
       const phoneControl = this.signupForm.get('phone');
-      if (code === '91') {
+      const numericCode = code?.replace('+', '');
+      if (numericCode === '91') {
         phoneControl?.setValidators([
           Validators.required,
           Validators.pattern(/^[3-9][0-9]{9}$/)
@@ -187,8 +188,10 @@ export class SignupComponent implements OnInit, AfterViewInit {
     if (!selectedCountry) return;
 
     // AUTO-UPDATE PHONE CODE
-    if (selectedCountry.phonecode || selectedCountry.phone_code) {
-      this.signupForm.get('phoneCode')?.setValue(selectedCountry.phonecode || selectedCountry.phone_code);
+    const phoneCode = selectedCountry.phonecode || selectedCountry.phone_code || '';
+    if (phoneCode) {
+      const formattedPhoneCode = phoneCode.startsWith('+') ? phoneCode : `+${phoneCode}`;
+      this.signupForm.get('phoneCode')?.setValue(formattedPhoneCode);
     }
 
     this.locationService.getStates(selectedCountry.iso2)
@@ -284,7 +287,7 @@ export class SignupComponent implements OnInit, AfterViewInit {
     const phoneCode = group.get('phoneCode')?.value;
     const phoneControl = group.get('phone');
 
-    if (country && country.phonecode !== phoneCode) {
+    if (country && country.phonecode !== phoneCode.replace('+', '')) {
       phoneControl?.setErrors({
         ...(phoneControl.errors || {}),
         countryMismatch: true
@@ -353,6 +356,8 @@ export class SignupComponent implements OnInit, AfterViewInit {
       const stateValue = raw.state?.name || raw.state;
       const cityValue = raw.city?.name || raw.city;
 
+    const phoneCode = raw.phoneCode?.startsWith('+') ? raw.phoneCode : `+${raw.phoneCode}`;
+
       const formData = {
         ...raw,
         email: raw.email.trim().toLowerCase(),
@@ -363,8 +368,8 @@ export class SignupComponent implements OnInit, AfterViewInit {
         country: countryValue,
         state: stateValue,
         city: cityValue,
-        // Map phoneCode to CountryCode for backend
-        countryCode: raw.phoneCode
+        // Map phoneCode to CountryCode for backend with + prefix
+        countryCode: phoneCode
       };
 
       this.authService.register(formData).subscribe({

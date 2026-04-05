@@ -33,6 +33,49 @@
   border-radius: 4px;
 }
 
+/* FAVORITE BUTTON */
+.favorite-btn-popular {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 10;
+  color: #fff;
+}
+
+.favorite-btn-popular:hover {
+  background: rgba(200, 169, 126, 0.3);
+  border-color: #C8A97E;
+  transform: scale(1.1);
+}
+
+.favorite-btn-popular.is-favorite {
+  background: rgba(200, 169, 126, 0.9);
+  border-color: #C8A97E;
+  color: #1C1C1C;
+}
+
+.favorite-btn-popular.is-favorite:hover {
+  background: rgba(200, 169, 126, 0.7);
+}
+
+/* CARD CLICKABLE WRAPPER */
+.card-clickable {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  cursor: pointer;
+}
+
 /* CARD */
 .business-card {
   min-width: 260px;
@@ -47,6 +90,7 @@
   justify-content: space-between; 
   transition: all 0.25s ease;
   cursor: pointer;
+  position: relative;
 }
 
 .business-card:hover {

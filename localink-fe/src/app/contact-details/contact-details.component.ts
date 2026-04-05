@@ -40,7 +40,7 @@ export class ContactDetailsComponent implements OnInit, AfterViewInit, OnDestroy
   phoneCountries: any[] = [];
 
   countries: any[] = [];
-  states: string[] = [];
+  states: any[] = [];
   cities: any[] = [];
 
   // Map related
@@ -73,7 +73,7 @@ export class ContactDetailsComponent implements OnInit, AfterViewInit, OnDestroy
   ) {
 
     this.contactForm = this.fb.group({
-      phoneCode: ['91', Validators.required],
+      phoneCode: ['+91', Validators.required],
       phone: [
         '',
         [
@@ -124,8 +124,8 @@ export class ContactDetailsComponent implements OnInit, AfterViewInit, OnDestroy
     /* Dynamic phone validation */
     this.contactForm.get('phoneCode')?.valueChanges.subscribe(code => {
       const phoneControl = this.contactForm.get('phone');
-
-      if (code === '+91') {
+      const numericCode = code?.replace('+', '');
+      if (numericCode === '91') {
         phoneControl?.setValidators([
           Validators.required,
           Validators.pattern(/^[3-9][0-9]{9}$/)
@@ -142,40 +142,53 @@ export class ContactDetailsComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   ngOnInit() {
-    this.http.get<any>('assets/data/countries.json')
-      .subscribe(data => {
-        this.countries = data;
+    if (isPlatformBrowser(this.platformId)) {
+      this.locationService.getCountries()
+        .subscribe((data: any[]) => {
+          this.countries = data;
+          this.phoneCountries = data.map((c: any) => ({
+            name: c.name,
+            code: c.phonecode?.startsWith('+') ? c.phonecode : `+${c.phonecode || ''}`,
+            flag: '',
+            searchLabel: `${c.name} +${c.phonecode || c.phone_code}`
+          }));
 
-        this.phoneCountries = data.map((c: any) => ({
-          name: c.name,
-          code: c.code,
-          flag: c.flag
-        }));
+          if (this.initialData) {
+            // Handle phone data - support both combined and separate formats
+            let phoneCode = this.initialData.phoneCode || '';
+            let phoneNumber = this.initialData.phone || '';
 
-        if (this.initialData) {
-          if (this.initialData.phone) {
-            const [code, number] = this.initialData.phone.split(' ');
+            // If phone contains code+number combined (e.g., "+91 9876543210")
+            if (this.initialData.phone && this.initialData.phone.includes(' ')) {
+              const [code, ...numberParts] = this.initialData.phone.split(' ');
+              phoneCode = code.replace('+', '');
+              phoneNumber = numberParts.join(' ');
+            }
+
             this.contactForm.patchValue({
               ...this.initialData,
-              phoneCode: code,
-              phone: number
+              phoneCode: phoneCode,
+              phone: phoneNumber
             });
-          } else {
-            this.contactForm.patchValue(this.initialData);
-          }
 
-          const countryObj = this.countries.find(
-            c => c.name === this.initialData.country
-          );
-          this.states = countryObj ? countryObj.states.map((s: any) => s.name) : [];
-
-          // Restore map pin if coordinates exist
-          if (this.initialData.latitude && this.initialData.longitude) {
-            this.selectedLat = this.initialData.latitude;
-            this.selectedLng = this.initialData.longitude;
+            // Load states for the selected country
+            const countryObj = this.countries.find(
+              c => c.name === this.initialData.country
+            );
+            if (countryObj) {
+              this.locationService.getStates(countryObj.iso2)
+                .subscribe(res => {
+                  this.states = res;
+                  // Restore map pin if coordinates exist
+                  if (this.initialData.latitude && this.initialData.longitude) {
+                    this.selectedLat = this.initialData.latitude;
+                    this.selectedLng = this.initialData.longitude;
+                  }
+                });
+            }
           }
-        }
-      });
+        });
+    }
 
     // Setup auto-search observable
     this.searchQuerySubject.pipe(
@@ -357,27 +370,46 @@ export class ContactDetailsComponent implements OnInit, AfterViewInit, OnDestroy
         const matchedCountry = countryObj ? countryObj.name : countryName;
 
         if (countryObj) {
-          this.states = countryObj.states.map((s: any) => s.name) || [];
+          this.locationService.getStates(countryObj.iso2)
+            .subscribe(res => {
+              this.states = res;
+              // Find matching state from API states
+              const matchedStateObj = this.states.find(
+                (s: any) => s.name.toLowerCase() === stateName.toLowerCase()
+              );
+              const matchedState = matchedStateObj ? matchedStateObj.name : stateName;
+
+              // Load cities if state match found
+              if (matchedStateObj) {
+                this.locationService.getCities(countryObj.iso2, matchedStateObj.iso2)
+                  .subscribe(citiesRes => {
+                    this.cities = citiesRes;
+                  });
+              }
+
+              this.contactForm.patchValue({
+                country: matchedCountry,
+                state: matchedState,
+                city: cityName,
+                pincode: postcode.replace(/\s/g, '').slice(0, 6),
+                address: streetAddress.slice(0, 200)
+              });
+            });
+        } else {
+          this.contactForm.patchValue({
+            country: matchedCountry,
+            state: stateName,
+            city: cityName,
+            pincode: postcode.replace(/\s/g, '').slice(0, 6),
+            address: streetAddress.slice(0, 200)
+          });
         }
 
-        // Find matching state
-        const matchedState = this.states.find(
-          (s: string) => s.toLowerCase() === stateName.toLowerCase()
-        ) || stateName;
-
-        this.contactForm.patchValue({
-          country: matchedCountry,
-          state: matchedState,
-          city: cityName,
-          pincode: postcode.replace(/\s/g, '').slice(0, 6),
-          address: streetAddress.slice(0, 200)
-        });
-
-        // Update phone code to match country if not manually changed
-        if (countryObj && countryObj.code) {
+    if (countryObj && countryObj.code) {
           const currentPhoneCode = this.contactForm.get('phoneCode')?.value;
           if (!currentPhoneCode || currentPhoneCode === '+91') {
-            this.contactForm.patchValue({ phoneCode: countryObj.code });
+            const formattedCode = countryObj.code?.startsWith('+') ? countryObj.code : `+${countryObj.code}`;
+            this.contactForm.patchValue({ phoneCode: formattedCode });
           }
         }
       },
@@ -461,10 +493,11 @@ export class ContactDetailsComponent implements OnInit, AfterViewInit, OnDestroy
 
     const phone = phoneControl.value;
     const code = phoneCodeControl.value;
+    const numericCode = code?.replace('+', '');
 
     if (!phone || !code) return null;
 
-    if (code === '91' || code === '+91') {
+    if (numericCode === '91') {
       if (!/^[3-9][0-9]{9}$/.test(phone)) {
         return { countryMismatch: true };
       }
@@ -478,35 +511,111 @@ export class ContactDetailsComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   onCountryChange() {
-    const countryName = this.contactForm.get('country')?.value;
-    const countryObj = this.countries.find(c => c.name === countryName);
-    this.states = countryObj ? countryObj.states.map((s: any) => s.name) : [];
-    this.contactForm.get('state')?.reset();
+    const selectedCountry = this.contactForm.get('country')?.value;
+
+    this.states = [];
+    this.cities = [];
+
+    this.contactForm.patchValue({
+      state: '',
+      city: '',
+      pincode: ''
+    });
+
+    if (!selectedCountry) return;
+
+    // AUTO-UPDATE PHONE CODE
+    const countryObj = this.countries.find(c => c.name === selectedCountry);
+    if (countryObj && (countryObj.phonecode || countryObj.phone_code)) {
+      const rawCode = countryObj.phonecode || countryObj.phone_code || '';
+      const formattedCode = rawCode.startsWith('+') ? rawCode : `+${rawCode}`;
+      this.contactForm.get('phoneCode')?.setValue(formattedCode);
+    }
+
+    this.locationService.getStates(countryObj?.iso2 || '')
+      .subscribe(res => {
+        this.states = res;
+      });
   }
 
+  onStateChange(event: any) {
+    const selectedCountry = this.contactForm.get('country')?.value;
+    const selectedState = this.contactForm.get('state')?.value;
+
+    this.cities = [];
+    this.contactForm.patchValue({ city: '', pincode: '' });
+
+    if (!selectedCountry || !selectedState) return;
+
+    const countryObj = this.countries.find(c => c.name === selectedCountry);
+    const stateObj = this.states.find((s: any) => s.name === selectedState);
+
+    this.locationService.getCities(countryObj?.iso2 || '', stateObj?.iso2 || '')
+      .subscribe(res => {
+        this.cities = res;
+      });
+  }
+
+  /* ===========================
+     PINCODE VALIDATION
+  =========================== */
   validatePincode() {
-    const pincodeControl = this.contactForm.get('pincode');
-    const countryControl = this.contactForm.get('country');
-    const stateControl = this.contactForm.get('state');
-    const cityControl = this.contactForm.get('city');
+    const control = this.contactForm.get('pincode');
+    const pincode = control?.value;
 
-    if (!pincodeControl?.value) return;
+    if (!pincode || pincode.length < 5) return;
 
-    const pincode = pincodeControl.value;
-    const country = countryControl?.value;
-    const state = stateControl?.value;
-    const city = cityControl?.value;
+    //  CLEAR OLD ERRORS FIRST
+    control?.setErrors(null);
 
-    this.pincodeService.validate(pincode).subscribe({
-      next: (isValid: boolean) => {
-        if (!isValid) {
-          pincodeControl.setErrors({ invalidPincode: true });
+    this.pincodeService.validate(pincode)
+      .subscribe({
+        next: (res: any) => {
+          if (!res || !res.country) {
+            control?.setErrors({ invalidPincode: true });
+            return;
+          }
+
+          const apiCountry = res.country;
+          const apiState = res.state;
+          const apiCity = res.city;
+
+          const selectedCountry = this.contactForm.get('country')?.value;
+          const selectedState = this.contactForm.get('state')?.value;
+          const selectedCity = this.contactForm.get('city')?.value;
+
+          const normalize = (val: string) =>
+            val?.toLowerCase().replace(/\s/g, '');
+
+          //  COUNTRY CHECK
+          if (selectedCountry &&
+              normalize(apiCountry) !== normalize(selectedCountry)) {
+            control?.setErrors({ ...control.errors, invalidCountry: true });
+            return;
+          }
+
+          //  STATE CHECK
+          if (selectedState &&
+              normalize(apiState) !== normalize(selectedState)) {
+            control?.setErrors({ ...control.errors, invalidState: true });
+            return;
+          }
+
+          //  CITY CHECK
+          if (selectedCity && apiCity &&
+              normalize(apiCity) !== normalize(selectedCity)) {
+            control?.setErrors({ ...control.errors, invalidCity: true });
+            return;
+          }
+
+          //  SUCCESS → CLEAR EVERYTHING
+          control?.setErrors(null);
+        },
+        error: (err) => {
+          console.error("API ERROR:", err);
+          control?.setErrors({ invalidPincode: true });
         }
-      },
-      error: () => {
-        // Silently fail validation on error
-      }
-    });
+      });
   }
 
   previousStep() {
@@ -518,7 +627,7 @@ export class ContactDetailsComponent implements OnInit, AfterViewInit, OnDestroy
       const formValue = this.contactForm.value;
       const phoneCode = formValue.phoneCode;
       const phone = formValue.phone;
-      const fullPhone = phone.startsWith('+') ? phone : `+${phoneCode} ${phone}`;
+      const fullPhone = phone.startsWith('+') ? phone : `${phoneCode} ${phone}`;
 
       const data = {
         ...formValue,

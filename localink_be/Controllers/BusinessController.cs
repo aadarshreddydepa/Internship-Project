@@ -36,6 +36,18 @@ namespace localink_be.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> RegisterBusiness([FromBody] RegisterBusinessDto dto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Validation failed",
+                    errors = ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage)
+                });
+            }
+
             var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
             var businessId = await _service.RegisterBusinessAsync(dto, long.Parse(userId));
@@ -51,8 +63,20 @@ namespace localink_be.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateBusiness(long id, [FromBody] UpdateBusinessDto dto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Validation failed",
+                    errors = ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage)
+                });
+            }
+
             var result = await _service.UpdateBusinessFullAsync(id, dto);
-            return result == null ? NotFound() : Ok(result);
+            return result == null ? NotFound(new { success = false, message = "Business not found" }) : Ok(new { success = true, data = result });
         }
 
         [Authorize(Roles = "client")]
@@ -105,6 +129,23 @@ namespace localink_be.Controllers
             }
 
             return Ok(await _service.SearchBusinessesAsync(query, userLat, userLng));
+        }
+
+        [HttpGet("validate-pincode/{pincode}")]
+        public async Task<IActionResult> ValidatePincode(string pincode)
+        {
+            using var client = new HttpClient();
+
+            var url = $"https://api.geoapify.com/v1/geocode/search?text={pincode}&format=json&apiKey=b5574329b50a49f49fe3b9ebbaf7a837";
+
+            var response = await client.GetAsync(url);
+
+            if (!response.IsSuccessStatusCode)
+                return BadRequest("Geoapify failed");
+
+            var content = await response.Content.ReadAsStringAsync();
+
+            return Content(content, "application/json");
         }
     }
 }

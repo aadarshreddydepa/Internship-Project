@@ -4,15 +4,17 @@ import { FormsModule } from '@angular/forms';
 import { AdminService, AdminBusiness } from '../../services/admin.service';
 import { UserProfile, UserService } from '../../services/user.service';
 import { ProfileComponent } from '../../pages/profile/profile.component';
+import { TranslateModule } from '@ngx-translate/core';
+import { LanguageSwitcherComponent } from '../../components/language-switcher/language-switcher.component';
 
 type Section = 'pending' | 'approved' | 'rejected' | 'inactive';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, ProfileComponent],
+  imports: [CommonModule, FormsModule, ProfileComponent, TranslateModule, LanguageSwitcherComponent],
   templateUrl: './admin-dashboard.component.html',
-  styleUrl: './admin-dashboard.component.css'
+  styleUrls: ['./admin-dashboard.component.css']
 })
 export class AdminDashboardComponent implements OnInit {
 

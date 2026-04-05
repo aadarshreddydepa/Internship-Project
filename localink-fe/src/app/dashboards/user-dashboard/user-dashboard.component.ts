@@ -6,6 +6,7 @@ import { Subject, debounceTime, distinctUntilChanged, switchMap, filter } from '
 import { CategoryService, Category } from '../../services/category.service';
 import { PopularBusinessesComponent } from '../../popular-businesses/popular-businesses.component';
 import { ProfileComponent } from '../../pages/profile/profile.component';
+import { LanguageSwitcherComponent } from '../../components/language-switcher/language-switcher.component';
 import { UserProfile, UserService } from '../../services/user.service';
 import { SearchService, BusinessDto } from '../../services/search.service';
 import { VoiceSearchComponent } from '../../components/voice-search/voice-search.component';
@@ -19,7 +20,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-search',
   standalone: true,
-  imports: [CommonModule, FormsModule, PopularBusinessesComponent, ProfileComponent, TranslateModule, VoiceSearchComponent],
+  imports: [CommonModule, FormsModule, PopularBusinessesComponent, ProfileComponent, TranslateModule, VoiceSearchComponent, LanguageSwitcherComponent],
   templateUrl: './user-dashboard.component.html',
   styleUrl: './user-dashboard.component.css'
 })
@@ -154,6 +155,10 @@ export class UserDashboardComponent implements OnInit {
         subcategoryId: business.subcategoryId
       }
     });
+  }
+
+  goToFavorites(): void {
+    this.router.navigate(['/favorites']);
   }
 
   // Voice search handlers - improved for real-time search

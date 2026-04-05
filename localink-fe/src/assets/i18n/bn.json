@@ -81,7 +81,8 @@
     "VIEW_SUBCATEGORIES": "সাবক্যাটাগরি দেখুন →",
     "SEARCH_RESULTS": "অনুসন্ধানের ফলাফল",
     "NO_RESULTS": "কোন ফলাফল পাওয়া যায়নি",
-    "NO_IMAGE": "কোন ছবি নেই"
+    "NO_IMAGE": "কোন ছবি নেই",
+    "POPULAR_THIS_WEEK": "এই সপ্তাহে জনপ্রিয়"
   },
   "BUSINESS": {
     "REGISTER_TITLE": "আপনার ব্যবসা নিবন্ধন করুন",

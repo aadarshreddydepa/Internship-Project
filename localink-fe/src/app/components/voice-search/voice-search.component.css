@@ -501,3 +501,208 @@
     animation: none;
   }
 }
+
+/* ===== GOOGLE-STYLE VOICE MODAL ===== */
+
+/* Google Style Modal Overlay */
+.voice-modal-overlay.google-style {
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(4px);
+}
+
+/* Google Style Modal */
+.voice-modal.google-style {
+  background: #1a1a1a;
+  border: none;
+  border-radius: 0;
+  width: 100%;
+  max-width: 600px;
+  height: 400px;
+  max-height: 80vh;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+/* Close Button - Google Style */
+.voice-modal.google-style .close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #888;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.voice-modal.google-style .close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+/* Google Style Content */
+.voice-modal-content.google-style {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px;
+  width: 100%;
+}
+
+/* Listening Container */
+.listening-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+}
+
+/* Red Mic Circle - Google Style */
+.mic-circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: #ea4335;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  animation: mic-pulse 1.5s ease-in-out infinite;
+  box-shadow: 0 4px 20px rgba(234, 67, 53, 0.4);
+}
+
+@keyframes mic-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 4px 20px rgba(234, 67, 53, 0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 8px 40px rgba(234, 67, 53, 0.6);
+  }
+}
+
+/* Sound Waves - Google Style */
+.sound-waves-google {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+}
+
+.sound-waves-google span {
+  width: 6px;
+  background: #4285f4;
+  border-radius: 3px;
+  animation: google-wave 0.8s ease-in-out infinite;
+}
+
+.sound-waves-google span:nth-child(1) { height: 20px; animation-delay: 0s; }
+.sound-waves-google span:nth-child(2) { height: 35px; animation-delay: 0.1s; }
+.sound-waves-google span:nth-child(3) { height: 50px; animation-delay: 0.2s; }
+.sound-waves-google span:nth-child(4) { height: 35px; animation-delay: 0.3s; }
+
+@keyframes google-wave {
+  0%, 100% { transform: scaleY(0.5); opacity: 0.6; }
+  50% { transform: scaleY(1); opacity: 1; }
+}
+
+/* Listening Text */
+.listening-text {
+  font-size: 28px;
+  color: #e0e0e0;
+  margin: 0;
+  font-weight: 400;
+}
+
+/* Transcript Container */
+.transcript-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.transcript-container .transcript-text {
+  font-size: 36px;
+  color: #fff;
+  font-weight: 400;
+  line-height: 1.4;
+  max-width: 90%;
+}
+
+.searching-text {
+  font-size: 16px;
+  color: #888;
+  margin: 0;
+}
+
+/* Error Container */
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.error-text {
+  font-size: 20px;
+  color: #ff6464;
+  margin: 0;
+}
+
+.retry-btn {
+  padding: 12px 32px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 24px;
+  background: transparent;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.retry-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #fff;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .voice-modal.google-style {
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+  
+  .mic-circle {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .mic-circle svg {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .listening-text {
+    font-size: 22px;
+  }
+  
+  .transcript-container .transcript-text {
+    font-size: 28px;
+  }
+}

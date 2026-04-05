@@ -7,6 +7,8 @@ using DotNetEnv;
 using localink_be.Data;
 using localink_be.Services.Interfaces;
 using localink_be.Services.Implementations;
+using localink_be.Middleware;
+
 Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
@@ -46,7 +48,12 @@ builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<ICaptchaService, CaptchaService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IFavoritesService, FavoritesService>();
 builder.Services.AddScoped<IAIService, AIService>();
+
+// AI GATEWAY SERVICE - Unified AI operations
+builder.Services.AddHttpClient("GroqAI");
+builder.Services.AddScoped<IAIGatewayService, AIGatewayService>();
 
 var jwtKey = builder.Configuration["Jwt:Key"];
 
@@ -108,6 +115,9 @@ if (app.Environment.IsDevelopment())
 
 // GLOBAL ERROR HANDLER
 app.UseMiddleware<ExceptionMiddleware>();
+
+// TRANSLATION MIDDLEWARE - Global response translation
+app.UseResponseTranslation();
 
 app.UseHttpsRedirection();
 

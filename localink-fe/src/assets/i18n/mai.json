@@ -79,7 +79,8 @@
     "VIEW_SUBCATEGORIES": "उपश्रेणीहरू हेर्नुहोस् →",
     "SEARCH_RESULTS": "खोज परिणामहरू",
     "NO_RESULTS": "कुनै परिणाम भेटिएन",
-    "NO_IMAGE": "कुनै छवि छैन"
+    "NO_IMAGE": "कोई चित्र नहि",
+    "POPULAR_THIS_WEEK": "एहि सप्ताहक लोकप्रिय"
   },
   "BUSINESS": {
     "REGISTER_TITLE": "आफ्नो व्यवसाय दर्ता गर्नुहोस्",

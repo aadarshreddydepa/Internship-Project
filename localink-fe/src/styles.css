@@ -13,6 +13,20 @@ body{
 
 *{
   box-sizing:border-box;
+  caret-color: transparent;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+input, textarea {
+  caret-color: auto;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
 }
 /* NG SELECT DEFAULT THEME */
 
