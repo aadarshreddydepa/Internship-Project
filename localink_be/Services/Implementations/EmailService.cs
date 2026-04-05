@@ -77,32 +77,96 @@ public class EmailService : IEmailService
     }
 
     private string GetWelcomeTemplate(string name)
-    {
-        return $@"
-        <div style='font-family: Arial; padding:20px'>
-            <h2 style='color:#2d89ef'>Welcome to Localink, {name}! </h2>
-            <p>We're excited to have you onboard.</p>
-            <p>Start exploring businesses and grow your network </p>
-            <hr/>
-            <small>Localink Team</small>
-        </div>";
-    }
+{
+    return $@"
+    <div style='margin:0;padding:0;background:#f4f6f8;font-family:Segoe UI,Arial,sans-serif'>
+        <table width='100%' cellpadding='0' cellspacing='0'>
+            <tr>
+                <td align='center'>
+                    <table width='600' style='background:#ffffff;border-radius:10px;padding:30px'>
+                        
+                        <tr>
+                            <td align='center'>
+                                <h1 style='color:#2d89ef;margin-bottom:5px'>Welcome to Localink 🚀</h1>
+                                <p style='color:#555;font-size:16px'>Hi {name}, we're excited to have you onboard!</p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style='padding:20px 0;color:#444;font-size:15px;text-align:center'>
+                                Discover local businesses, connect with customers, and grow faster than ever.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td align='center'>
+                                <a href='#' style='background:#2d89ef;color:#fff;padding:12px 25px;
+                                    border-radius:6px;text-decoration:none;font-weight:bold'>
+                                    Explore Localink
+                                </a>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style='padding-top:30px;font-size:13px;color:#888;text-align:center'>
+                                Need help? Contact our support anytime.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style='padding-top:10px;font-size:12px;color:#aaa;text-align:center'>
+                                © {DateTime.Now.Year} Localink. All rights reserved.
+                            </td>
+                        </tr>
+
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>";
+}
 
     // TEMPLATE
     private string GetOtpTemplate(string otp)
-    {
-        return $@"
-        <div style='font-family: Arial; padding:20px'>
-            <h2>Password Reset OTP</h2>
-            <p>Your OTP is:</p>
-            <div style='font-size:28px;font-weight:bold;color:#2d89ef'>
-                {otp}
-            </div>
-            <p>This OTP is valid for 10 minutes.</p>
-            <hr/>
-            <small>Localink Security Team</small>
-        </div>";
-    }
+{
+    return $@"
+    <div style='background:#f4f6f8;padding:20px;font-family:Segoe UI,Arial'>
+        <table width='100%' align='center'>
+            <tr>
+                <td align='center'>
+                    <table width='500' style='background:#fff;border-radius:10px;padding:30px;text-align:center'>
+
+                        <h2 style='color:#333'>Password Reset Request 🔐</h2>
+
+                        <p style='color:#555;font-size:14px'>
+                            Use the OTP below to reset your password.
+                        </p>
+
+                        <div style='margin:25px 0;font-size:32px;font-weight:bold;
+                            letter-spacing:5px;color:#2d89ef'>
+                            {otp}
+                        </div>
+
+                        <p style='color:#888;font-size:13px'>
+                            This OTP is valid for <b>10 minutes</b>.
+                        </p>
+
+                        <hr style='margin:25px 0'/>
+
+                        <p style='color:#999;font-size:12px'>
+                            If you didn’t request this, please ignore this email.
+                        </p>
+
+                        <p style='color:#aaa;font-size:11px'>
+                            Localink Security Team
+                        </p>
+
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>";
+}
 
     public async Task SendNewBusinessNotificationToAdminAsync(
         string adminEmail,
@@ -116,29 +180,36 @@ public class EmailService : IEmailService
         var subject = "🚀 New Business Registration - Action Required";
 
         var body = $@"
-        <div style='font-family: Arial; padding:20px'>
-            <h2>New Business Registration</h2>
+<div style='background:#f4f6f8;padding:20px;font-family:Segoe UI,Arial'>
+    <table width='600' align='center' style='background:#fff;padding:25px;border-radius:10px'>
 
-            <p>A new business has been registered and is pending approval.</p>
+        <h2 style='color:#2d89ef'>🚀 New Business Pending Approval</h2>
 
-            <hr/>
+        <p style='color:#555'>
+            A new business has been registered and requires your review.
+        </p>
 
-            <b>Business Name:</b> {businessName} <br/>
-            <b>Category:</b> {category} <br/>
-            <b>Description:</b> {description} <br/><br/>
+        <table width='100%' style='margin-top:20px;font-size:14px;color:#333'>
+            <tr><td><b>Business Name:</b></td><td>{businessName}</td></tr>
+            <tr><td><b>Category:</b></td><td>{category}</td></tr>
+            <tr><td><b>Description:</b></td><td>{description}</td></tr>
+            <tr><td><b>Address:</b></td><td>{address}</td></tr>
+            <tr><td><b>Phone:</b></td><td>{phone}</td></tr>
+            <tr><td><b>Email:</b></td><td>{email}</td></tr>
+        </table>
 
-            <b>Address:</b> {address} <br/>
-            <b>Phone:</b> {phone} <br/>
-            <b>Email:</b> {email} <br/>
+        <div style='margin-top:20px;padding:10px;background:#fff3cd;border-radius:6px;color:#856404'>
+            Status: <b>Pending Approval</b>
+        </div>
 
-            <hr/>
+        <p style='margin-top:20px'>
+            Please review this request in the admin dashboard.
+        </p>
 
-            <p><b>Status:</b> Pending Approval</p>
+        <small style='color:#aaa'>Localink System</small>
 
-            <p>Please review it from the admin dashboard.</p>
-
-            <small>Localink System</small>
-        </div>";
+    </table>
+</div>";
 
         await SendEmailAsync(adminEmail, subject, body);
     }
@@ -159,48 +230,69 @@ public class EmailService : IEmailService
             subject = "🎉 Your Business Has Been Approved!";
 
             body = $@"
-            <div style='font-family: Arial; padding:20px'>
-                <h2>Congratulations {ownerName}! 🎉</h2>
+<div style='background:#f4f6f8;padding:20px;font-family:Segoe UI'>
+    <table width='600' align='center' style='background:#fff;padding:25px;border-radius:10px;text-align:center'>
 
-                <p>Your business has been approved.</p>
+        <h2 style='color:#28a745'>🎉 Approved!</h2>
 
-                <hr/>
+        <p style='font-size:16px;color:#333'>
+            Congratulations {ownerName}, your business is now live!
+        </p>
 
-                <b>Business Name:</b> {businessName} <br/>
-                <b>Category:</b> {category} <br/>
-                <b>Status:</b> Approved <br/>
+        <div style='margin:20px 0;text-align:left;font-size:14px'>
+            <p><b>Business:</b> {businessName}</p>
+            <p><b>Category:</b> {category}</p>
+            <p><b>Status:</b> Approved ✅</p>
+        </div>
 
-                <hr/>
+        <a href='#' style='background:#28a745;color:#fff;padding:12px 25px;
+            border-radius:6px;text-decoration:none;font-weight:bold'>
+            View Dashboard
+        </a>
 
-                <p>You can now start getting customers.</p>
+        <p style='margin-top:20px;color:#777;font-size:13px'>
+            Start attracting customers today 🚀
+        </p>
 
-                <small>Localink Team</small>
-            </div>";
+        <small style='color:#aaa'>Localink Team</small>
+
+    </table>
+</div>";
         }
         else
         {
             subject = "❌ Business Registration Update";
 
             body = $@"
-            <div style='font-family: Arial; padding:20px'>
-                <h2>Hello {ownerName},</h2>
+<div style='background:#f4f6f8;padding:20px;font-family:Segoe UI'>
+    <table width='600' align='center' style='background:#fff;padding:25px;border-radius:10px'>
 
-                <p>Your business was reviewed but not approved.</p>
+        <h2 style='color:#dc3545'>Update on Your Business Submission</h2>
 
-                <hr/>
+        <p>Hello {ownerName},</p>
 
-                <b>Business Name:</b> {businessName} <br/>
-                <b>Category:</b> {category} <br/>
-                <b>Status:</b> Rejected <br/>
+        <p style='color:#555'>
+            Unfortunately, your business submission was not approved at this time.
+        </p>
 
-                <p><b>Reason:</b> {rejectionReason}</p>
+        <div style='margin:20px 0;font-size:14px'>
+            <p><b>Business:</b> {businessName}</p>
+            <p><b>Category:</b> {category}</p>
+            <p><b>Status:</b> Rejected ❌</p>
+        </div>
 
-                <hr/>
+        <div style='background:#ffe6e6;padding:12px;border-radius:6px;color:#a94442'>
+            <b>Reason:</b> {rejectionReason}
+        </div>
 
-                <p>Please update and resubmit.</p>
+        <p style='margin-top:20px'>
+            You can update your details and resubmit anytime.
+        </p>
 
-                <small>Localink Team</small>
-            </div>";
+        <small style='color:#aaa'>Localink Team</small>
+
+    </table>
+</div>";
         }
 
         await SendEmailAsync(userEmail, subject, body);

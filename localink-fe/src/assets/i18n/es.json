@@ -293,6 +293,30 @@
     "SUNDAY": "Domingo"
   },
   "RTL": {
-    "LANGUAGES": ["ar", "sd", "ur"]
+    "LANGUAGES": [
+      "ar",
+      "sd",
+      "ur"
+    ]
+  },
+  "ABOUT": {
+    "TITLE": "Acerca de LocaLink",
+    "SUBTITLE": "Su plataforma de directorio de empresas de confianza",
+    "WELCOME_TITLE": "Bienvenido a LocaLink: su plataforma de directorio de empresas de confianza.",
+    "WELCOME_DESC1": "Ayudamos a los usuarios a descubrir y conectarse con empresas globales de manera fácil y eficiente a través de una experiencia de búsqueda fluida e intuitiva.",
+    "WELCOME_DESC2": "LocaLink también permite a los propietarios de empresas registrar y mostrar sus negocios proporcionando información detallada, gestionando su presencia y llegando a una audiencia más amplia. Las empresas pueden interactuar con los clientes a través de reseñas y calificaciones, lo que ayuda a generar credibilidad y confianza.",
+    "WELCOME_DESC3": "Nuestro objetivo es simplificar la búsqueda global mientras creamos un ecosistema confiable donde los usuarios encuentren información precisa en tiempo real y las empresas crezcan a través de la visibilidad y la interacción con el cliente.",
+    "OFFER_TITLE": "Lo que ofrecemos",
+    "GLOBAL_SEARCH": "Búsqueda Global",
+    "GLOBAL_SEARCH_DESC": "Encuentre empresas en todos los países con un sistema de búsqueda potente y unificado.",
+    "REAL_TIME_DATA": "Datos en Tiempo Real",
+    "REAL_TIME_DATA_DESC": "Acceda instantáneamente a detalles comerciales actualizados con datos precisos en vivo.",
+    "SMART_FILTERING": "Filtrado Inteligente",
+    "SMART_FILTERING_DESC": "Refine rápidamente los resultados utilizando filtros inteligentes basados en la ubicación y la categoría.",
+    "SECURE_PLATFORM": "Plataforma Segura",
+    "SECURE_PLATFORM_DESC": "La autenticación sólida garantiza datos de usuario seguros y un acceso protegido.",
+    "AI_INSIGHTS": "Información de IA",
+    "AI_INSIGHTS_DESC": "Obtenga recomendaciones inteligentes para descubrir empresas relevantes más rápido.",
+    "TEAM_TITLE": "Nuestro Equipo"
   }
 }

@@ -292,6 +292,30 @@
     "UR": "اردو (Urdu)"
   },
   "RTL": {
-    "LANGUAGES": ["ar", "sd", "ur"]
+    "LANGUAGES": [
+      "ar",
+      "sd",
+      "ur"
+    ]
+  },
+  "ABOUT": {
+    "TITLE": "关于 LocaLink",
+    "SUBTITLE": "您值得信赖的商业目录平台",
+    "WELCOME_TITLE": "欢迎来到 LocaLink — 您值得信赖的商业目录平台。",
+    "WELCOME_DESC1": "我们通过无缝且直观的搜索体验，帮助用户轻松高效地发现全球业务并与之建立联系。",
+    "WELCOME_DESC2": "LocaLink 还使企业所有者能够通过提供详细信息、管理其存在并覆盖更广泛的受众来注册和展示其业务。企业可以通过评论和评分与客户互动，帮助建立信誉和信任。",
+    "WELCOME_DESC3": "我们的目标是简化全球搜索，同时创建一个可靠的生态系统，让用户获得准确、实时的信息，并通过可见性和客户互动实现业务增长。",
+    "OFFER_TITLE": "我们提供什么",
+    "GLOBAL_SEARCH": "全球搜索",
+    "GLOBAL_SEARCH_DESC": "通过统一且强大的搜索系统跨国家/地区查找业务。",
+    "REAL_TIME_DATA": "实时数据",
+    "REAL_TIME_DATA_DESC": "通过准确的实时数据即时访问最新的业务详情。",
+    "SMART_FILTERING": "智能过滤",
+    "SMART_FILTERING_DESC": "根据位置和类别使用智能过滤器快速优化结果。",
+    "SECURE_PLATFORM": "安全平台",
+    "SECURE_PLATFORM_DESC": "强大的身份验证确保用户数据安全和安全访问。",
+    "AI_INSIGHTS": "AI 洞察",
+    "AI_INSIGHTS_DESC": "获取智能建议以更快地发现相关业务。",
+    "TEAM_TITLE": "我们的团队"
   }
 }

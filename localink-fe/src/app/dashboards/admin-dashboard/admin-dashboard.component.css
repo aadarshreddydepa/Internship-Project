@@ -14,11 +14,10 @@ html, body {
 .dashboard {
   width: 100%;
   min-height: 100vh;
-  padding: 0;
+  padding: 80px 0 0 0;
   background: #121212;
   color: #F8F4F0;
   font-family: system-ui;
-  overflow-x: hidden;
 }
 
 .title {
@@ -432,17 +431,20 @@ tr:hover {
 }
 /* HEADER */
 .header{
-position:sticky;
+position:fixed;
 top:0;
-z-index:100;
+left:0;
+right:0;
+z-index:1000;
 display:flex;
 justify-content:space-between;
 align-items:center;
-padding:18px 40px 0px 40px;
-background:rgba(18,18,18,0.6);
-backdrop-filter:blur(10px);
--webkit-backdrop-filter:blur(10px);
-border-bottom:1px solid rgba(255,255,255,0.05);
+padding:18px 40px;
+background:rgba(18,18,18,0.7);
+backdrop-filter:blur(15px) saturate(160%);
+-webkit-backdrop-filter:blur(15px) saturate(160%);
+border-bottom:1px solid rgba(255,255,255,0.1);
+box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .logo{

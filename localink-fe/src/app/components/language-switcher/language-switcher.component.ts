@@ -445,7 +445,9 @@ export class LanguageSwitcherComponent implements OnInit, OnDestroy {
     { code: 'mni', name: 'Manipuri', nativeName: 'মৈতৈলোন্', flag: '🇮🇳', isRTL: false },
     { code: 'mai', name: 'Maithili', nativeName: 'मैथिली', flag: '🇮🇳', isRTL: false },
     { code: 'brx', name: 'Bodo', nativeName: 'बड़ो', flag: '🇮🇳', isRTL: false },
-    { code: 'doi', name: 'Dogri', nativeName: 'डोगरी', flag: '🇮🇳', isRTL: false }
+    { code: 'doi', name: 'Dogri', nativeName: 'डोगरी', flag: '🇮🇳', isRTL: false },
+    { code: 'tr', name: 'Turkish', nativeName: 'Türkçe', flag: '🇹🇷', isRTL: false },
+    { code: 'vi', name: 'Vietnamese', nativeName: 'Tiếng Việt', flag: '🇻🇳', isRTL: false }
   ];
 
   // RTL languages
