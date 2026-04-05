@@ -3,6 +3,10 @@
     "TITLE": "Localink",
     "TAGLINE": "地元の企業を発見"
   },
+  "AUTH": {
+    "WELCOME": "お帰りなさい",
+    "SUBTITLE": "私たちのコミュニティに参加して、地元の企業を発見しましょう"
+  },
   "NAV": {
     "HOME": "ホーム",
     "PROFILE": "プロフィール",

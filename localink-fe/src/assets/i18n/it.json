@@ -3,6 +3,10 @@
     "TITLE": "Localink",
     "TAGLINE": "Scopri le attività locali"
   },
+  "AUTH": {
+    "WELCOME": "Bentornato",
+    "SUBTITLE": "Unisciti alla nostra comunità e scopri le attività locali"
+  },
   "NAV": {
     "HOME": "Home",
     "PROFILE": "Profilo",

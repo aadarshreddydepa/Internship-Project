@@ -3,6 +3,10 @@
     "TITLE": "Localink",
     "TAGLINE": "发现本地商家"
   },
+  "AUTH": {
+    "WELCOME": "欢迎回来",
+    "SUBTITLE": "加入我们的社区，发现本地商家"
+  },
   "NAV": {
     "HOME": "首页",
     "PROFILE": "个人资料",

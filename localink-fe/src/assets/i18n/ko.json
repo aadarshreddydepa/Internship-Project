@@ -3,6 +3,10 @@
     "TITLE": "Localink",
     "TAGLINE": "지역 비즈니스 발견"
   },
+  "AUTH": {
+    "WELCOME": "다시 오신 것을 환영합니다",
+    "SUBTITLE": "우리 커뮤니티에 참가하고 지역 비즈니스를 발견하세요"
+  },
   "NAV": {
     "HOME": "홈",
     "PROFILE": "프로필",

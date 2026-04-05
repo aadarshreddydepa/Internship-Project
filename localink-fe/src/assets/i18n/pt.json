@@ -3,6 +3,10 @@
     "TITLE": "Localink",
     "TAGLINE": "Descubra negócios locais"
   },
+  "AUTH": {
+    "WELCOME": "Bem-vindo de volta",
+    "SUBTITLE": "Junte-se à nossa comunidade e descubra negócios locais"
+  },
   "NAV": {
     "HOME": "Início",
     "PROFILE": "Perfil",
