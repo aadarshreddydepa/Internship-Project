@@ -1,11 +1,14 @@
 import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgSelectModule } from '@ng-select/ng-select';
 import { ProfileComponent } from '../../pages/profile/profile.component';
 import { ClientDashboardService } from '../../services/client-dashboard.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { LanguageSwitcherComponent } from '../../components/language-switcher/language-switcher.component';
+import { BusinessLocationService } from '../../services/business-location.service';
+import { BusinessPincodeService } from '../../services/business-pincode.service';
 import { NotificationService } from '../../services/notification.service';
 
 interface Business {
@@ -30,7 +33,7 @@ interface Business {
 @Component({
   selector: 'app-client-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, ProfileComponent, TranslateModule, LanguageSwitcherComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, NgSelectModule, ProfileComponent, TranslateModule, LanguageSwitcherComponent],
   templateUrl: './client-dashboard.component.html',
   styleUrls: ['./client-dashboard.component.css']
 })
@@ -52,6 +55,7 @@ export class ClientDashboardComponent implements OnInit {
 
   // 🌍 LOCATION DATA
   countries: any[] = [];
+  phoneCountries: any[] = [];
   states: any[] = [];
   cities: any[] = [];
 
@@ -61,6 +65,8 @@ export class ClientDashboardComponent implements OnInit {
   constructor(
     private router: Router,
     private dashboardService: ClientDashboardService,
+    private locationService: BusinessLocationService,
+    private pincodeService: BusinessPincodeService,
     private notificationService: NotificationService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
@@ -71,9 +77,15 @@ export class ClientDashboardComponent implements OnInit {
     this.fetchBusinesses();
     this.loadCategories();
 
-    // ✅ Load countries from API
-    this.dashboardService.getCountries().subscribe(res => {
+    // Load countries from standardized service (CACHED)
+    this.locationService.getCountries().subscribe(res => {
       this.countries = res;
+      this.phoneCountries = res.map((c: any) => ({
+        name: c.name,
+        code: '+' + (c.phonecode || c.phone_code || ''),
+        flag: '',
+        searchLabel: `${c.name} +${c.phonecode || c.phone_code}`
+      }));
     });
   }
 
@@ -98,27 +110,38 @@ export class ClientDashboardComponent implements OnInit {
 
         this.setUserName();
 
-        this.businesses = res.map((b: any) => ({
-          id: b.id,
-          businessName: b.name,
-          category: b.categoryName?.toLowerCase(),
-          subcategory: b.subcategoryName,
-          status: b.status ?? 'Pending',
-          description: b.description,
-          contact: {
-            phone: (b.phoneNumber || '')
-              .replace(/^\+\d+\s*/, '')
-              .replace(/\s+/g, '')
-              .trim(),
-            phoneCode: b.phoneCode || '',
-            email: b.email || '',
-            city: b.city || '',
-            state: b.state || '',
-            streetAddress: b.streetAddress || '',
-            country: b.country || '',
-            pincode: b.pincode || ''
+        this.businesses = res.map((b: any) => {
+          let pCode = b.phoneCode || '';
+          if (pCode && !pCode.startsWith('+')) pCode = '+' + pCode;
+
+          let pNum = (b.phoneNumber || '').trim();
+          if (pCode && pNum.startsWith(pCode)) {
+            pNum = pNum.substring(pCode.length).trim();
+          } else if (b.phoneCode && pNum.startsWith(b.phoneCode)) {
+            pNum = pNum.substring(b.phoneCode.length).trim();
           }
-        }));
+          // Remove any leftover non-digit separators at the start
+          pNum = pNum.replace(/^[\s\+\-]+/, '').trim();
+
+          return {
+            id: b.id,
+            businessName: b.name,
+            category: b.categoryName?.toLowerCase(),
+            subcategory: b.subcategoryName,
+            status: b.status ?? 'Pending',
+            description: b.description,
+            contact: {
+              phone: pNum,
+              phoneCode: pCode,
+              email: b.email || '',
+              city: b.city || '',
+              state: b.state || '',
+              streetAddress: b.streetAddress || '',
+              country: b.country || '',
+              pincode: b.pincode || ''
+            }
+          };
+        });
 
         this.isLoading = false;
       },
@@ -172,18 +195,16 @@ export class ClientDashboardComponent implements OnInit {
     );
     if (categoryObj) this.loadSubcategories(categoryObj.id);
 
-    // 🌍 LOAD COUNTRY → STATE → CITY (FIXED)
+    // LOAD COUNTRY → STATE → CITY (FIXED)
     if (this.editingBusiness?.contact.country) {
-
       const country = this.countries.find(
         c => c.name === this.editingBusiness!.contact.country
       );
 
       if (country) {
         this.selectedCountryCode = country.iso2;
-
-        this.dashboardService.getStates(this.selectedCountryCode)
-          .subscribe(states => {
+        this.locationService.getStates(this.selectedCountryCode)
+          .subscribe((states: any[]) => {
             this.states = states;
 
             const state = states.find(
@@ -192,11 +213,10 @@ export class ClientDashboardComponent implements OnInit {
 
             if (state) {
               this.selectedStateCode = state.iso2;
-
-              this.dashboardService.getCities(
+              this.locationService.getCities(
                 this.selectedCountryCode,
                 this.selectedStateCode
-              ).subscribe(cities => {
+              ).subscribe((cities: any[]) => {
                 this.cities = cities;
               });
             }
@@ -217,14 +237,14 @@ export class ClientDashboardComponent implements OnInit {
     if (categoryObj) this.loadSubcategories(categoryObj.id);
   }
 
-  // 🌍 COUNTRY CHANGE
+  // COUNTRY CHANGE
   onCountryChange(countryName: string) {
     const country = this.countries.find(c => c.name === countryName);
     if (!country) return;
 
     this.selectedCountryCode = country.iso2;
 
-    this.dashboardService.getStates(this.selectedCountryCode)
+    this.locationService.getStates(this.selectedCountryCode)
       .subscribe(res => {
         this.states = res;
         this.cities = [];
@@ -237,14 +257,14 @@ export class ClientDashboardComponent implements OnInit {
     }
   }
 
-  // 🌍 STATE CHANGE
+  // STATE CHANGE
   onStateChange(stateName: string) {
     const state = this.states.find(s => s.name === stateName);
     if (!state) return;
 
     this.selectedStateCode = state.iso2;
 
-    this.dashboardService.getCities(
+    this.locationService.getCities(
       this.selectedCountryCode,
       this.selectedStateCode
     ).subscribe(res => this.cities = res);
@@ -263,32 +283,31 @@ export class ClientDashboardComponent implements OnInit {
     const pincode = eb.contact.pincode;
     if (!pincode) return;
 
-    // ✅ Preserve address
+    // Preserve address
     const existingAddress = eb.contact.streetAddress;
 
-    // ✅ Reset old values (IMPORTANT)
+    // Reset old values (IMPORTANT)
     eb.contact.state = '';
     eb.contact.city = '';
     this.states = [];
     this.cities = [];
     this.pincodeError = '';
 
-    this.dashboardService.validatePincode(pincode)
+    this.pincodeService.validate(pincode)
       .subscribe(res => {
 
-        if (!res.results || res.results.length === 0) {
+        if (!res || !res.country) {
           this.pincodeError = "Invalid pincode";
           return;
         }
 
-        const data = res.results[0];
+        const countryName = res.country;
+        const stateName = res.state;
+        const cityName = res.city;
 
-        const countryName = data.country;
-        const stateName = data.state;
-        const cityName = data.city || data.county || data.state_district;
-
-        // ✅ Set country
+        // Set country
         eb.contact.country = countryName || '';
+
 
         const country = this.countries.find(
           c => c.name.toLowerCase() === countryName?.toLowerCase()
@@ -297,14 +316,15 @@ export class ClientDashboardComponent implements OnInit {
         if (!country) return;
 
         this.selectedCountryCode = country.iso2;
+        eb.contact.phoneCode = '+' + country.phonecode;
 
-        // ✅ Load states
-        this.dashboardService.getStates(this.selectedCountryCode)
-          .subscribe(states => {
+        // Load states
+        this.locationService.getStates(this.selectedCountryCode)
+          .subscribe((states: any[]) => {
 
             this.states = states;
 
-            const state = states.find(s =>
+            const state = states.find((s: any) =>
               stateName &&
               s.name.toLowerCase().includes(stateName.toLowerCase())
             );
@@ -313,15 +333,15 @@ export class ClientDashboardComponent implements OnInit {
               eb.contact.state = state.name;
               this.selectedStateCode = state.iso2;
 
-              // ✅ Load cities
-              this.dashboardService.getCities(
+              // Load cities
+              this.locationService.getCities(
                 this.selectedCountryCode,
                 this.selectedStateCode
-              ).subscribe(cities => {
+              ).subscribe((cities: any[]) => {
 
                 this.cities = cities;
 
-                const city = cities.find(c =>
+                const city = cities.find((c: any) =>
                   cityName &&
                   c.name.toLowerCase().includes(cityName.toLowerCase())
                 );
@@ -414,8 +434,8 @@ export class ClientDashboardComponent implements OnInit {
       description: this.editingBusiness!.description,
       categoryId: categoryObj?.id,
       subcategoryId: subcategoryObj?.id,
-      phoneCode: this.selectedCountryCode ? '+' + this.countries.find(c => c.iso2 === this.selectedCountryCode)?.phonecode : '',
-      phoneNumber: this.editingBusiness!.contact.phone,
+      phoneCode: this.editingBusiness?.contact?.phoneCode || '',
+      phoneNumber: this.editingBusiness!.contact.phone.replace(/\D/g, ''),
       email: this.editingBusiness!.contact.email,
       city: this.editingBusiness!.contact.city,
       streetAddress: this.editingBusiness!.contact.streetAddress,

@@ -67,32 +67,6 @@ uploadPhoto(businessId: number, file: File) {
 deletePhoto(photoId: number) {
   return this.http.delete(`http://localhost:5138/api/v1/photos/${photoId}`);
 }
-// GET COUNTRIES
-getCountries() {
-  return this.http.get<any[]>(`${this.cscBaseUrl}/countries`, {
-    headers: this.headers
-  });
-}
-
-// GET STATES
-getStates(countryCode: string) {
-  return this.http.get<any[]>(`${this.cscBaseUrl}/countries/${countryCode}/states`, {
-    headers: this.headers
-  });
-}
-
-// GET CITIES
-getCities(countryCode: string, stateCode: string) {
-  return this.http.get<any[]>(
-    `${this.cscBaseUrl}/countries/${countryCode}/states/${stateCode}/cities`,
-    { headers: this.headers }
-  );
-}
-validatePincode(pincode: string) {
-  return this.http.get<any>(
-    `http://localhost:5138/api/v1/business/validate-pincode/${pincode}`
-  );
-}
 }
  
  

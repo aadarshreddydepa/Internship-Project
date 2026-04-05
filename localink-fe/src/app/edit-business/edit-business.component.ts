@@ -4,7 +4,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { Subject } from 'rxjs';
+import { Subject, ReplaySubject } from 'rxjs';
 import { take } from 'rxjs/operators';
 
 import { HoursComponent } from '../business/hours/hours.component';
@@ -39,6 +39,8 @@ export class EditBusinessComponent implements OnInit {
   contactData: any = {};
   hoursData: any = [];
   photoData: string | null = null;
+  currentCategoryId: number = 1;
+  currentSubcategoryId: number = 1;
 
   submitSuccessMessage = '';
   hoursErrorMessage = '';
@@ -81,16 +83,18 @@ export class EditBusinessComponent implements OnInit {
   }
 
   ngOnInit() {
-    // Load countries from cache/API
-    this.loadCountriesCache();
+    if (isPlatformBrowser(this.platformId)) {
+      // Load countries from cache/API
+      this.loadCountriesCache();
 
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.businessId = +id;
-      // Wait for countries to load before loading business data
-      this.loadCountriesCache$.pipe(take(1)).subscribe(() => {
-        this.loadBusinessData(this.businessId);
-      });
+      const id = this.route.snapshot.paramMap.get('id');
+      if (id) {
+        this.businessId = +id;
+        // Wait for countries to load before loading business data
+        this.loadCountriesCache$.pipe(take(1)).subscribe(() => {
+          this.loadBusinessData(this.businessId);
+        });
+      }
     }
   }
 
@@ -99,7 +103,7 @@ export class EditBusinessComponent implements OnInit {
   }
 
   // CACHE: Load countries from API with cache-aside pattern
-  private loadCountriesCache$ = new Subject<void>();
+  private loadCountriesCache$ = new ReplaySubject<void>(1);
   
   private loadCountriesCache() {
     this.locationService.getCountries()
@@ -237,30 +241,38 @@ export class EditBusinessComponent implements OnInit {
           subcategory: res.subcategory
         });
 
+        this.currentCategoryId = res.categoryId || 1;
+        this.currentSubcategoryId = res.subcategoryId || 1;
+
         this.onCategoryChange();
 
-        // Parse phone into code and number
+        // Robust phone parsing (matches Dashboard logic)
         let phoneCode = '+91';
-        let phoneNumber = '';
-        if (res.phone) {
-          const phoneParts = res.phone.split(' ');
-          if (phoneParts.length >= 2) {
-            phoneCode = phoneParts[0];
-            phoneNumber = phoneParts.slice(1).join(' ');
-          } else {
-            phoneNumber = res.phone;
-          }
-        }
-
-        // Ensure phoneCode has + prefix
-        if (!phoneCode.startsWith('+')) {
-          phoneCode = '+' + phoneCode;
-        }
-
-        // Find country object by name from the countries list
-        const countryObj = res.country 
-          ? this.countries.find(c => this.normalizeString(c.name) === this.normalizeString(res.country))
+        let phoneNumber = (res.contact?.phoneNumber || '').trim();
+        
+        // Find country object to help with phone code context
+        const countryName = res.contact?.country || '';
+        const countryObj = countryName 
+          ? this.countries.find(c => this.normalizeString(c.name) === this.normalizeString(countryName))
           : null;
+
+        if (countryObj) {
+          const rawCode = countryObj.phonecode || countryObj.phone_code || '';
+          if (rawCode) phoneCode = rawCode.startsWith('+') ? rawCode : `+${rawCode}`;
+        } else if (res.contact?.phoneCode) {
+          // Fallback to directly stored code if country match fails
+          const directCode = res.contact.phoneCode;
+          phoneCode = directCode.startsWith('+') ? directCode : `+${directCode}`;
+        }
+
+        // Strip code from number if it's duplicated (e.g. "+91 9174287308" -> "9174287308")
+        if (phoneCode && phoneNumber.startsWith(phoneCode)) {
+          phoneNumber = phoneNumber.substring(phoneCode.length).trim();
+        } else if (phoneCode && phoneNumber.startsWith(phoneCode.substring(1))) {
+          phoneNumber = phoneNumber.substring(phoneCode.length - 1).trim();
+        }
+        phoneNumber = phoneNumber.replace(/^[\s\+\-]+/, '').trim();
+
 
         // Load states first, then set data
         if (countryObj) {
@@ -268,8 +280,9 @@ export class EditBusinessComponent implements OnInit {
             this.states = states;
 
             // Find state object by name
-            const stateObj = res.state
-              ? states.find((s: any) => this.normalizeString(s.name) === this.normalizeString(res.state))
+            const stateName = res.contact?.state || '';
+            const stateObj = stateName
+              ? states.find((s: any) => this.normalizeString(s.name) === this.normalizeString(stateName))
               : null;
 
             // Load cities if state found
@@ -278,47 +291,48 @@ export class EditBusinessComponent implements OnInit {
                 this.cities = cities;
 
                 // Find city object by name
-                const cityObj = res.city
-                  ? cities.find((c: any) => this.normalizeString(c.name) === this.normalizeString(res.city))
+                const cityName = res.contact?.city || '';
+                const cityObj = cityName
+                  ? cities.find((c: any) => this.normalizeString(c.name) === this.normalizeString(cityName))
                   : null;
 
                 // Set all contact data at once after cascading loads complete
                 this.contactData = {
-                  email: res.email || '',
+                  email: res.contact?.email || '',
                   phone: phoneNumber,
                   phoneCode: phoneCode,
                   country: countryObj,
                   state: stateObj || null,
                   city: cityObj || null,
-                  streetAddress: res.streetAddress || '',
-                  pincode: res.pincode || ''
+                  streetAddress: res.contact?.streetAddress || '',
+                  pincode: res.contact?.pincode || ''
                 };
               });
             } else {
               // No state match found, set data without cities
               this.contactData = {
-                email: res.email || '',
+                email: res.contact?.email || '',
                 phone: phoneNumber,
                 phoneCode: phoneCode,
                 country: countryObj,
                 state: null,
                 city: null,
-                streetAddress: res.streetAddress || '',
-                pincode: res.pincode || ''
+                streetAddress: res.contact?.streetAddress || '',
+                pincode: res.contact?.pincode || ''
               };
             }
           });
         } else {
           // No country match found, set data with strings only
           this.contactData = {
-            email: res.email || '',
+            email: res.contact?.email || '',
             phone: phoneNumber,
             phoneCode: phoneCode,
             country: null,
             state: null,
             city: null,
-            streetAddress: res.streetAddress || '',
-            pincode: res.pincode || ''
+            streetAddress: res.contact?.streetAddress || '',
+            pincode: res.contact?.pincode || ''
           };
         }
       });
@@ -385,9 +399,13 @@ export class EditBusinessComponent implements OnInit {
     const cityValue = this.contactData.city?.name || this.contactData.city || '';
 
     const payload = {
-      ...this.businessData,
+      businessName: this.businessForm.get('businessName')?.value,
+      description: this.businessForm.get('description')?.value,
+      categoryId: this.currentCategoryId,
+      subcategoryId: this.currentSubcategoryId, 
+      phoneCode: this.contactData.phoneCode || '+91',
+      phoneNumber: (this.contactData.phone || '').replace(/\D/g, ''),
       email: this.contactData.email,
-      phone: fullPhone,
       country: countryValue,
       state: stateValue,
       city: cityValue,
