@@ -5,6 +5,7 @@
   min-height: 100vh;
   color: #F8F4F0;
   font-family: system-ui;
+  overflow-x: hidden;
 }
 .header{
   position: sticky;
@@ -14,6 +15,7 @@
   justify-content:space-between;
   align-items:center;
   padding:18px 60px 0px 60px;
+  background:rgba(18,18,18,0.6);
   backdrop-filter:blur(10px);
   -webkit-backdrop-filter:blur(10px);
   border-bottom:1px solid rgba(255,255,255,0.05);

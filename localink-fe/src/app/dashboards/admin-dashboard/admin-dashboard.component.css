@@ -18,6 +18,7 @@ html, body {
   background: #121212;
   color: #F8F4F0;
   font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
 }
 
 .title {

@@ -4,6 +4,7 @@ background:#121212;
 min-height:100vh;
 color:#F8F4F0;
 font-family:system-ui;
+overflow-x:hidden;
 }
 
 /* HEADER */
