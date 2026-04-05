@@ -1,12 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { Subject } from 'rxjs';
+import { Subject, ReplaySubject } from 'rxjs';
+import { take } from 'rxjs/operators';
 
-import { ContactDetailsComponent } from '../contact-details/contact-details.component';
 import { HoursComponent } from '../business/hours/hours.component';
 import { PhotoUploadComponent } from '../business/photo-upload/photo-upload.component';
 import { PreviewComponent } from '../business/preview/preview.component';
@@ -14,13 +14,13 @@ import { BusinessLocationService } from '../services/business-location.service';
 import { BusinessPincodeService } from '../services/business-pincode.service';
 
 @Component({
-  selector: 'app-register-business',
+  selector: 'app-edit-business',
   standalone: true,
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    FormsModule,
     NgSelectModule,
-    ContactDetailsComponent,
     HoursComponent,
     PhotoUploadComponent,
     PreviewComponent
@@ -28,7 +28,7 @@ import { BusinessPincodeService } from '../services/business-pincode.service';
   templateUrl: './edit-business.component.html',
   styleUrls: ['./edit-business.component.css']
 })
-export class EditBusinessBusinessComponent implements OnInit {
+export class EditBusinessComponent implements OnInit {
 
   currentStep = 1;
   businessForm!: FormGroup;
@@ -36,21 +36,21 @@ export class EditBusinessBusinessComponent implements OnInit {
   businessId!: number;
 
   businessData: any;
-  contactData: any;
+  contactData: any = {};
   hoursData: any = [];
   photoData: string | null = null;
+  currentCategoryId: number = 1;
+  currentSubcategoryId: number = 1;
 
   submitSuccessMessage = '';
   hoursErrorMessage = '';
+  pincodeError: string = '';
 
-  // 🌍 LOCATION DATA (cached from contact-details pattern)
+  // Location data from API
   countries: any[] = [];
   states: any[] = [];
   cities: any[] = [];
   phoneCountries: any[] = [];
-  selectedCountryCode: string = '';
-  selectedStateCode: string = '';
-  pincodeError: string = '';
 
   categories = [
     { name: 'Food', subcategories: ['Restaurant', 'Cafe', 'Bakery'] },
@@ -66,7 +66,8 @@ export class EditBusinessBusinessComponent implements OnInit {
     private router: Router,
     private http: HttpClient,
     private locationService: BusinessLocationService,
-    private pincodeService: BusinessPincodeService
+    private pincodeService: BusinessPincodeService,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.businessForm = this.fb.group({
       businessName: ['', [Validators.required, Validators.pattern(/^[A-Za-z\s&'-]+$/)]],
@@ -82,109 +83,157 @@ export class EditBusinessBusinessComponent implements OnInit {
   }
 
   ngOnInit() {
-    // ✅ Load countries from cache/local JSON (same as contact-details)
-    this.loadCountriesCache();
+    if (isPlatformBrowser(this.platformId)) {
+      // Load countries from cache/API
+      this.loadCountriesCache();
 
-    const id = this.route.snapshot.paramMap.get('id');
-
-    if (id) {
-      this.businessId = +id;
-      // Wait for countries to load before loading business data
-      this.loadCountriesCache$.subscribe(() => {
-        this.loadBusinessData(this.businessId);
-      });
+      const id = this.route.snapshot.paramMap.get('id');
+      if (id) {
+        this.businessId = +id;
+        // Wait for countries to load before loading business data
+        this.loadCountriesCache$.pipe(take(1)).subscribe(() => {
+          this.loadBusinessData(this.businessId);
+        });
+      }
     }
   }
 
-  // 🌍 CACHE: Load countries from local JSON (cached data)
-  private loadCountriesCache$ = new Subject<void>();
+  private normalizeString(val: string): string {
+    return val?.toLowerCase().replace(/\s/g, '');
+  }
+
+  // CACHE: Load countries from API with cache-aside pattern
+  private loadCountriesCache$ = new ReplaySubject<void>(1);
   
   private loadCountriesCache() {
-    this.http.get<any>('assets/data/countries.json')
-      .subscribe(data => {
+    this.locationService.getCountries()
+      .subscribe((data: any[]) => {
+        console.log('Countries loaded:', data);
+        console.log('First country:', data[0]);
         this.countries = data;
         this.phoneCountries = data.map((c: any) => ({
           name: c.name,
-          code: c.code?.startsWith('+') ? c.code : `+${c.code || c.phonecode || ''}`,
-          flag: c.flag
+          code: c.phonecode?.startsWith('+') ? c.phonecode : `+${c.phonecode || ''}`,
+          flag: '',
+          searchLabel: `${c.name} +${c.phonecode || c.phone_code}`
         }));
+        console.log('Countries array set:', this.countries.length);
         this.loadCountriesCache$.next();
         this.loadCountriesCache$.complete();
       });
   }
 
-  // 🌍 CACHE: Get states from API with cache-aside pattern via service
-  getStates(countryCode: string) {
-    this.locationService.getStates(countryCode).subscribe(states => {
-      this.states = states;
-    });
-  }
+  // Handle country change - load states and update phone code
+  onCountryChange() {
+    const selectedCountryObj = this.contactData.country;
 
-  // 🌍 CACHE: Get cities from API with cache-aside pattern via service
-  getCities(countryCode: string, stateCode: string) {
-    this.locationService.getCities(countryCode, stateCode).subscribe(cities => {
-      this.cities = cities;
-    });
-  }
-
-  // 🌍 Handle country change - updates states and phone code
-  onCountryChange(countryName: string) {
-    const country = this.countries.find(c => c.name === countryName);
-    if (!country) return;
-
-    this.selectedCountryCode = country.iso2;
-    this.getStates(this.selectedCountryCode);
+    this.states = [];
     this.cities = [];
+    this.contactData.state = null;
+    this.contactData.city = null;
+    this.contactData.pincode = '';
 
-    // Update phone code in contact data if available
-    if (this.contactData) {
-      const rawCode = country.phonecode || '';
-      this.contactData.phoneCode = rawCode.startsWith('+') ? rawCode : `+${rawCode}`;
+    if (!selectedCountryObj) return;
+
+    // Auto-update phone code based on selected country
+    const phoneCode = selectedCountryObj.phonecode || selectedCountryObj.phone_code || '';
+    if (phoneCode) {
+      const formattedPhoneCode = phoneCode.startsWith('+') ? phoneCode : `+${phoneCode}`;
+      this.contactData.phoneCode = formattedPhoneCode;
+    }
+
+    // Load states from API using iso2 code
+    const countryCode = selectedCountryObj.iso2 || '';
+    if (countryCode) {
+      this.locationService.getStates(countryCode)
+        .subscribe(res => {
+          this.states = res;
+        });
     }
   }
 
-  // 🌍 Handle state change - updates cities
-  onStateChange(stateName: string) {
-    const state = this.states.find(s => s.name === stateName);
-    if (!state) return;
+  // Handle state change - load cities
+  onStateChange() {
+    const selectedCountryObj = this.contactData.country;
+    const selectedStateObj = this.contactData.state;
 
-    this.selectedStateCode = state.iso2;
-    this.getCities(this.selectedCountryCode, this.selectedStateCode);
+    this.cities = [];
+    this.contactData.city = null;
+    this.contactData.pincode = '';
 
-    // Reset city in contact data
-    if (this.contactData) {
-      this.contactData.city = '';
+    if (!selectedCountryObj || !selectedStateObj) return;
+
+    const countryCode = selectedCountryObj.iso2 || '';
+    const stateCode = selectedStateObj.iso2 || '';
+
+    if (countryCode && stateCode) {
+      this.locationService.getCities(countryCode, stateCode)
+        .subscribe(res => {
+          this.cities = res;
+        });
     }
   }
 
-  // 📮 CACHE: Validate pincode using cached service
-  validatePincode(pincode: string) {
-    if (!pincode) return;
+  // Pincode validation via API
+  validatePincode() {
+    const pincode = this.contactData.pincode;
 
-    this.pincodeService.validate(pincode).subscribe({
-      next: (isValid: boolean) => {
-        if (!isValid) {
-          this.pincodeError = 'Invalid pincode';
-        } else {
+    if (!pincode || pincode.length < 5) {
+      this.pincodeError = '';
+      return;
+    }
+
+    this.pincodeService.validate(pincode)
+      .subscribe({
+        next: (res: any) => {
+          if (!res || !res.country) {
+            this.pincodeError = 'Invalid pincode';
+            return;
+          }
+
+          const apiCountry = res.country;
+          const apiState = res.state;
+          const apiCity = res.city;
+
+          const selectedCountry = this.contactData.country?.name;
+          const selectedState = this.contactData.state?.name;
+          const selectedCity = this.contactData.city?.name;
+
+          // Country check
+          if (selectedCountry &&
+              this.normalizeString(apiCountry) !== this.normalizeString(selectedCountry)) {
+            this.pincodeError = 'Pincode does not match selected country';
+            return;
+          }
+
+          // State check
+          if (selectedState &&
+              this.normalizeString(apiState) !== this.normalizeString(selectedState)) {
+            this.pincodeError = 'Pincode does not match selected state';
+            return;
+          }
+
+          // City check
+          if (selectedCity && apiCity &&
+              this.normalizeString(apiCity) !== this.normalizeString(selectedCity)) {
+            this.pincodeError = 'Pincode does not match selected city';
+            return;
+          }
+
+          // Success
           this.pincodeError = '';
+        },
+        error: (err) => {
+          console.error("Pincode validation error:", err);
+          this.pincodeError = 'Invalid pincode';
         }
-      },
-      error: () => {
-        // Silently fail on error
-      }
-    });
+      });
   }
 
-  // 📮 Clear pincode error
-  clearPincodeError() {
-    this.pincodeError = '';
-  }
-
-  // ✅ LOAD FROM BACKEND
+  // Load business data from backend with proper object mapping for location fields
   loadBusinessData(id: number) {
     this.http.get<any>(`http://localhost:5173/api/business/${id}`)
       .subscribe(res => {
-
         this.businessForm.patchValue({
           businessName: res.businessName,
           description: res.description,
@@ -192,47 +241,99 @@ export class EditBusinessBusinessComponent implements OnInit {
           subcategory: res.subcategory
         });
 
+        this.currentCategoryId = res.categoryId || 1;
+        this.currentSubcategoryId = res.subcategoryId || 1;
+
         this.onCategoryChange();
 
-        // ✅ FIXED: Parse phone into code and number
-        let phoneCode = '';
-        let phoneNumber = '';
-        if (res.phone) {
-          const phoneParts = res.phone.split(' ');
-          if (phoneParts.length >= 2) {
-            phoneCode = phoneParts[0];
-            phoneNumber = phoneParts.slice(1).join(' ');
-          } else {
-            phoneNumber = res.phone;
-          }
+        // Robust phone parsing (matches Dashboard logic)
+        let phoneCode = '+91';
+        let phoneNumber = (res.contact?.phoneNumber || '').trim();
+        
+        // Find country object to help with phone code context
+        const countryName = res.contact?.country || '';
+        const countryObj = countryName 
+          ? this.countries.find(c => this.normalizeString(c.name) === this.normalizeString(countryName))
+          : null;
+
+        if (countryObj) {
+          const rawCode = countryObj.phonecode || countryObj.phone_code || '';
+          if (rawCode) phoneCode = rawCode.startsWith('+') ? rawCode : `+${rawCode}`;
+        } else if (res.contact?.phoneCode) {
+          // Fallback to directly stored code if country match fails
+          const directCode = res.contact.phoneCode;
+          phoneCode = directCode.startsWith('+') ? directCode : `+${directCode}`;
         }
 
-        // ✅ FIXED: Set phone code from country if available
-        if (res.country && !phoneCode) {
-          const country = this.countries.find(c => c.name === res.country);
-          if (country) {
-            const rawCode = country.code || country.phonecode || '';
-            phoneCode = rawCode.startsWith('+') ? rawCode : `+${rawCode}`;
-          }
+        // Strip code from number if it's duplicated (e.g. "+91 9174287308" -> "9174287308")
+        if (phoneCode && phoneNumber.startsWith(phoneCode)) {
+          phoneNumber = phoneNumber.substring(phoneCode.length).trim();
+        } else if (phoneCode && phoneNumber.startsWith(phoneCode.substring(1))) {
+          phoneNumber = phoneNumber.substring(phoneCode.length - 1).trim();
         }
+        phoneNumber = phoneNumber.replace(/^[\s\+\-]+/, '').trim();
 
-        this.contactData = {
-          email: res.email,
-          city: res.city,
-          phone: phoneNumber,
-          phoneCode: phoneCode,
-          country: res.country,
-          state: res.state,
-          streetAddress: res.streetAddress,
-          pincode: res.pincode
-        };
 
-        // ✅ Load states and cities if country exists
-        if (res.country) {
-          this.onCountryChange(res.country);
-          if (res.state) {
-            setTimeout(() => this.onStateChange(res.state), 100);
-          }
+        // Load states first, then set data
+        if (countryObj) {
+          this.locationService.getStates(countryObj.iso2).subscribe(states => {
+            this.states = states;
+
+            // Find state object by name
+            const stateName = res.contact?.state || '';
+            const stateObj = stateName
+              ? states.find((s: any) => this.normalizeString(s.name) === this.normalizeString(stateName))
+              : null;
+
+            // Load cities if state found
+            if (stateObj) {
+              this.locationService.getCities(countryObj.iso2, stateObj.iso2).subscribe(cities => {
+                this.cities = cities;
+
+                // Find city object by name
+                const cityName = res.contact?.city || '';
+                const cityObj = cityName
+                  ? cities.find((c: any) => this.normalizeString(c.name) === this.normalizeString(cityName))
+                  : null;
+
+                // Set all contact data at once after cascading loads complete
+                this.contactData = {
+                  email: res.contact?.email || '',
+                  phone: phoneNumber,
+                  phoneCode: phoneCode,
+                  country: countryObj,
+                  state: stateObj || null,
+                  city: cityObj || null,
+                  streetAddress: res.contact?.streetAddress || '',
+                  pincode: res.contact?.pincode || ''
+                };
+              });
+            } else {
+              // No state match found, set data without cities
+              this.contactData = {
+                email: res.contact?.email || '',
+                phone: phoneNumber,
+                phoneCode: phoneCode,
+                country: countryObj,
+                state: null,
+                city: null,
+                streetAddress: res.contact?.streetAddress || '',
+                pincode: res.contact?.pincode || ''
+              };
+            }
+          });
+        } else {
+          // No country match found, set data with strings only
+          this.contactData = {
+            email: res.contact?.email || '',
+            phone: phoneNumber,
+            phoneCode: phoneCode,
+            country: null,
+            state: null,
+            city: null,
+            streetAddress: res.contact?.streetAddress || '',
+            pincode: res.contact?.pincode || ''
+          };
         }
       });
   }
@@ -268,8 +369,7 @@ export class EditBusinessBusinessComponent implements OnInit {
     }
   }
 
-  saveContactAndNext(data: any) {
-    this.contactData = data;
+  saveContactAndNext() {
     this.currentStep = 3;
   }
 
@@ -283,27 +383,42 @@ export class EditBusinessBusinessComponent implements OnInit {
   }
 
   validateBusinessHours(): boolean {
-    if (!this.hoursData || this.hoursData.length === 0) return true; // relaxed
+    if (!this.hoursData || this.hoursData.length === 0) return true;
     return true;
   }
 
-  // ✅ FINAL UPDATE API CALL
+  // Final update API call - extract string values from objects
   submitRegistration() {
+    const phoneCode = this.contactData.phoneCode;
+    const phone = this.contactData.phone;
+    const fullPhone = phone?.startsWith('+') ? phone : `${phoneCode} ${phone}`;
+
+    // Extract string values from objects for backend compatibility
+    const countryValue = this.contactData.country?.name || this.contactData.country || '';
+    const stateValue = this.contactData.state?.name || this.contactData.state || '';
+    const cityValue = this.contactData.city?.name || this.contactData.city || '';
 
     const payload = {
-      ...this.businessData,
-      ...this.contactData
+      businessName: this.businessForm.get('businessName')?.value,
+      description: this.businessForm.get('description')?.value,
+      categoryId: this.currentCategoryId,
+      subcategoryId: this.currentSubcategoryId, 
+      phoneCode: this.contactData.phoneCode || '+91',
+      phoneNumber: (this.contactData.phone || '').replace(/\D/g, ''),
+      email: this.contactData.email,
+      country: countryValue,
+      state: stateValue,
+      city: cityValue,
+      streetAddress: this.contactData.streetAddress,
+      pincode: this.contactData.pincode
     };
 
     this.http.put(`http://localhost:5173/api/business/${this.businessId}`, payload)
       .subscribe(() => {
-
         this.submitSuccessMessage = "Business updated successfully!";
-
         setTimeout(() => {
           this.router.navigate(['/client-dashboard']);
         }, 1500);
-
       });
   }
 }

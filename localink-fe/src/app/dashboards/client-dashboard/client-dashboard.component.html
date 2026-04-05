@@ -222,17 +222,25 @@
  
         <div class="form-row">
 
-          <div class="form-group" style="max-width:120px;">
+          <div class="form-group" style="max-width:140px;">
             <label>{{ 'CONTACT.PHONE_CODE' | translate }}</label>
-            <input [(ngModel)]="editingBusiness.contact.phoneCode"
-  name="phoneCode"
-  placeholder="+91"
-  required
-  #code="ngModel" />
-
-        <small class="error" *ngIf="code.invalid && code.touched">
-          {{ 'VALIDATION.INVALID_COUNTRY_CODE' | translate }}
-        </small>
+            <ng-select
+              [items]="phoneCountries"
+              bindLabel="code"
+              bindValue="code"
+              placeholder="+91"
+              [(ngModel)]="editingBusiness.contact.phoneCode"
+              name="phoneCode"
+              appendTo="body"
+              [searchable]="true"
+              [clearable]="false">
+              <ng-template ng-label-tmp let-item="item">
+                {{item.code}}
+              </ng-template>
+              <ng-template ng-option-tmp let-item="item">
+                {{item.name}} ({{item.code}})
+              </ng-template>
+            </ng-select>
           </div>
  
           <div class="form-group">

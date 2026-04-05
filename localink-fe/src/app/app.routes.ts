@@ -11,7 +11,7 @@ import { ContactDetailsComponent } from './contact-details/contact-details.compo
 import { ClientDashboardComponent } from './dashboards/client-dashboard/client-dashboard.component';
 import { RegisterBusinessComponent } from './register-business/register-business.component';
 import { UserDashboardComponent } from './dashboards/user-dashboard/user-dashboard.component';
-import { EditBusinessBusinessComponent } from './edit-business/edit-business.component';
+import { EditBusinessComponent } from './edit-business/edit-business.component';
 import { BusinessDetailComponent } from './pages/business-detail/business-detail.component';
 import { AdminDashboardComponent } from './dashboards/admin-dashboard/admin-dashboard.component';
 import { AuthGuard } from './guards/auth.guard';
@@ -118,7 +118,7 @@ export const routes: Routes = [
   },
   {
     path: 'edit-business/:id',
-    component: EditBusinessBusinessComponent,
+    component: EditBusinessComponent,
     canActivate: [AuthGuard],
     data: { roles: ['client'] }
   },
